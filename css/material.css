@@ -2,3 +2,16 @@
 .md-main__inner {
   margin-bottom: 1.5rem;
 }
+
+[data-md-color-primary="ilund4u_blue"] {
+    --md-primary-fg-color: #355066;
+    --md-primary-fg-color--light: #355066;
+    --md-primary-fg-color--dark: #355066;
+}
+
+
+[data-md-color-accent="lund4u_yellow"] {
+    --md-accent-fg-color: #FFD168;
+    --md-accent-fg-color--light: #FFD168;
+    --md-accent-fg-color--dark: #FFD168;
+}
