@@ -1,0 +1,58 @@
+iLund4u
+Home page and documentation: https://github.com/art-egorov/ilund4u
+The Atkinson Lab 4U | AE
+-------- HOTSPOTS MODE --------
+-------------------------------
+    COMMAND-LINE PARAMETERS
+-------------------------------
+[MANDATORY ARGUMENTS]
+-gff <folder>
+    Path to a folder containing extended gff files.
+    Each gff file should contain a corresponding nucleotide sequence.
+    (designed to handle pharokka/prokka produced annotation files).
+-------------------------------
+[OPTIONAL ARGUMENTS | DATA PROCESSING]
+-mps, --min-proteome-size <int>
+    Minimal number of proteins in a genome to be taken in analysis.
+    [default: 15]
+-psc, --proteome-sim-cutoff <float>
+    Minimal fraction of shared homologous proteins between two
+    proteomes to be connected in proteome network by edge.
+    [default: 0.7]
+-mpcs, --min-proteome-community-size <int>
+   Minimal size of proteome community which then will be taken in
+   hotspot search analysis [default: 10].
+-vpc, --variable-protein-cutoff <float>
+    Upper limit of fraction of proteomes in which a protein homology
+    group should be found within a proteome community to be called
+    "variable". [default: 0.25]
+-cpc, --conserved-protein-cutoff <float>
+    Lower limit of fraction of proteomes in which a protein homology
+    group should be found within a proteome community to be called
+    "conserved". [default: 0.75]
+-ncg, --non-circular-genomes
+    Consider each input genome as non-circular. That means that first
+    and last proteins won't be considered as neighbours.
+    [default: circular]
+-hpc, --hotspot-presence-cutoff
+    Fraction of proteomes within a proteome community in which clustered
+    variable islands should be found to be considered as a hotspot.
+    [default: 0.3]
+-------------------------------
+[OPTIONAL ARGUMENTS | OTHERS]
+-o <name>
+    Output dir name. This will be created if it does not exist.
+	[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]
+-o-db, --output-database
+    Output dir name for the database.
+    If not specified then no database will be saved.
+-c <standard|<file.cfg>
+    Path to a configuration file or name of a premade config file
+    [default: standard]
+-------------------------------
+[MISCELLANEOUS ARGUMENTS]
+--debug
+    Provide a detailed stack trace for debugging purposes.
+-q, --quiet
+    Don't show progress messages.
+-------------------------------

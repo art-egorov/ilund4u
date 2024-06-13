@@ -1,0 +1,41 @@
+iLund4u
+Home page and documentation: https://github.com/art-egorov/ilund4u
+The Atkinson Lab 4U | AE
+----------- NO MODE -----------
+-------------------------------
+    COMMAND-LINE PARAMETERS
+-------------------------------
+[POST-INSTALL STEPS]
+--data
+    Creates the 'ilund4u_data' folder in the current working directory.
+    The folder contains adjustable configuration files used by iLund4u.
+--linux
+    Replaces the mmseqs path in the pre-made config file from the MacOS
+    version [default] to the Linux version.
+--mac
+    Replaces the mmseqs path in the pre-made config file from the Linux
+    version to the MacOS version.
+--get-hmms
+    Download HMMs (hmmscan format) of defence, anti-defence, virulence,
+    and AMR proteins from our server [data-sharing.atkinson-lab.com]
+--database <phages|plasmids>
+    Download iLund4u database from our server [data-sharing.atkinson-lab.com].
+    Available databases: "phages" and "plasmids" (see documentation for details)
+[MISCELLANEOUS ARGUMENTS]
+-h, --help
+    Show this help message and exit.
+-v, --version
+    Show program version.
+--debug
+    Provide detailed stack trace for debugging purposes.
+-q, --quiet
+    Don't show progress messages.
+-------------------------------
+iLund4u can be used in three different modes:
+1. ilund4u hotspots [parameters] - hotspot annotation.
+2. ilund4u protein [parameters] - protein search versus iLund4u database.
+3. ilund4u proteome [parameters] - proteome annotation and search versus
+   iLund4u database.
+To show mode-specific help messages use: ilund4u --help [mode]
+(e.g. ilund4u --help hotspots)
+-------------------------------

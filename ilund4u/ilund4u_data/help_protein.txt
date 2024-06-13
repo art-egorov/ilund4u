@@ -1,0 +1,47 @@
+iLund4u
+Home page and documentation: https://github.com/art-egorov/ilund4u
+The Atkinson Lab 4U | AE
+-------- PROTEIN MODE ---------
+-------------------------------
+    COMMAND-LINE PARAMETERS
+-------------------------------
+[MANDATORY ARGUMENTS]
+-fa <path>
+    Path to a fasta file with query protein sequence.
+-db <path>
+    Path to iLund4u database.
+-------------------------------
+[OPTIONAL ARGUMENTS | DATA PROCESSING]
+-hsm, --homology-search-mode <group|proteins>
+    Mode to define homologous proteins from the database.
+    If "group" is selected, a query protein is assigned to the
+    same homologous group as that of the best search hit
+    protein. In "proteins" mode, all target proteins that
+    pass the cutoffs are considered to be homologues.
+-msqc, --mmseqs-query-cov <float>
+    MMseqs search query coverage cutoff [default: 0.65]
+-mstc, --mmseqs-target-cov <float>
+    MMseqs search query coverage cutoff [default: 0.65]
+-msf, --mmseqs-fident <float>
+    MMseqs search fident (fraction of identical matches) cutoff
+    [default: 0.2]
+-mse, --mmseqs-evalue
+    MMseqs search evalut cutoff [default: 1e-5]
+-ql, --query-label <str>
+    Label for query protein homologues on LoVis4u visualisation.
+    [default: database protein names]
+-------------------------------
+[OPTIONAL ARGUMENTS | OTHERS]
+-o <name>
+    Output dir name. This will be created if it does not exist.
+	[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]
+-c <standard|<file.cfg>
+    Path to a configuration file or name of a premade config file
+    [default: standard]
+-------------------------------
+[MISCELLANEOUS ARGUMENTS]
+--debug
+    Provide a detailed stack trace for debugging purposes.
+-q, --quiet
+    Don't show progress messages.
+-------------------------------

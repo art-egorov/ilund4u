@@ -1,0 +1,45 @@
+iLund4u
+Home page and documentation: https://github.com/art-egorov/ilund4u
+The Atkinson Lab 4U | AE
+-------- PROTEOME MODE --------
+-------------------------------
+    COMMAND-LINE PARAMETERS
+-------------------------------
+[MANDATORY ARGUMENTS]
+-ff <path>
+    Path to a query proteome gff file.
+    (designed to handle pharokka/prokka produced annotation files).
+-db <path>
+    Path to iLund4u database.
+-------------------------------
+[OPTIONAL ARGUMENTS | DATA PROCESSING]
+-ncg, --non-circular-genomes
+    Consider tje query genome as non-circular. This means that first
+    and last proteins won't be considered to be neighbours.
+    [default: circular]
+Note: MMseqs arguments below are used for assigning homology
+      group for each protein in your query proteome.
+-msqc, --mmseqs-query-cov <float>
+    MMseqs search query coverage cutoff [default: 0.65]
+-mstc, --mmseqs-target-cov <float>
+    MMseqs search query coverage cutoff [default: 0.65]
+-msf, --mmseqs-fident <float>
+    MMseqs search fident (fraction of identical matches) cutoff
+    [default: 0.2]
+-mse, --mmseqs-evalue
+    MMseqs search evalut cutoff [default: 1e-5]
+-------------------------------
+[OPTIONAL ARGUMENTS | OTHERS]
+-o <name>
+    Output dir name. It will be created if it does not exist.
+	[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]
+-c <standard|<file.cfg>
+    Path to a configuration file or name of a premade config file
+    [default: standard]
+-------------------------------
+[MISCELLANEOUS ARGUMENTS]
+--debug
+    Provide a detailed stack trace for debugging purposes.
+-q, --quiet
+    Don't show progress messages.
+-------------------------------

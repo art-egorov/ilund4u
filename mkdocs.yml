@@ -1,0 +1,107 @@
+site_name: LoVis4u
+
+
+repo_url: https://github.com/art-egorov/lovis4u.git
+edit_uri: ''  #disables edit button
+
+
+theme:
+    name: material
+    custom_dir: docs/material
+    favicon: assets/images/favicon.ico
+    palette:
+    # Palette toggle for light mode
+      - scheme: default
+        primary: grey
+        accent: yellow
+    icon:
+      logo: lovis4u_small
+
+    features:
+        - content.code.annotate
+        - announce.dismiss
+        - navigation.tabs
+        - toc.integrate
+        - header.autohide
+
+extra_css:
+- css/material.css
+- css/mkdocstrings.css
+
+
+nav:
+  - Home: index.md
+  - Example-driven guide: ExampleDrivenGuide/cmd_guide.md
+  - Parameters:
+    - Command-line parameters: Parameters/cmd_parameters.md
+    - Configuration file parameters: Parameters/config_parameters.md
+  - API:
+    - Usage examples: API/usage_examples.md
+    - lovis4u.DataProcessing: API/package_data_processing.md
+    - lovis4u.Manager: API/package_manager.md
+    - lovis4u.Drawing: API/package_drawing.md
+    - lovis4u.Methods: API/package_methods.md
+  - Version log: VersionLog/versions.md
+
+markdown_extensions:
+ - def_list
+ - pymdownx.tasklist:
+       custom_checkbox: true
+ - admonition
+ - footnotes
+ - pymdownx.emoji
+ - pymdownx.magiclink
+ - pymdownx.snippets:
+     check_paths: true
+ - pymdownx.superfences
+ - pymdownx.tabbed:
+     alternate_style: true
+ - pymdownx.tasklist
+ - pymdownx.highlight
+ - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+ - pymdownx.inlinehilite
+ - pymdownx.snippets
+ - pymdownx.superfences
+ - pymdownx.critic
+ - pymdownx.caret
+ - pymdownx.keys
+ - pymdownx.mark
+ - pymdownx.tilde
+
+plugins:
+ - search
+ - table-reader
+ - markdown-exec
+ - section-index
+ - autorefs
+ - mkdocstrings:
+    watch: 
+      - lovis4u
+    handlers:
+      python:
+        import:
+        - https://docs.python.org/3/objects.inv
+        - https://www.mkdocs.org/objects.inv
+        - https://python-markdown.github.io/objects.inv
+        options:
+          docstring_style: google
+          docstring_options:
+            ignore_init_summary: no
+          separate_signature: False
+          show_signature_annotation: True
+          show_source: True
+          show_root_heading: False
+          show_root_full_path: True
+          show_object_full_path: False
+          show_category_heading: False
+          merge_init_into_class: False
+          docstring_section_style: list
+
+extra:
+  generator: false
+  analytics:
+    provider: google
+    property: G-4JWMGFSKXS

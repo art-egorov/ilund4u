@@ -1,0 +1,56 @@
+#!/usr/bin/python3
+import traceback
+import sys
+
+import ilund4u
+
+
+try:
+    parameters = ilund4u.manager.Parameters()
+    parameters.parse_cmd_arguments()
+    parameters.load_config(parameters.cmd_arguments["config_file"])
+    if parameters.args["mode"] == "hotspots":
+        proteomes = ilund4u.data_processing.Proteomes(parameters=parameters)
+        proteomes.load_sequences_from_extended_gff(input_f=parameters.args["gff"])
+        mmseqs_clusters = proteomes.mmseqs_cluster()
+        cluster_to_sequence = proteomes.process_mmseqs_results(mmseqs_clusters)
+        proteome_network = proteomes.build_proteome_network(cluster_to_sequence)
+        proteomes.find_proteome_communities(proteome_network)
+        proteomes.define_protein_classes()
+        proteomes.annotate_variable_islands()
+        island_networks = proteomes.build_islands_network()
+
+        hotspots = proteomes.find_hotspots(island_networks)
+        hotspots.pyhmmer_annotation(proteomes)
+        hotspots.build_hotspot_network()
+        hotspots.calculate_hotspot_statistics_and_get_annotation(proteomes)
+        hotspots.get_each_protein_group_statistics(proteomes)
+
+        drawing_manager = ilund4u.drawing.DrawingManager(proteomes, hotspots, parameters)
+        drawing_manager.plot_hotspot_communities()
+        drawing_manager.plot_proteome_communities()
+
+        if parameters.args["output_database"]:
+            database_manager = ilund4u.data_manager.DatabaseManager(parameters)
+            database_manager.build_database(proteomes, hotspots, parameters.args["output_database"])
+    elif parameters.args["mode"] == "protein":
+
+        database_manager = ilund4u.data_manager.DatabaseManager(parameters)
+        database = database_manager.load_database(db_path=parameters.args["database"])
+        database.protein_search_mode(query_fasta=parameters.args["fa"], query_label = parameters.args["query_label"])
+
+    elif parameters.args["mode"] == "proteome":
+        database_manager = ilund4u.data_manager.DatabaseManager(parameters)
+        database = database_manager.load_database(db_path=parameters.args["database"])
+        database.proteome_annotation_mode(query_gff=parameters.args["gff"])
+
+except SystemExit:
+    pass
+except:
+    if parameters.args["debug"]:
+        traceback.print_exc()
+    else:
+        for i in (traceback.format_exc()).split('\n'):
+            if "ilund4uError:" in i:
+                print(f"ilund4uError:{i.split(':')[1]}", file=sys.stderr)
+                
