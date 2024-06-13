@@ -15,8 +15,9 @@
 **License:** WTFPL  
 **Version:** 0.0.1 (June 2024)
 
-*Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)*
+**Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
 
+*iLund4u workflow*
 <img  src="docs/img/ilundu4_pipeline.png" width="100%"/>
 
 
