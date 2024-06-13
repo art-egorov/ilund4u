@@ -15,6 +15,12 @@ The Atkinson Lab 4U | AE
 -mps, --min-proteome-size <int>
     Minimal number of proteins in a genome to be taken in analysis.
     [default: 15]
+-gct, --genome-circularity-table <path>
+    Path to a table containing information for each genome about whether
+    it is circular or not.
+    Format: tab-separated; column names: id, circular. Values 1 or 0.
+    For genomes in which id is not listed, the default value will be used.
+    [default: circular; use -ncg/--non-circular-genomes to change]
 -psc, --proteome-sim-cutoff <float>
     Minimal fraction of shared homologous proteins between two
     proteomes to be connected in proteome network by edge.

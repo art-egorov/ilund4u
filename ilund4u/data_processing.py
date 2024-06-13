@@ -563,11 +563,13 @@ class Proteomes:
         except Exception as error:
             raise ilund4u.manager.ilund4uError(f"Unable to read Proteomes from the database.") from error
 
-    def load_sequences_from_extended_gff(self, input_f: typing.Union[str, list]) -> None:
+    def load_sequences_from_extended_gff(self, input_f: typing.Union[str, list], genome_annotation = None) -> None:
         """Load proteomes from gff files.
 
         Arguments:
-            input_f [str | list]: List of file paths or path to a folder with gff files.
+            input_f (str | list): List of file paths or path to a folder with gff files.
+            genome_annotation (path): Path to a table with annotation of genome circularity.
+                Format: two columns with names: id, circular; tab-separated, 1,0 values.
 
         Returns:
             None
@@ -592,6 +594,13 @@ class Proteomes:
             else:
                 if os.path.exists(self.proteins_fasta_file):
                     os.remove(self.proteins_fasta_file)
+            genome_circularity_dict = dict()
+            if genome_annotation:
+                try:
+                    genome_annotation_table = pd.read_table(genome_annotation, sep = "\t").set_index("id")
+                    genome_circularity_dict = genome_annotation_table["circular"].to_dict()
+                except:
+                    print("○ Warning: unable to read genome annotation table. Check the format.")
             num_of_gff_files = len(gff_files)
             if self.prms.args["verbose"]:
                 print(f"○ Reading gff file{'s' if len(gff_files) > 1 else ''}...", file=sys.stdout)
@@ -615,8 +624,12 @@ class Proteomes:
                     raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature ids while"
                                                        f" only unique are allowed.")
                 if len(features_ids) > self.prms.args["min_proteome_size"]:
+                    if gff_record.id in genome_circularity_dict.keys():
+                        circular = int(genome_circularity_dict[gff_record.id])
+                    else:
+                        circular = int(self.prms.args["circular_genomes"])
                     record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
-                                               circular=int(self.prms.args["circular_genomes"]))
+                                               circular=circular)
                     record_cdss = []
                     gff_records = []
                     for gff_feature in gff_record.features:
@@ -901,6 +914,9 @@ class Proteomes:
                       file=sys.stdout)
                 print(f"  ⦿ {len(sequences_to_drop)} proteomes from smaller communities were excluded from the "
                       f"analysis", file=sys.stdout)
+            if len(communities_annot.index) == 0:
+                print("○ Termination since no proteome community was taken for further analysis")
+                sys.exit()
             return None
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to find proteome communities.") from error
@@ -967,8 +983,9 @@ class Proteomes:
                 proteome.annotate_variable_islands(self.prms)
                 total_number_of_variable_regions += proteome.islands.size
             if self.prms.args["verbose"]:
-                print(f"  ⦿ {total_number_of_variable_regions} variable regions are annotated in {len(self.proteomes)}"
-                      f" proteomes ({round(total_number_of_variable_regions / len(self.proteomes), 3)} per proteome)",
+                print(f"  ⦿ {total_number_of_variable_regions} variable regions are annotated in "
+                      f"{len(self.proteomes.index)} proteomes "
+                      f"({round(total_number_of_variable_regions / len(self.proteomes.index), 3)} per proteome)",
                       file=sys.stdout)
             return None
         except Exception as error:

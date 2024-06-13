@@ -64,13 +64,14 @@ class Parameters:
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
         parser.add_argument("-mac", "--mac", dest="mac", action="store_true", default=None)
         parser.add_argument("-h", "--help", dest="help", action="store_true")
-        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.1")
+        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.2")
 
         subparsers = parser.add_subparsers(dest="mode")
 
         parser_hm = subparsers.add_parser("hotspots")
         parser_hm.add_argument("-gff", "--gff", dest="gff", type=str, default=None)
         parser_hm.add_argument("-mps", "--min-proteome-size", dest="min_proteome_size", type=int, default=None)
+        parser_hm.add_argument("-gct", "--genome-circularity-table", dest="genome_annotation", type=str, default=None)
         parser_hm.add_argument("-psc", "--proteome-sim-cutoff", dest="proteome_similarity_cutoff", type=float,
                                default=None)
         parser_hm.add_argument("-mpcs", "--min-proteome-community-size", dest="min_proteome_community_size", type=int,
@@ -156,7 +157,7 @@ class Parameters:
             if not args["gff"] or not args["database"]:
                 raise ilund4uError("Both -gff/--gff and -db/--database arguments are required for protein mode.")
 
-        args_to_keep = ["gff", "output_database", "query_label"]
+        args_to_keep = ["gff", "output_database", "query_label", "genome_annotation"]
         filtered_args = {k: v for k, v in args.items() if v is not None or k in args_to_keep}
         self.cmd_arguments = filtered_args
         return None

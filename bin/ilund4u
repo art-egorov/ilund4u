@@ -11,7 +11,8 @@ try:
     parameters.load_config(parameters.cmd_arguments["config_file"])
     if parameters.args["mode"] == "hotspots":
         proteomes = ilund4u.data_processing.Proteomes(parameters=parameters)
-        proteomes.load_sequences_from_extended_gff(input_f=parameters.args["gff"])
+        proteomes.load_sequences_from_extended_gff(input_f=parameters.args["gff"],
+                                                   genome_annotation=parameters.args["genome_annotation"])
         mmseqs_clusters = proteomes.mmseqs_cluster()
         cluster_to_sequence = proteomes.process_mmseqs_results(mmseqs_clusters)
         proteome_network = proteomes.build_proteome_network(cluster_to_sequence)
