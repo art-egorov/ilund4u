@@ -1,1 +1,0 @@
-::: lovis4u.Manager

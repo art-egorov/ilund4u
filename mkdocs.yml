@@ -1,7 +1,7 @@
-site_name: LoVis4u
+site_name: iLund4u
 
 
-repo_url: https://github.com/art-egorov/lovis4u.git
+repo_url: https://github.com/art-egorov/ilund4u.git
 edit_uri: ''  #disables edit button
 
 
@@ -37,10 +37,11 @@ nav:
     - Configuration file parameters: Parameters/config_parameters.md
   - API:
     - Usage examples: API/usage_examples.md
-    - lovis4u.DataProcessing: API/package_data_processing.md
-    - lovis4u.Manager: API/package_manager.md
-    - lovis4u.Drawing: API/package_drawing.md
-    - lovis4u.Methods: API/package_methods.md
+    - Data processing: API/data_processing.md
+    - Manager: API/manager.md
+    - Data manager: API/data_manager.md
+    - Methods: API/methods.md
+    - Drawing: API/drawing.md
   - Version log: VersionLog/versions.md
 
 markdown_extensions:
@@ -104,4 +105,4 @@ extra:
   generator: false
   analytics:
     provider: google
-    property: G-4JWMGFSKXS
+    property: G-2MTBEQBNY

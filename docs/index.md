@@ -1,61 +1,57 @@
 
-<img  src="img/lovis4u_logo.png" width="250"/>
+<img  src="img/ilund4u_logo.png" width="300"/>
 #
 ## Description
 
-**LoVis4u** is a bioinformatics tool for **Lo**ci **Vis**ualisation.
+**iLund4u** is a bioinformatics tool for search and annotation of hotspots in a large set of proteomes. 
 
-**Supported input**: Genbank, gff3 with sequence    
-**Supported output**: Static vector graphics (pdf)   
+**Supported input**: gff3 with sequence (prokka/pharokka produced)      
 **Programming language:** Python3   
 **OS:** MacOS, Linux  
-**Python dependencies:** biopython, bcbio-gff, scipy, configs, argparse, pandas, distinctipy, matplotlib, seaborn, reportlab  
-**Python version:** >= 3.9  
+**Python dependencies:** biopython, bcbio-gff, scipy, configs, argparse, pandas, matplotlib, seaborn, progess, leidanalg, igraph. pyhmmer, msa4u, lovis4u    
+**Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.3 (May 2024)
+**Version:** 0.0.1 (June 2024)
 
 
-**Pipeline:**
-<img  src="img/lovis4u_pipeline_only.png" width="100%"/>
+## Workflow
 
-**Visualisation example:**
-<img  src="img/output_example_advanced_multiple_regions_labeled.png" width="100%"/>
+<img  src="img/ilundu4_pipeline.png" width="90%"/>
 
 
-## Installation
+## Installation 
 
-- The most stable release of lovis4u can be installed directly from pypi:
+- The most stable release of ilund4u can be installed directly from pypi:
 
 ```
-python3 -m pip install lovis4u
+python3 -m pip install ilund4u
 ```
 
 - The development version is available at github :
 
 ```
-git clone https://github.com/art-egorov/lovis4u.git
-cd lovis4u
+git clone https://github.com/art-egorov/ilund4u.git
+cd ilund4u
 python3 -m pip install --upgrade pip
 python3 -m pip install setuptools wheel
 python3 setup.py sdist
 python3 -m pip install -e .
 ```
 
-**!** If you're a linux user, run `lovis4u --linux` post-install command once to update paths in the premade config files that set by default for MacOS users.
+**!** If you're a linux user, run `ilund4u --linux` post-install command once to update paths in the premade config files that set by default for MacOS users.
 
 
 ## Reference 
 
-If you find lovis4u useful, please cite:  
-Artyom. A. Egorov, Gemma C. Atkinson, **lovis4u: ...**, *...*
+If you find iLund4u useful, please cite:  
+Artyom. A. Egorov, Gemma C. Atkinson, **iLund4u: ---**, *---*
 
 ## Contact 
 
-Please contact us by e-mail _artem**dot**egorov**AT**med**dot**lu**dot**se_ or use [Issues](https://github.com/art-egorov/lovis4u/issues?q=) to report any technical problems.  
-You can also use [Discussions section](https://github.com/art-egorov/lovis4u/discussions) for sharing your ideas or feature requests! 
+Please contact us by e-mail _artem**dot**egorov**AT**med**dot**lu**dot**se_ or use [Issues](https://github.com/art-egorov/ilund4u/issues?q=) to report any technical problems.  
+You can also use [Discussions section](https://github.com/art-egorov/ilund4u/discussions) for sharing your ideas or feature requests! 
 
 ## Authors 
 
-LoVis4u is developed by Artyom Egorov at [the Atkinson Lab](https://atkinson-lab.com), Department of Experimental Medical Science, Lund University, Sweden 🇸🇪. We are open for suggestions to extend and improve LoVis4u functionality. Please don't hesitate to share your ideas or feature requests.
-
+iLund4u is developed by Artyom Egorov at [the Atkinson Lab](https://atkinson-lab.com), Department of Experimental Medical Science, Lund University, Sweden. We are open for suggestions to extend and improve iLund4u functionality. Please don't hesitate to share your ideas or feature requests.

@@ -1,11 +1,11 @@
-# Short example-drived guide to LoVis4u API.  
+# Short example-drived guide to iLund4u API.  
 
-LoVis4u has a simple API allowing it programmatic usage from within a python program. Below we descrive several Python snippets that mimic results of command-line calls.
+iLund4u has a simple API allowing it programmatic usage from within a python program. Below we descrive several Python snippets that mimic results of command-line calls.
 
 
 
 ```python
-import lovis4u
+import ilund4u
 
 ```  
 

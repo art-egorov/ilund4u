@@ -1,5 +1,5 @@
 iLund4u
-Home page and documentation: https://github.com/art-egorov/ilund4u
+Home page and documentation: https://art-egorov.github.io/iLund4u/
 The Atkinson Lab 4U | AE
 ----------- NO MODE -----------
 -------------------------------
