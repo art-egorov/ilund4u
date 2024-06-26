@@ -60,7 +60,16 @@
 
     
     
-  </head>
+   <link href="assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="assets/javascripts/glightbox.min.js"></script></head>
   
   
     
@@ -597,7 +606,7 @@
                 
 
 
-<p><img  src="img/ilund4u_logo.png" width="265"/></p>
+<p><a class="glightbox" href="img/ilund4u_logo.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img  src="img/ilund4u_logo.png" width="265"/></a></p>
 <h1 id="_1"></h1>
 <h2 id="description">Description</h2>
 <p><strong>iLund4u</strong> is a bioinformatics tool for search and annotation of hotspots in a large set of proteomes. </p>
@@ -610,7 +619,7 @@
 <strong>License:</strong> WTFPL<br />
 <strong>Version:</strong> 0.0.2 (June 2024)</p>
 <h2 id="workflow">Workflow</h2>
-<p><img  src="img/ilundu4_pipeline.png" width="100%"/></p>
+<p><a class="glightbox" href="img/ilundu4_pipeline.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img  src="img/ilundu4_pipeline.png" width="100%"/></a></p>
 <h2 id="installation">Installation</h2>
 <ul>
 <li>The most stable release of ilund4u can be installed directly from pypi:</li>
@@ -691,5 +700,7 @@ You can also use <a href="https://github.com/art-egorov/ilund4u/discussions">Dis
         <script src="assets/_markdown_exec_pyodide.js"></script>
       
     
-  </body>
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
 </html>

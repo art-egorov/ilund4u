@@ -60,7 +60,16 @@
 
     
     
-  </head>
+   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
   
   
     
@@ -314,9 +323,108 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Example-driven guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Example-driven guide
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#before-start" class="md-nav__link">
+    Before start
+  </a>
+  
+    <nav class="md-nav" aria-label="Before start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-preparation" class="md-nav__link">
+    Data preparation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-compatible-gff-files-based-on-nucleotide-sequences-using-prokka-or-pharokka-tools" class="md-nav__link">
+    Building compatible gff files based on nucleotide sequences using prokka or pharokka tools.
+  </a>
+  
+    <nav class="md-nav" aria-label="Building compatible gff files based on nucleotide sequences using prokka or pharokka tools.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-pharokka-for-annotation-of-phage-genomes" class="md-nav__link">
+    Using pharokka for annotation of phage genomes.
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-prokka-for-annotation-of-prokaryotic-genomes" class="md-nav__link">
+    Using prokka for annotation of prokaryotic genomes.
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u-workflow" class="md-nav__link">
+    iLund4u workflow
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hotspot-annotation-mode" class="md-nav__link">
+    Hotspot annotation mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protein-annotation-mode" class="md-nav__link">
+    Protein annotation mode
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proteome-annotation-mode" class="md-nav__link">
+    Proteome annotation mode
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -532,13 +640,305 @@
 
 
 <h1 id="example-driven-guide">Example-driven guide</h1>
-<p>Here we show usage examples of iund4u command-line interface. Through this guide we will show step-by-step how you can optimise your visualisation starting from default parameters.</p>
-<p><strong>Before start:</strong> The necessary sample data as well as adjustable tool configuration files are provided by lovis4u at the post-install step:  <br />
-<code>ilund4u --data</code> which copies <em>lovis4u_data</em> folder to your working directory. </p>
+<p>Here we show usage examples of iund4u command-line interface. Through this guide we will show step-by-step how you can use our tool in different modes.</p>
+<h2 id="before-start">Before start</h2>
+<h3 id="data-preparation">Data preparation</h3>
+<p>The necessary sample data as well as adjustable tool configuration files are provided by lovis4u at the post-install step:  <br />
+<code>ilund4u --data</code> which copies <em>ilund4u_folder</em> folder to your working directory. </p>
 <p><strong>If you work on a Linux machine</strong> after installation you should run: <code>ilund4u --linux</code><br />
 This command replaces the tools paths (MMseqs2) in the pre-made config files from the MacOS version (default) to the Linux.<br />
 If you run it for fun and want to change it back you can use <code>ilund4u --mac</code>.</p>
-<p><strong>Under construction...</strong></p>
+<p><strong>Downloading HMM models:</strong> ilund4u uses pyhmmer for additional functional annotation of hotspot proteins with hmmscan versus a set of databases. You can download these database from our server (<a href="https://data-sharing.atkinson-lab.com/iLund4u/">data-sharing.atkinson-lab.com/iLund4u</a>) by running <code>ilund4u --get-hmms</code> command. List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); Virulence: VFDB (v. 10.05.2024).</p>
+<p><ins>For demonstration we will use pharokka generated gff files with sequences of 70 P2-like phages.<br />
+Gff files are stored at: <em>ilund4u_data/guide/gff_files</em>.</ins>    <br />
+The main difference of pharokka generated gff files from regular gff3 (for ex. which you can download from the NCBI) is that in addition to annotation rows they contain corresponding to the annotation nucleotide sequence. </p>
+<p><strong>Note:</strong> Each gff file should contain a corresponding nucleotide and iLund4u designed to handle pharokka/prokka produced annotation files.  </p>
+<h3 id="building-compatible-gff-files-based-on-nucleotide-sequences-using-prokka-or-pharokka-tools">Building compatible gff files based on nucleotide sequences using prokka or pharokka tools.</h3>
+<p>If your query set of sequences of hotspot annotation contains only nucleotide fasta files, below we will provide the efficient way of using <a href="https://pharokka.readthedocs.io/en/latest/">pharokka</a> (phage annotation pipeline) and <a href="https://github.com/tseemann/prokka">prokka</a> (prokaryotic genome annotation pipeline).</p>
+<h4 id="using-pharokka-for-annotation-of-phage-genomes">Using pharokka for annotation of phage genomes.</h4>
+<p>Firstly, if you have up to ~1000 nucleotide sequences we recommend to merge them into one fasta file (could be done simply by using cat: <code>cat folder_with_fasta_files/*.fa &gt; merged_fasta.fa</code>.<br />
+Then, you can use pharokka in meta mode with one command:<br />
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pharokka.py<span class="w"> </span>-i<span class="w"> </span>merged_fasta.fa<span class="w">  </span>-o<span class="w"> </span>pharokka_output<span class="w">  </span>--meta<span class="w"> </span>--split<span class="w"> </span>-t<span class="w"> </span>Num_of_threads<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--skip_mash<span class="w"> </span>--dnaapler<span class="w">  </span>-database<span class="w"> </span>path_do_pharokka_database<span class="w"> </span>
+</span></code></pre></div></p>
+<p>Gff files for each query contig will be stored at: <em>pharokka_output /single_gffs</em></p>
+<p>As you see, before running pharokka you need to install pharokka databases (and pharokka itself, of course). Due to the number of non-python dependencies there we recommend to use conda envioroment for this task. See <a href="https://pharokka.readthedocs.io/en/latest/install/">pharokka documentation page</a> for details (it's written quite clearly).</p>
+<p>We recommend to merge multiple sequences to one file and using meta mode since in that case we do not load databases for each contig while annotating. </p>
+<p>In case you thousands of input sequences we recommend you to split them into several fasta files with ~1000 sequences per each. Then you can run pharokka on this set of sequence. One of the way to parallelise this process:
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>folder_with_fasta/*.fa<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nv">fb</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="nv">$f</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="nv">nm</span><span class="o">=</span><span class="si">${</span><span class="nv">fb</span><span class="p">//.fa/</span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="se">\ </span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span>pharokka.py<span class="w"> </span>-i<span class="w"> </span><span class="nv">$f</span><span class="w">  </span>-o<span class="w"> </span>pharokka_batches/<span class="nv">$nm</span><span class="w">  </span>--meta<span class="w"> </span>--split<span class="w"> </span>-t<span class="w"> </span>Num_of_threads<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span>--skip_mash<span class="w"> </span>--dnaapler<span class="w">  </span>--database<span class="w"> </span>bin/pharokka/databases<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>parallel<span class="w"> </span>-j<span class="w"> </span>Num_of_parallel_processes
+</span></code></pre></div>
+Here you set Num_of_threads* Num_of_parallel_processes equal to the number of available threads.</p>
+<p>Then you can move generated gff files to one folder using:
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>pharokka_batches/*<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>mv<span class="w"> </span><span class="nv">$f</span>/single_gffs/*<span class="w"> </span>pharokka_gffs/<span class="p">;</span><span class="w"> </span><span class="k">done</span>
+</span></code></pre></div></p>
+<h4 id="using-prokka-for-annotation-of-prokaryotic-genomes">Using prokka for annotation of prokaryotic genomes.</h4>
+<p>In that case we do not have something similar to meta mode, so, in case of any number of input sequences we need to run prokka independently for each contig. Again, for prokka installation instruction and parameter description see <a href="https://github.com/tseemann/prokka">prokka documentation page</a>.</p>
+<p>In case your input fasta query files (<ins>one sequence per file</ins>) are located in <em>sigle_records</em> folders you can run:
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>single_records/*.fa<span class="p">;</span><span class="w">  </span><span class="k">do</span><span class="w"> </span><span class="nv">fb</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="nv">$f</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="nv">nm</span><span class="o">=</span><span class="si">${</span><span class="nv">fb</span><span class="p">//.fa/</span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="se">\ </span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span>prokka<span class="w"> </span>--outdir<span class="w"> </span>prokka/<span class="nv">$nm</span><span class="w"> </span>--prefix<span class="w"> </span><span class="nv">$nm</span><span class="w"> </span>--quiet<span class="w"> </span>--cpus<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nv">$f</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">|</span><span class="w"> </span>parallel<span class="w"> </span>-j<span class="w"> </span>num_of_available_threads
+</span></code></pre></div>
+Then you can move generated gff files to one folder using:
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>prokka/*<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nv">fb</span><span class="o">=</span><span class="k">$(</span>basename<span class="w"> </span><span class="nv">$f</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>mv<span class="w">  </span><span class="nv">$f</span>/<span class="nv">$fb</span>.gff<span class="w"> </span>prokka_gffs/<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">done</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>parallel
+</span></code></pre></div></p>
+<h2 id="ilund4u-workflow">iLund4u workflow</h2>
+<p><a class="glightbox" href="img/ilundu4_pipeline.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="pipeline" loading="lazy" src="img/ilundu4_pipeline.png" width="100%" /></a>  </p>
+<h2 id="hotspot-annotation-mode">Hotspot annotation mode</h2>
+<p>Let's start with the main hotspot annotation mode of iLund4u (see the workflow figure above).<br />
+The only mandatory argument for this mode is a folder path containing pharokka/prokka generated gff files.<br />
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ilund4u hotspots --gff ilund4u_data/guide/gff_files
+</span></code></pre></div>
+With the first argument we specified the mode of usage <code>hotspots</code>.   </p>
+<details class="card_heart_cog">
+<summary><strong>Log messages for the example run with default parameters</strong></summary>
+<p><div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>○ Reading gff files...
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 70/70
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>○ Running mmseqs for protein clustering...
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>⦿ 166 clusters for 2847 proteins were found with mmseqs
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>⦿ mmseqs clustering results were saved to P2-like_phages_guide/mmseqs/mmseqs_clustering.tsv
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>○ Processing mmseqs results ...
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 70/70
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>⦿ 0 proteomes were excluded after proteome deduplication and filtering
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>○ Proteomes network construction...
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 70/70
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>⦿ Network building elapsed time: 0.03 sec
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>⦿ Proteomes network with 2413 connections was built
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>⦿ Network was saved as P2-like_phages_guide/proteome_network.gml
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>○ Proteome network partitioning using the Leiden algorithm...
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>⦿ 1 proteome communities were found
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>⦿ 1 proteomes communities with size &gt;= 10 were taken for further analysis
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>⦿ 0 proteomes from smaller communities were excluded from the analysis
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>○ Defining protein classes within each community...
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 1/1
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>○ Annotating variable islands within each proteome...
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>⦿ 176 variable regions are annotated in 70 proteomes (2.514 per proteome)
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>○ Island network construction within each proteome community...
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 1/1
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>⦿ Island network building elapsed time: 0.09 sec
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>○ Searching for hotspots within each community...
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 1/1
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>⦿ 2 hotspots were found in 1 proteome communities  (Avg: 2.0 per community)
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>○ Preparing data for additional island protein annotation with pyhmmer hmmscan...
+</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>⦿ Running pyhmmer hmmscan versus DefenceFinder and CasFinder Databases...
+</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 143/143
+</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>    Number of hits: 22
+</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>⦿ Running pyhmmer hmmscan versus Virulence Factor Database...
+</span><span id="__span-6-33"><a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 143/143
+</span><span id="__span-6-34"><a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>    Number of hits: 3
+</span><span id="__span-6-35"><a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>⦿ Running pyhmmer hmmscan versus Anti-Prokaryotic Immune Systems Database (dbAPIS)...
+</span><span id="__span-6-36"><a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 143/143
+</span><span id="__span-6-37"><a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a>    Number of hits: 0
+</span><span id="__span-6-38"><a id="__codelineno-6-38" name="__codelineno-6-38" href="#__codelineno-6-38"></a>⦿ Running pyhmmer hmmscan versus AMRFinderPlus Database...
+</span><span id="__span-6-39"><a id="__codelineno-6-39" name="__codelineno-6-39" href="#__codelineno-6-39"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 143/143
+</span><span id="__span-6-40"><a id="__codelineno-6-40" name="__codelineno-6-40" href="#__codelineno-6-40"></a>    Number of hits: 0
+</span><span id="__span-6-41"><a id="__codelineno-6-41" name="__codelineno-6-41" href="#__codelineno-6-41"></a>○ Hotspot network construction...
+</span><span id="__span-6-42"><a id="__codelineno-6-42" name="__codelineno-6-42" href="#__codelineno-6-42"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2/2
+</span><span id="__span-6-43"><a id="__codelineno-6-43" name="__codelineno-6-43" href="#__codelineno-6-43"></a>○ Hotspot network partitioning using the Leiden algorithm...
+</span><span id="__span-6-44"><a id="__codelineno-6-44" name="__codelineno-6-44" href="#__codelineno-6-44"></a>  ⦿  0 hotspots were merged to 0 not singleton communities
+</span><span id="__span-6-45"><a id="__codelineno-6-45" name="__codelineno-6-45" href="#__codelineno-6-45"></a>○ Protein group statistics calculation...
+</span><span id="__span-6-46"><a id="__codelineno-6-46" name="__codelineno-6-46" href="#__codelineno-6-46"></a>  ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2/2
+</span><span id="__span-6-47"><a id="__codelineno-6-47" name="__codelineno-6-47" href="#__codelineno-6-47"></a>○ Visualisation of hotspot communities using lovis4u...
+</span><span id="__span-6-48"><a id="__codelineno-6-48" name="__codelineno-6-48" href="#__codelineno-6-48"></a> ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2/2
+</span><span id="__span-6-49"><a id="__codelineno-6-49" name="__codelineno-6-49" href="#__codelineno-6-49"></a>○ Visualisation of proteome communities with corresponding hotspots using lovis4u...
+</span><span id="__span-6-50"><a id="__codelineno-6-50" name="__codelineno-6-50" href="#__codelineno-6-50"></a> ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 1/1
+</span></code></pre></div>
+<strong>Note:</strong> you can use <code>-q</code>, <code>--quite</code> command-line argument to hide progress messages. </p>
+</details>
+<p>As results of running this command an output folder named ilund4u_{current_date} (e.g. ilund4u_2024_06_25-16_36) will be created.<br />
+Name of the output folder can be changed with <code>-o &lt;output_folder_name&gt;</code>.  </p>
+<details class="card_hearts">
+<summary><strong>Output folder structure</strong></summary>
+<ul>
+<li><strong><em>all_proteins.fa</em></strong> - fasta file with all proteins encoded by input genomes.</li>
+<li><strong><em>mmseqs</em></strong> - folder containing mmseqs clustering results.  </li>
+<li><strong><em>dropped_sequences.tsv</em></strong> - table containing information about dropped input sequences during the deduplication process (in order not to analyse several sequences with identical sets of protein groups)</li>
+<li><strong><em>proteome_network.gml</em></strong> - proteome network in gml format.</li>
+<li><strong><em>proteome_communities.tsv</em></strong> - proteome communities and annotation based on proteome network partitioning using the Leiden algorithm.</li>
+<li><strong><em>protein_group_classes.tsv</em></strong> - annotation table for each protein group (set of homologous  proteins defined by mmseqs clustering) with a group presence in a community of proteomes and corresponding class.</li>
+<li><strong><em>island_networks</em></strong> - folder containing networks of islands in gml format.</li>
+<li><strong><em>island_annotation.tsv</em></strong> - table with annotation of islands (regions of non-conserved  proteins in each proteome) that then were merged to hotspots.</li>
+<li><strong><em>hotspot_annotation.tsv</em></strong> - annotation table of found hotspots.</li>
+<li><strong><em>hotspot_network.gml</em></strong> - network of hotspots in gml format.</li>
+<li><strong><em>hotspot_communities.tsv</em></strong> - hotspot communities - we can expect that hotspots found in different proteome communities could have the same flanking genes. That's why we then cluster  together such hotspots. This file describes such communities.</li>
+<li><strong><em>hotspot_community_annotation.tsv</em></strong> - annotation table of found hotspot communities.</li>
+<li><strong><em>protein_group_statistics.tsv</em></strong> - annotation table of protein groups found as cargo in hotspots.</li>
+<li><strong><em>lovis4u_proteome_communities</em></strong> - folder with lovis4u visualisation of proteome communities.</li>
+<li><strong><em>lovis4u_hotspots</em></strong> - folder with lovis4u visualisation of each hotspot community.</li>
+<li><strong><em>lovis4u_hotspots_annotation</em></strong> - folder with LoVis4u annotation tables for hotspot visualisation.  </li>
+</ul>
+</details>
+<p><a class="glightbox" href="img/proteome_com_def_run.png" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img align="right" alt="p_com" class="responsive-image" loading="lazy" src="img/proteome_com_def_run.png" /></a>  </p>
+<p>In the example above we used 70 P2-like phages that are known to be in one community based on our iLund4u hotspot annotation run on all available phage sequences. Then as expected we found all sequences to be members of one community of proteomes with average proteome composition similarity (fraction of shared protein homologues) equal to 0.856 (see <em>proteome_communities.tsv</em> table and <em>proteome_network.gml</em> network file).</p>
+<p>On the visualisation of full length sequences from the proteome community built with <a href="https://art-egorov.github.io/lovis4u/">LoVis4u</a> we can see highlighted two annotated hotspots.<br />
+Since it is P2-like phages, presence of hotspots there has already been studied and it is known that the first one (highlighted in red colour) hotspot contains diverse anti-phage defence cargo proteins <em>(See <a href="https://doi.org/10.1016/j.chom.2022.02.018">Rousset Francois, et al. "Phages and their satellites encode hotspots of antiviral systems." Cell host &amp; microbe(2022)</a>)</em>.<br />
+However, here we also found that some loci contain virulence factors in the same hotspot.</p>
+<p>On the figure of proteome community you can see that most differences in terms of protein composition between phages are concentrated in these two hotspots. However, there are also other variable islands (regions with at least one non-conserved protein) that are found only in few phages. These proteins shown with more "darkish" grey colour while conserved or core proteins are shown in light grey colour.  </p>
+<p>Below you can see LoVis4u visualisation of each hotspot loci - cargo proteins and up to 10 conserved flanking genes. </p>
+<details class="card_figure_red">
+<summary><strong>LoVis4u visualisation of 0-0 hotspot</strong></summary>
+<p><a class="glightbox" href="img/0-0.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0" loading="lazy" src="img/0-0.pdf" width="100%" /></a>  </p>
+</details>
+<details class="card_figure_blue">
+<summary><strong>LoVis4u visualisation of 0-1 hotspot</strong></summary>
+<p><a class="glightbox" href="img/0-1.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-1" loading="lazy" src="img/0-1.pdf" width="100%" /></a>  </p>
+</details>
+<p>As you can see on the workflow figure, iLund4u during the hotspot annotation mode also can create a database which then can be used for two  other modes: protein annotation and proteome annotation.<br />
+In order to create a database in addition to hotspot annotation you just need to add an argument <code>-o-db &lt;dir name&gt;</code> or <code>--output-database &lt;dir name&gt;</code> with specified database folder name. For example:
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>ilund4u<span class="w"> </span>hotspots<span class="w"> </span>--gff<span class="w"> </span>ilund4u_data/guide/gff_files<span class="w"> </span>-o<span class="w"> </span>P2-like_phages_guide<span class="w">  </span>-o-db<span class="w"> </span>P2-like_phages_guide_DB
+</span></code></pre></div>
+This database is also available in ilundu4_data folder under the following path: <em>ilund4u_data/guide/like_phages_guide_DB</em>. </p>
+<h2 id="protein-annotation-mode">Protein annotation mode</h2>
+<p>For demonstration of protein annotation mode we took <a href="https://www.ncbi.nlm.nih.gov/protein/WP_171864480.1/">WP_171864480.1</a> protein annotated as e.coli RloC protein in <a href="https://defensefinder.mdmlab.fr/wiki/refseq">Defense Finder database</a>. We have chosen RloC since it is an annotated cargo protein and was found on both of our annotated hotspots.<br />
+Here we can also start only with mandatory arguments: <code>-fa &lt;fasta_path&gt;</code> - path to a fasta file with query protein aa sequence and <code>-db &lt;db_path&gt;</code> - path to iLund4u database folder. Again, optionally you can specify output folder name using <code>-o &lt;folder_name&gt;</code> parameter.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ilund4u protein -fa  ilund4u_data/guide/RloC.fa -db ilund4u_data/guide/P2-like_phages_guide_DB -o RloC_search
+</span></code></pre></div></p>
+<details class="card_heart_cog">
+<summary><strong>Log messages for the example run with default parameters</strong></summary>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>○ Loading database from ilund4u_data/guide/P2-like_phages_guide_DB...
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>○ Loading cds objects...
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2847/2847
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>○ Loading island objects...
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 176/176
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>○ Loading proteome objects...
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 70/70
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>○ Loading hotspot objects...
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2/2
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>⦿ The ilund4u_data/guide/P2-like_phages_guide_DB database was successfully loaded
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>○ Running mmseqs for protein search versus the database of proteins...
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>⦿ A homologous group was found for 1/1 query protein
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>○ Searching for hotspots with your query protein homologues...
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>⦿ Query protein homologues were found in 2 hotspot communities (2 hotspots) on 4 islands
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    Found as cargo: 4, as flanking gene: 0
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>⦿ Homologous proteins were saved to RloC_search/homologous_proteins.fa and the MSA was visualised with MSA4u
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>○ Visualisation of the hotspot(s) with your query protein homologues using lovis4u...
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>⦿ Done!
+</span></code></pre></div>
+</details>
+<details class="card_hearts">
+<summary><strong>Output folder structure</strong></summary>
+<ul>
+<li><strong><em>mmseqs_homology_search_full.tsv</em></strong> - table with found homologues.</li>
+<li><strong><em>mmseqs</em></strong> - folder containing mmseqs results and logs.  </li>
+<li><strong><em>homologous_proteins.fa</em></strong> - fasta file containing query protein and found homologues.</li>
+<li><strong><em>homologous_proteins_aln.fa</em></strong> - alignment fasta file containing query protein and found homologues built with MAFFT.</li>
+<li><strong><em>msa4u_homologous_proteines.pdf</em></strong> - msa4u visualisation of protein alignment.</li>
+<li><strong><em>found_island_annotation.tsv</em></strong> - annotation table of islands containing query protein homologues.</li>
+<li><strong><em>found_hotspot_annotation.tsv</em></strong> - annotation table of hotspots containing query protein homologues. </li>
+<li><strong><em>lovis4u_full</em></strong> - folder containing LoVis4u visualisation of hotspots where query protein homologues are found.</li>
+<li><strong><em>lovis4u_with_query</em></strong> - folder containing LoVis4u visualisation of hotspots with only loci where query protein homologues are found.</li>
+<li><strong><em>lovis4u_hotspots_annotation</em></strong> - folder with LoVis4u annotation tables for hotspot visualisation.  </li>
+</ul>
+</details>
+<p><strong>Note:</strong> iLund4u searches for homology not only versus cargo proteins but against flanking genes as well.</p>
+<p>Protein annotation mode has two important optional arguments that important to describe here.  </p>
+<p>The first one: <code>-hsm, --homology-search-mode &lt;group|proteins&gt;</code>  which specifies the to define homologous proteins from the database. If "group" is selected, a query protein is assigned to the same homologous group as that of the best search hit protein. In "proteins" mode, all target proteins that pass the cutoffs are considered to be homologues. By default "group" mode is set. We recommend to use "proteins" mode if you want to find the more diverse set of homologues.  </p>
+<p>Second important argument we want to highlight is <code>-ql, --query-label &lt;str&gt;</code> which simply changes the label of your query protein homologues on LoVis4u visualisation.<br />
+For example:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>ilund4u protein -fa  ilund4u_data/guide/RloC.fa -db ilund4u_data/guide/P2-like_phages_guide_DB -o RloC_search -ql &quot;RloC from the guide&quot;
+</span></code></pre></div>
+Below you can see visualisation of the same 0-0 and 0-1 hotspots with highlighted RloC protein</p>
+<details class="card_figure_red">
+<summary><strong>LoVis4u visualisation of 0-0 hotspot with RloC</strong></summary>
+<p><a class="glightbox" href="img/0-0_RloC.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0_1" loading="lazy" src="img/0-0_RloC.pdf" width="100%" /></a>  </p>
+</details>
+<details class="card_figure_blue">
+<summary><strong>LoVis4u visualisation of 0-1 hotspot with RloC</strong></summary>
+<p><a class="glightbox" href="img/0-1_RloC.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-1_1" loading="lazy" src="img/0-1_RloC.pdf" width="100%" /></a>  </p>
+</details>
+<p>Additionally, iLund4u returns visualisation of all loci where only query protein homologues are found on one figure:</p>
+<p><a class="glightbox" href="img/0-0_0-1.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0_0-1" loading="lazy" src="img/0-0_0-1.pdf" width="100%" /></a>  </p>
+<h2 id="proteome-annotation-mode">Proteome annotation mode</h2>
+<p>For demonstration of proteome annotation mode we took <a href="https://www.ncbi.nlm.nih.gov/nuccore/NC_001895.1/">NC_001895.1</a> - <em>Enterobacteria phage P2</em> that also known based on our analysis of all phages be a member of this community.<br />
+In this mode mandatory arguments are <code>-gff &lt;gff_path&gt;</code> - path to gff file (again, pharokka/prokka annotated) of your query proteome  and <code>-db &lt;db_path&gt;</code> - path to a database. Optionally you can specify output folder name using <code>-o &lt;folder_name&gt;</code> parameter.
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>ilund4u proteome -gff  ilund4u_data/guide/NC_001895.1.gff -db ilund4u_data/guide/P2-like_phages_guide_DB -o NC_001895.1_search  s
+</span></code></pre></div></p>
+<details class="card_heart_cog">
+<summary><strong>Log messages for the example run with default parameters</strong></summary>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>○ Loading database from ilund4u_data/guide/P2-like_phages_guide_DB...
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>○ Loading cds objects...
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2847/2847
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>○ Loading island objects...
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 176/176
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>○ Loading proteome objects...
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 70/70
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>○ Loading hotspot objects...
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 2/2
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>⦿ The ilund4u_data/guide/P2-like_phages_guide_DB database was successfully loaded
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>○ Reading gff file...
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>○ Running mmseqs for protein search versus the database of proteins...
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>  ⦿ A homologous group was found for 39/42 query proteins
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>○ Searching for similar proteomes in the database network
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>○ Preparing data for protein annotation with pyhmmer hmmscan...
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>  ⦿ Running pyhmmer hmmscan versus DefenceFinder and CasFinder Databases...
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 42/42
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>    Number of hits: 1
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>  ⦿ Running pyhmmer hmmscan versus Virulence Factor Database...
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 42/42
+</span><span id="__span-12-21"><a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>    Number of hits: 0
+</span><span id="__span-12-22"><a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>  ⦿ Running pyhmmer hmmscan versus Anti-Prokaryotic Immune Systems Database (dbAPIS)...
+</span><span id="__span-12-23"><a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 42/42
+</span><span id="__span-12-24"><a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>    Number of hits: 0
+</span><span id="__span-12-25"><a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a>⦿ Running pyhmmer hmmscan versus AMRFinderPlus Database...
+</span><span id="__span-12-26"><a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>    ◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉ 42/42
+</span><span id="__span-12-27"><a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>    Number of hits: 0
+</span><span id="__span-12-28"><a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a>⦿ 70 similar proteomes were found in the database network with max proteome similarity = 0.92
+</span><span id="__span-12-29"><a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>⦿ The query proteome was assigned to a community (id: 0) with connection to 1.0 of its members with avg weight = 0.86
+</span><span id="__span-12-30"><a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>⦿ Protein class distribution in query proteome: 36 conserved, 5 variable, 1 intermediate
+</span><span id="__span-12-31"><a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>⦿ 3 variable islands were annotated in the query proteome
+</span><span id="__span-12-32"><a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a>⦿ 2 of annotated variable islands were mapped to the database hotspots
+</span><span id="__span-12-33"><a id="__codelineno-12-33" name="__codelineno-12-33" href="#__codelineno-12-33"></a>○ Lovis4u visualisation of communities and proteomes...
+</span><span id="__span-12-34"><a id="__codelineno-12-34" name="__codelineno-12-34" href="#__codelineno-12-34"></a>○ Lovis4u visualisation found hotspots..
+</span><span id="__span-12-35"><a id="__codelineno-12-35" name="__codelineno-12-35" href="#__codelineno-12-35"></a>⦿ Done!
+</span></code></pre></div>
+</details>
+<details class="card_hearts">
+<summary><strong>Output folder structure</strong></summary>
+<ul>
+<li><strong><em>all_proteins.fa</em></strong> - fasta file with query sequence proteins.</li>
+<li><strong><em>mmseqs</em></strong> - folder containing mmseqs results and logs.  </li>
+<li><strong><em>mmseqs_homology_search_full.tsv</em></strong> - table containing results of finding protein homologues for all proteins from the query proteome.  </li>
+<li><strong><em>hmmscan</em></strong> - folder containing additional functional annotation of <em>all</em> query sequence proteins versus a set of databases with pyhmmer. </li>
+<li><strong><em>query_proteome_network.tsv</em></strong> - sequence id and weights of all edges to the database network of proteomes.</li>
+<li><strong><em>similar_proteome_communities.tsv</em></strong> - table containing annotation of proteome communities with similar proteomes to your query.    - <strong><em>query_protein_clusters.tsv</em></strong> - annotation of query sequence protein classes - variable/intermediate/conserved depending on their presence in proteome community.</li>
+<li><strong><em>island_to_hotspot_mapping.tsv</em></strong> - mapping of variable islands (regions with at least one non-conserved proteins in your query sequence) that were annotation as hotspots in the database.</li>
+<li><strong><em>annotation_of_mapped_hotspots.tsv</em></strong> - annotation of mapped hotspots containing their description and statistics.</li>
+<li><strong><em>lovis4u_proteome_community_hotspots.pdf</em></strong>* - LoVis4u visualisation of all members of proteome community with your query sequence where hotspots are highlighted.</li>
+<li><strong><em>lovis4u_proteome_community.pdf</em></strong> - LoVis4u visualisation of all members of proteome community with your query sequence where highlighted all non-conserved proteins (found in a small fraction of proteomes within the community).  </li>
+<li><strong><em>lovis4u_query_proteome_hotspot.pdf</em></strong> - LoVis4u visualisation of only query proteome with highlighted hotspots.</li>
+<li><strong><em>lovis4u_query_proteome_variable.pdf</em></strong> - LoVis4u visualisation of only query proteome with highlighted non-conserved proteins.</li>
+<li><strong><em>lovis4u_hotspot_full</em></strong> - folder containing LoVis4u visualisation of hotspots with your query proteome.</li>
+<li><strong><em>lovis4u_hotspot_with_query</em></strong> - folder containing LoVis4u visualisation of hotspots but only with your query proteome.</li>
+<li><strong><em>lovis4u_hotspots_annotation</em></strong> - folder with LoVis4u annotation tables for hotspot visualisation.  </li>
+</ul>
+</details>
+<p>This mode contains several types of visualisation.<br />
+Firstly, it includes visualisation of your query proteome together with all other proteomes from a proteome community to which your query sequence was assigned.</p>
+<details class="card_figure">
+<summary><strong>LoVis4u visualisation of community proteomes + query sequence with hotspots highlighted</strong></summary>
+<p><a class="glightbox" href="img/lovis4u_proteome_community_hotspots.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0_1" loading="lazy" src="img/lovis4u_proteome_community_hotspots.pdf" width="100%" /></a>  </p>
+</details>
+<details class="card_figure">
+<summary><strong>LoVis4u visualisation of community proteomes + query sequence with non-conserved proteins highlighted</strong></summary>
+<p><a class="glightbox" href="img/lovis4u_proteome_community.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0_1" loading="lazy" src="img/lovis4u_proteome_community.pdf" width="100%" /></a>  </p>
+</details>
+<p>Additionally, iLund4u generates LoVis4u visualisation of only your query sequence highlighting annotated hotspots:</p>
+<p><a class="glightbox" href="img/lovis4u_query_proteome_hotspot.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="qph" loading="lazy" src="img/lovis4u_query_proteome_hotspot.pdf" width="100%" /></a>  </p>
+<p>Or highlighting non-conserved proteins based on corresponding to a protein group of homologues and its presence in a community of proteomes.  As you can see, non-conserved proteins that were not assigned to any hotspot are shown in more dark grey colour on the figure above.</p>
+<p><a class="glightbox" href="img/lovis4u_query_proteome_variable.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="qpv" loading="lazy" src="img/lovis4u_query_proteome_variable.pdf" width="100%" /></a>  </p>
+<p>Moreover, iLund4u plots each annotated hotspots in the same way: figures containing all proteomes from a community with your query proteome and only loci of your proteome.</p>
+<details class="card_figure_red">
+<summary><strong>LoVis4u visualisation of 0-0 hotspot with query sequence</strong></summary>
+<p><a class="glightbox" href="img/0-0_wq.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-0_1" loading="lazy" src="img/0-0_wq.pdf" width="100%" /></a>  </p>
+</details>
+<p>As you can see, we have a hit to a Defense Finder database with a cargo protein encoded in our query sequence on 0-0 hotspot.</p>
+<details class="card_figure_blue">
+<summary><strong>LoVis4u visualisation of 0-1 hotspot with query sequence</strong></summary>
+<p><a class="glightbox" href="img/0-1_wq.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-1_1" loading="lazy" src="img/0-1_wq.pdf" width="100%" /></a>  </p>
+</details>
+<p>As we mentioned above we also have LoVis4u visualisation of each hotspot with only query proteome locus. Below we show 0-0 hotspot locus.</p>
+<p><a class="glightbox" href="img/0-0_oq.pdf" data-type="image" data-width="auto" data-height="auto" data-desc-position="bottom"><img alt="0-1_1" loading="lazy" src="img/0-0_oq.pdf" width="100%" /></a> </p>
 
               
             </article>
@@ -609,5 +1009,7 @@ If you run it for fun and want to change it back you can use <code>ilund4u --mac
         <script src="../../assets/_markdown_exec_pyodide.js"></script>
       
     
-  </body>
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
 </html>

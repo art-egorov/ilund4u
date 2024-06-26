@@ -60,7 +60,16 @@
 
     
     
-  </head>
+   <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"/><style>
+    html.glightbox-open { overflow: initial; height: 100%; }
+    .gslide-title { margin-top: 0px; user-select: text; }
+    .gslide-desc { color: #666; user-select: text; }
+    .gslide-image img { background: white; }
+    .gscrollbar-fixer { padding-right: 15px; }
+    .gdesc-inner { font-size: 0.75rem; }
+    body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color);}
+    body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color);}
+    body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color);}</style> <script src="../../assets/javascripts/glightbox.min.js"></script></head>
   
   
     
@@ -941,7 +950,7 @@
 </span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a>            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </span><span id="__span-0-138"><a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;get_database&quot;</span><span class="p">]:</span>
 </span><span id="__span-0-139"><a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
-</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="n">ilund4u</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">get_ilund4u_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">])</span>
+</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="n">ilund4u</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">get_ilund4u_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;get_database&quot;</span><span class="p">])</span>
 </span><span id="__span-0-141"><a id="__codelineno-0-141" name="__codelineno-0-141"></a>            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </span><span id="__span-0-142"><a id="__codelineno-0-142" name="__codelineno-0-142"></a>        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">]:</span>
 </span><span id="__span-0-143"><a id="__codelineno-0-143" name="__codelineno-0-143"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]:</span>
@@ -1391,7 +1400,7 @@
 </span><span id="__span-0-137"><a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </span><span id="__span-0-138"><a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;get_database&quot;</span><span class="p">]:</span>
 </span><span id="__span-0-139"><a id="__codelineno-0-139" name="__codelineno-0-139"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">()</span>
-</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="n">ilund4u</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">get_ilund4u_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">])</span>
+</span><span id="__span-0-140"><a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="n">ilund4u</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">get_ilund4u_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;get_database&quot;</span><span class="p">])</span>
 </span><span id="__span-0-141"><a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </span><span id="__span-0-142"><a id="__codelineno-0-142" name="__codelineno-0-142"></a>    <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">]:</span>
 </span><span id="__span-0-143"><a id="__codelineno-0-143" name="__codelineno-0-143"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]:</span>
@@ -1544,5 +1553,7 @@
         <script src="../../assets/_markdown_exec_pyodide.js"></script>
       
     
-  </body>
+  <script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(() => { lightbox.reload() });
+</script></body>
 </html>

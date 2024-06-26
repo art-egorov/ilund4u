@@ -15,3 +15,121 @@
     --md-accent-fg-color--light: #FFD168;
     --md-accent-fg-color--dark: #FFD168;
 }
+
+
+.responsive-image {
+    width: 45%;
+    max-width: 100%;
+}
+
+@media (max-width: 600px) {
+    .responsive-image {
+        width: 100%;
+    }
+}
+
+:root {
+  --md-admonition-icon--card_hearts: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12 21.1-1.5 1.3c-6.6-5.9-10-9-10-12.8 0-1.2.4-2.3 1-3.2V7c0 4.7 3.9 8.2 10.5 14.1m1.6-4.1c4.7-4.3 7.9-7.1 8-10 0-2-1.5-3.5-3.5-3.5-1.6 0-3.1 1-3.6 2.4h-1.9C12 4.5 10.5 3.5 9 3.5 7 3.5 5.5 5 5.5 7c0 2.9 3.1 5.7 7.9 10l.1.1M18 1.5c3.1 0 5.5 2.4 5.5 5.5 0 3.7-3.4 6.8-10 12.8-6.6-5.9-10-9-10-12.8 0-3.1 2.4-5.5 5.5-5.5 1.7 0 3.4.8 4.5 2.1 1.1-1.3 2.8-2.1 4.5-2.1Z"/></svg>')
+}
+
+.md-typeset .admonition.card_hearts,
+.md-typeset details.card_hearts {
+    border-color: rgba(169, 169, 169, 0.1);
+}
+
+.md-typeset .card_hearts > .admonition-title,
+.md-typeset .card_hearts > summary {
+  background-color: rgba(169, 169, 169, 0.1); /* Light grey background */
+}
+
+.md-typeset .card_hearts > .admonition-title::before,
+.md-typeset .card_hearts > summary::before {
+ 	background-color: rgba(0, 0, 0, 1); 
+  	 -webkit-mask-image: var(--md-admonition-icon--card_hearts);
+          	mask-image: var(--md-admonition-icon--card_hearts);
+}
+
+
+
+
+
+:root {
+  --md-admonition-icon--card_heart_cog: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 5c-1.54 0-3.04 1-3.57 2.36h-1.86C10.54 6 9.04 5 7.5 5 5.5 5 4 6.5 4 8.5c0 2.89 3.14 5.74 7.89 10.05l.11.1v-.02.37c0 .71.12 1.4.32 2.06l-.32.29-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 1.3-.41 2.5-1.16 3.75-.59-.16-1.21-.25-1.84-.25h-.4c.9-1.21 1.4-2.35 1.4-3.5 0-2-1.5-3.5-3.5-3.5m7.33 15.64-1 1.73c-.07.13-.2.13-.33.13l-1.23-.5c-.27.18-.54.34-.84.47l-.19 1.32c-.02.12-.13.21-.24.21h-2c-.14 0-.24-.09-.26-.21l-.19-1.32c-.31-.12-.59-.29-.85-.47l-1.24.5c-.12 0-.25 0-.31-.13l-1-1.73a.26.26 0 0 1 .06-.32l1.06-.82a4.193 4.193 0 0 1 0-1l-1.06-.82a.248.248 0 0 1-.06-.32l1-1.73c.07-.13.2-.13.31-.13l1.24.5c.26-.18.55-.34.85-.47l.19-1.32A.26.26 0 0 1 18 14h2c.11 0 .22.09.23.21l.19 1.32c.31.12.58.29.85.47l1.23-.5c.13 0 .26 0 .32.13l1 1.73c.06.11.03.24-.06.32l-1.06.82c.03.17.04.33.04.5s-.02.33-.04.5l1.07.82c.09.08.12.21.06.32M20.5 19c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5.66 1.5 1.5 1.5c.83 0 1.5-.67 1.5-1.5Z"/></svg>')
+}
+
+.md-typeset .admonition.card_heart_cog,
+.md-typeset details.card_heart_cog {
+    border-color: rgba(169, 169, 169, 0.1);
+}
+
+.md-typeset .card_heart_cog > .admonition-title,
+.md-typeset .card_heart_cog > summary {
+  background-color: rgba(169, 169, 169, 0.1); /* Light grey background */
+}
+
+.md-typeset .card_heart_cog > .admonition-title::before,
+.md-typeset .card_heart_cog > summary::before {
+ 	background-color: rgba(0, 0, 0, 1); 
+  	 -webkit-mask-image: var(--md-admonition-icon--card_heart_cog);
+          	mask-image: var(--md-admonition-icon--card_heart_cog);
+}
+
+
+
+
+:root {
+  --md-admonition-icon--card_figure: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14 2 6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8m4 18V9h-5V4H6v16h12m-1-7v6H7l5-5 2 2m-4-5.5A1.5 1.5 0 0 1 8.5 12 1.5 1.5 0 0 1 7 10.5 1.5 1.5 0 0 1 8.5 9a1.5 1.5 0 0 1 1.5 1.5Z"/></svg>')
+}
+
+.md-typeset .admonition.card_figure,
+.md-typeset details.card_figure {
+    border-color: rgba(169, 169, 169, 0.1);
+}
+
+.md-typeset .card_figure > .admonition-title,
+.md-typeset .card_figure > summary {
+  background-color: #3D362815; /* Light grey background */
+}
+
+.md-typeset .card_figure > .admonition-title::before,
+.md-typeset .card_figure > summary::before {
+ 	background-color: rgba(0, 0, 0, 1); 
+  	 -webkit-mask-image: var(--md-admonition-icon--card_figure);
+          	mask-image: var(--md-admonition-icon--card_figure);
+}
+
+
+/* New card_figure_red styles */
+.md-typeset .admonition.card_figure_red,
+.md-typeset details.card_figure_red {
+    border-color: rgba(169, 169, 169, 0.1);
+}
+
+.md-typeset .card_figure_red > .admonition-title,
+.md-typeset .card_figure_red > summary {
+    background-color: #F7718910; /* Different background color */
+}
+
+.md-typeset .card_figure_red > .admonition-title::before,
+.md-typeset .card_figure_red > summary::before {
+    background-color: rgba(0, 0, 0, 1);
+    -webkit-mask-image: var(--md-admonition-icon--card_figure);
+    mask-image: var(--md-admonition-icon--card_figure);
+}
+
+.md-typeset .admonition.card_figure_blue,
+.md-typeset details.card_figure_blue {
+    border-color: rgba(169, 169, 169, 0.1);
+}
+
+.md-typeset .card_figure_blue > .admonition-title,
+.md-typeset .card_figure_blue > summary {
+    background-color: #36ADA410; /* Different background color */
+}
+
+.md-typeset .card_figure_blue > .admonition-title::before,
+.md-typeset .card_figure_blue > summary::before {
+    background-color: rgba(0, 0, 0, 1);
+    -webkit-mask-image: var(--md-admonition-icon--card_figure);
+    mask-image: var(--md-admonition-icon--card_figure);
+}
