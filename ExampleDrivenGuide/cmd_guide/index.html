@@ -363,6 +363,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#help-messages" class="md-nav__link">
+    Help messages
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#building-compatible-gff-files-based-on-nucleotide-sequences" class="md-nav__link">
     Building compatible gff files based on nucleotide sequences
   </a>
@@ -373,13 +380,6 @@
           <li class="md-nav__item">
   <a href="#using-pharokka-for-annotation-of-phage-genomes" class="md-nav__link">
     Using pharokka for annotation of phage genomes
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#help-messages" class="md-nav__link">
-    Help messages
   </a>
   
 </li>
@@ -691,6 +691,9 @@ If you run it for fun and want to change it back you can use <code>ilund4u --mac
 Gff files are stored at: <em>ilund4u_data/guide/gff_files</em>.</ins>    <br />
 The main difference of pharokka/prokka generated gff files from a regular gff3 (for ex. which you can download from the NCBI) is that in addition to annotation rows they contain corresponding nucleotide sequence in fasta format. </p>
 <p><strong>Note:</strong> Each gff file should contain a corresponding nucleotide and iLund4u designed to handle pharokka/prokka produced annotation files.  </p>
+<h3 id="help-messages">Help messages</h3>
+<p>To show the main iLund4u help message you can use <code>ilund4u --help</code>.<br />
+To show mode-specific help messages use: <code>ilund4u --help [mode]</code> (e.g. <code>ilund4u --help hotspots</code>)</p>
 <h3 id="building-compatible-gff-files-based-on-nucleotide-sequences">Building compatible gff files based on nucleotide sequences</h3>
 <p>If your query set of sequences for hotspot annotation contains only nucleotide fasta files, below we will provide the efficient way of using <a href="https://pharokka.readthedocs.io/en/latest/">pharokka</a> (phage annotation pipeline) and <a href="https://github.com/tseemann/prokka">prokka</a> (prokaryotic genome annotation pipeline) for preparing gff files compatible with iLund4u. </p>
 <h4 id="using-pharokka-for-annotation-of-phage-genomes">Using pharokka for annotation of phage genomes</h4>
@@ -712,9 +715,6 @@ Here you set Num_of_threads* Num_of_parallel_processes equal to the number threa
 <p>Then you can move generated gff files to one folder using:
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">for</span><span class="w"> </span>f<span class="w"> </span><span class="k">in</span><span class="w"> </span>pharokka_batches/*<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>mv<span class="w"> </span><span class="nv">$f</span>/single_gffs/*<span class="w"> </span>pharokka_gffs/<span class="p">;</span><span class="w"> </span><span class="k">done</span>
 </span></code></pre></div></p>
-<h4 id="help-messages">Help messages</h4>
-<p>To show the main iLund4u help message you can use <code>ilund4u --help</code>.<br />
-To show mode-specific help messages use: <code>ilund4u --help [mode]</code> (e.g. <code>ilund4u --help hotspots</code>)</p>
 <h4 id="using-prokka-for-annotation-of-prokaryotic-genomes">Using prokka for annotation of prokaryotic genomes</h4>
 <p>Prokka does not have something similar to meta mode which we used in pharokka in the example above, then, for any number of input sequences we prefer running prokka independently for each contig instead of dividing then more complex gff files which requires an additional step. Again, for prokka installation instruction and parameter description see <a href="https://github.com/tseemann/prokka">prokka documentation page</a>.</p>
 <p>In case your input fasta query files (<ins>one sequence per file</ins>) are located in <em>single_records</em> folders you can run:
