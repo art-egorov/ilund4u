@@ -46,12 +46,10 @@ python3 -m pip install  .
 
 
 
-<img src="docs/img/ilund4u_dbs_wo_header.png" align="right" width="300" max-width="100%" />
+<img src="docs/img/ilund4u_dbs_wo_header.png" align="right" width="400" max-width="100%" />
 
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
 The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~800K genomes, version of June 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
-
-<div style="clear: both;"></div>
 
 
 To download iLund4u database from [our server](https://data-sharing.atkinson-lab.com/iLund4u/) you can use the following argument: `--database <phages|plasmids>`. For example, to get plasmids database you need to run:  
