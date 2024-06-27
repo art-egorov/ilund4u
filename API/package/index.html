@@ -13,7 +13,7 @@
     
     
       
-        <title>data processing module - iLund4u</title>
+        <title>Library - iLund4u</title>
       
     
     
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              data processing module
+              Library
             
           </span>
         </div>
@@ -215,13 +215,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../usage_examples/" class="md-tabs__link">
+      <a href="../usage_examples/" class="md-tabs__link md-tabs__link--active">
         API
       </a>
     </li>
@@ -387,12 +389,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       
       
@@ -427,67 +431,437 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../data_processing/" class="md-nav__link">
-        Data processing
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Library
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Library
       </a>
-    </li>
-  
+      
+        
 
-            
-          
-            
-              
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
-    <li class="md-nav__item">
-      <a href="../manager/" class="md-nav__link">
-        Manager
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
+    
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing" class="md-nav__link">
+    data_processing
+  </a>
   
-    <li class="md-nav__item">
-      <a href="../data_manager/" class="md-nav__link">
-        Data manager
-      </a>
-    </li>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.CDS" class="md-nav__link">
+    CDS
+  </a>
   
-
-            
-          
-            
-              
+    <nav class="md-nav" aria-label="CDS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.CDS.__init__" class="md-nav__link">
+    __init__()
+  </a>
   
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.CDS.get_cds_db_row" class="md-nav__link">
+    get_cds_db_row()
+  </a>
   
+</li>
+        
+      </ul>
+    </nav>
   
-    <li class="md-nav__item">
-      <a href="../methods/" class="md-nav__link">
-        Methods
-      </a>
-    </li>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Database" class="md-nav__link">
+    Database
+  </a>
   
-
-            
-          
-            
-              
+    <nav class="md-nav" aria-label="Database">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Database.__init__" class="md-nav__link">
+    __init__()
+  </a>
   
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Database.mmseqs_search_versus_protein_database" class="md-nav__link">
+    mmseqs_search_versus_protein_database()
+  </a>
   
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Database.protein_search_mode" class="md-nav__link">
+    protein_search_mode()
+  </a>
   
-    <li class="md-nav__item">
-      <a href="../drawing/" class="md-nav__link">
-        Drawing
-      </a>
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Database.proteome_annotation_mode" class="md-nav__link">
+    proteome_annotation_mode()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspot" class="md-nav__link">
+    Hotspot
+  </a>
+  
+    <nav class="md-nav" aria-label="Hotspot">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspot.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspot.calculate_database_hits_stats" class="md-nav__link">
+    calculate_database_hits_stats()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspot.get_hotspot_db_row" class="md-nav__link">
+    get_hotspot_db_row()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspot.get_hotspot_groups" class="md-nav__link">
+    get_hotspot_groups()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots" class="md-nav__link">
+    Hotspots
+  </a>
+  
+    <nav class="md-nav" aria-label="Hotspots">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.build_hotspot_network" class="md-nav__link">
+    build_hotspot_network()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.calculate_hotspot_statistics_and_get_annotation" class="md-nav__link">
+    calculate_hotspot_statistics_and_get_annotation()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.db_init" class="md-nav__link">
+    db_init()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.get_each_protein_group_statistics" class="md-nav__link">
+    get_each_protein_group_statistics()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.pyhmmer_annotation" class="md-nav__link">
+    pyhmmer_annotation()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Hotspots.save_as_db" class="md-nav__link">
+    save_as_db()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island" class="md-nav__link">
+    Island
+  </a>
+  
+    <nav class="md-nav" aria-label="Island">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.calculate_database_hits_stat" class="md-nav__link">
+    calculate_database_hits_stat()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_all_locus_indexes" class="md-nav__link">
+    get_all_locus_indexes()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_cons_neighbours_groups" class="md-nav__link">
+    get_cons_neighbours_groups()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_flanking_groups" class="md-nav__link">
+    get_flanking_groups()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_island_db_row" class="md-nav__link">
+    get_island_db_row()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_island_groups" class="md-nav__link">
+    get_island_groups()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_island_proteins" class="md-nav__link">
+    get_island_proteins()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_locus_groups" class="md-nav__link">
+    get_locus_groups()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Island.get_locus_proteins" class="md-nav__link">
+    get_locus_proteins()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteome" class="md-nav__link">
+    Proteome
+  </a>
+  
+    <nav class="md-nav" aria-label="Proteome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteome.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteome.annotate_variable_islands" class="md-nav__link">
+    annotate_variable_islands()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteome.get_proteome_db_row" class="md-nav__link">
+    get_proteome_db_row()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes" class="md-nav__link">
+    Proteomes
+  </a>
+  
+    <nav class="md-nav" aria-label="Proteomes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.annotate_variable_islands" class="md-nav__link">
+    annotate_variable_islands()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.build_islands_network" class="md-nav__link">
+    build_islands_network()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.build_proteome_network" class="md-nav__link">
+    build_proteome_network()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.db_init" class="md-nav__link">
+    db_init()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.define_protein_classes" class="md-nav__link">
+    define_protein_classes()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.find_hotspots" class="md-nav__link">
+    find_hotspots()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.find_proteome_communities" class="md-nav__link">
+    find_proteome_communities()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.load_sequences_from_extended_gff" class="md-nav__link">
+    load_sequences_from_extended_gff()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.mmseqs_cluster" class="md-nav__link">
+    mmseqs_cluster()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.process_mmseqs_results" class="md-nav__link">
+    process_mmseqs_results()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilund4u.data_processing.Proteomes.save_as_db" class="md-nav__link">
+    save_as_db()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -15891,6 +16265,42 @@ be plotted.</p>
       </main>
       
         <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../usage_examples/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage examples" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Usage examples
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../VersionLog/versions/" class="md-footer__link md-footer__link--next" aria-label="Next: Version log" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Version log
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
