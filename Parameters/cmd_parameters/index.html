@@ -366,9 +366,183 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Command-line parameters
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Command-line parameters
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-mode" class="md-nav__link">
+    No mode
+  </a>
+  
+    <nav class="md-nav" aria-label="No mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#post-install-steps" class="md-nav__link">
+    Post-install steps
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#miscellaneous-arguments" class="md-nav__link">
+    Miscellaneous arguments
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hotspot-annotation-mode" class="md-nav__link">
+    Hotspot annotation mode
+  </a>
+  
+    <nav class="md-nav" aria-label="Hotspot annotation mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mandatory-arguments" class="md-nav__link">
+    Mandatory arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-data-processing" class="md-nav__link">
+    Optional arguments | data processing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-others" class="md-nav__link">
+    Optional arguments | others
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#miscellaneous-arguments_1" class="md-nav__link">
+    Miscellaneous arguments
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protein-annotation-mode" class="md-nav__link">
+    Protein annotation mode
+  </a>
+  
+    <nav class="md-nav" aria-label="Protein annotation mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mandatory-arguments_1" class="md-nav__link">
+    Mandatory arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-data-processing_1" class="md-nav__link">
+    Optional arguments | data processing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-others_1" class="md-nav__link">
+    Optional arguments | others
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#miscellaneous-arguments_2" class="md-nav__link">
+    Miscellaneous arguments
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proteome-annotation-mode" class="md-nav__link">
+    Proteome annotation mode
+  </a>
+  
+    <nav class="md-nav" aria-label="Proteome annotation mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mandatory-arguments_2" class="md-nav__link">
+    Mandatory arguments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-data-processing_2" class="md-nav__link">
+    Optional arguments | data processing
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-arguments-others_2" class="md-nav__link">
+    Optional arguments | others
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#miscellaneous-arguments_3" class="md-nav__link">
+    Miscellaneous arguments
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -543,7 +717,207 @@
 
 
 <h1 id="ommand-line-parameters">Сommand-line parameters</h1>
-<p><strong>Under construction...</strong></p>
+<h2 id="no-mode">No mode</h2>
+<h3 id="post-install-steps">Post-install steps</h3>
+<dl>
+<dt><code>--data</code></dt>
+<dd>Creates the 'ilund4u_data' folder in the current working directory.
+ The folder contains adjustable configuration files used by iLund4u.</dd>
+<dt><code>--linux</code></dt>
+<dd>Replaces the mmseqs path in the pre-made config file from the MacOS
+ version [default] to the Linux version.</dd>
+<dt><code>--mac</code></dt>
+<dd>Replaces the mmseqs path in the pre-made config file from the Linux
+ version to the MacOS version.</dd>
+<dt><code>--get-hmms</code></dt>
+<dd>Download HMMs (hmmscan format) of defence, anti-defence, virulence,
+ and AMR proteins from our server [data-sharing.atkinson-lab.com]</dd>
+<dt><code>--database &lt;phages|plasmids&gt;</code></dt>
+<dd>Download iLund4u database from our server [data-sharing.atkinson-lab.com].
+ Available databases: "phages" and "plasmids" (see documentation for details)</dd>
+</dl>
+<h3 id="miscellaneous-arguments">Miscellaneous arguments</h3>
+<dl>
+<dt><code>-h --help</code></dt>
+<dd>Show this help message and exit.</dd>
+<dt><code>-v, --version</code></dt>
+<dd>Show program version.</dd>
+<dt><code>--debug</code></dt>
+<dd>Provide detailed stack trace for debugging purposes.</dd>
+<dt><code>-q, --quiet</code></dt>
+<dd>Don't show progress messages.</dd>
+</dl>
+<p><strong>iLund4u can be used in three different modes:</strong></p>
+<ul>
+<li>
+<p><code>ilund4u hotspots [parameters]</code> - hotspot annotation.</p>
+</li>
+<li>
+<p><code>ilund4u protein [parameters]</code> - protein search versus iLund4u database.</p>
+</li>
+<li>
+<p><code>ilund4u proteome [parameters]</code> - proteome annotation and search versus iLund4u database.</p>
+</li>
+</ul>
+<p>To show mode-specific help messages use: <code>ilund4u --help [mode]</code>
+(e.g. <code>ilund4u --help hotspots</code>)</p>
+<hr />
+<h2 id="hotspot-annotation-mode">Hotspot annotation mode</h2>
+<h3 id="mandatory-arguments">Mandatory arguments</h3>
+<dl>
+<dt><code>-gff &lt;folder&gt;</code></dt>
+<dd>Path to a folder containing extended gff files.
+ Each gff file should contain a corresponding nucleotide sequence.
+ (designed to handle pharokka/prokka produced annotation files).</dd>
+</dl>
+<h3 id="optional-arguments-data-processing">Optional arguments | data processing</h3>
+<dl>
+<dt><code>-mps, --min-proteome-size &lt;int&gt;</code></dt>
+<dd>Minimal number of proteins in a genome to be taken in analysis.
+ [default: 15]</dd>
+<dt><code>-gct, --genome-circularity-table &lt;path&gt;</code></dt>
+<dd>Path to a table containing information for each genome about whether
+ it is circular or not.
+ Format: tab-separated; column names: id, circular. Values 1 or 0.
+ For genomes which id is not listed, the default value will be used.
+ [default: circular; use <code>-ncg/--non-circular-genomes</code> to change]</dd>
+<dt><code>-psc, --proteome-sim-cutoff &lt;float&gt;</code></dt>
+<dd>Minimal fraction of shared homologous proteins between two
+proteomes to be connected in proteome network by edge.
+[default: 0.7]</dd>
+<dt><code>-mpcs, --min-proteome-community-size &lt;int&gt;</code></dt>
+<dd>Minimal size of proteome community which then will be taken in
+   hotspot search analysis [default: 10].</dd>
+<dt><code>-vpc, --variable-protein-cutoff &lt;float&gt;</code></dt>
+<dd>Upper limit of fraction of proteomes in which a protein homology
+group should be found within a proteome community to be called
+"variable". [default: 0.25]</dd>
+<dt><code>-cpc, --conserved-protein-cutoff &lt;float&gt;</code></dt>
+<dd>Lower limit of fraction of proteomes in which a protein homology
+group should be found within a proteome community to be called
+"conserved". [default: 0.75]</dd>
+<dt><code>-ncg, --non-circular-genomes</code></dt>
+<dd>Consider each input genome as non-circular. That means that first
+and last proteins won't be considered as neighbours.
+[default: circular]</dd>
+<dt><code>-hpc, --hotspot-presence-cutoff</code></dt>
+<dd>Fraction of proteomes within a proteome community in which clustered
+variable islands should be found to be considered as a hotspot.
+[default: 0.3]</dd>
+</dl>
+<h3 id="optional-arguments-others">Optional arguments | others</h3>
+<dl>
+<dt><code>-o &lt;dir name&gt;</code></dt>
+<dd>Output dir name. This will be created if it does not exist.
+[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]</dd>
+<dt><code>-o-db, --output-database &lt;dirname&gt;</code></dt>
+<dd>Output dir name for the database.
+If not specified then no database will be saved.</dd>
+<dt><code>-c &lt;standard|&lt;file.cfg&gt;</code></dt>
+<dd>Path to a configuration file or name of a premade config file
+[default: standard]</dd>
+</dl>
+<h3 id="miscellaneous-arguments_1">Miscellaneous arguments</h3>
+<dl>
+<dt><code>--debug</code></dt>
+<dd>Provide a detailed stack trace for debugging purposes.</dd>
+<dt><code>-q, --quiet</code></dt>
+<dd>Don't show progress messages.</dd>
+</dl>
+<hr />
+<h2 id="protein-annotation-mode">Protein annotation mode</h2>
+<h3 id="mandatory-arguments_1">Mandatory arguments</h3>
+<dl>
+<dt><code>-fa &lt;path&gt;</code></dt>
+<dd>Path to a fasta file with query protein sequence.</dd>
+<dt><code>-db &lt;path&gt;</code></dt>
+<dd>Path to iLund4u database.</dd>
+</dl>
+<h3 id="optional-arguments-data-processing_1">Optional arguments | data processing</h3>
+<dl>
+<dt><code>-hsm, --homology-search-mode &lt;group|proteins&gt;</code></dt>
+<dd>Mode to define homologous proteins from the database.
+If "group" is selected, a query protein is assigned to the
+same homologous group as that of the best search hit
+protein. In "proteins" mode, all target proteins that
+pass the cutoffs are considered to be homologues.
+[default: group]</dd>
+<dt><code>-msqc, --mmseqs-query-cov &lt;float&gt;</code></dt>
+<dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
+<dt><code>-mstc, --mmseqs-target-cov &lt;float&gt;</code></dt>
+<dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
+<dt><code>-msf, --mmseqs-fident &lt;float&gt;</code></dt>
+<dd>MMseqs search fident (fraction of identical matches) cutoff
+[default: 0.2]</dd>
+<dt><code>-mse, --mmseqs-evalue</code></dt>
+<dd>MMseqs search evalue cutoff [default: 1e-5]</dd>
+<dt><code>-ql, --query-label &lt;str&gt;</code></dt>
+<dd>Label for query protein homologues on LoVis4u visualisation.
+[default: database protein names]</dd>
+</dl>
+<h3 id="optional-arguments-others_1">Optional arguments | others</h3>
+<dl>
+<dt><code>-o &lt;name&gt;</code></dt>
+<dd>Output dir name. This will be created if it does not exist.
+[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]</dd>
+<dt><code>-c &lt;standard|&lt;file.cfg&gt;</code></dt>
+<dd>Path to a configuration file or name of a premade config file
+[default: standard]</dd>
+</dl>
+<h3 id="miscellaneous-arguments_2">Miscellaneous arguments</h3>
+<dl>
+<dt><code>--debug</code></dt>
+<dd>Provide a detailed stack trace for debugging purposes.</dd>
+<dt><code>-q, --quiet</code></dt>
+<dd>Don't show progress messages.</dd>
+</dl>
+<hr />
+<h2 id="proteome-annotation-mode">Proteome annotation mode</h2>
+<h3 id="mandatory-arguments_2">Mandatory arguments</h3>
+<dl>
+<dt><code>-gff &lt;path&gt;</code></dt>
+<dd>Path to a query proteome gff file.
+(designed to handle pharokka/prokka produced annotation files).</dd>
+<dt><code>-db &lt;path&gt;</code></dt>
+<dd>Path to iLund4u database.</dd>
+</dl>
+<h3 id="optional-arguments-data-processing_2">Optional arguments | data processing</h3>
+<dl>
+<dt><code>-ncg, --non-circular-genomes</code></dt>
+<dd>Consider tje query genome as non-circular. This means that first
+and last proteins won't be considered to be neighbours.
+[default: circular]</dd>
+</dl>
+<p><strong>Note</strong>: MMseqs arguments below are used for assigning homology
+      group for each protein in your query proteome.</p>
+<dl>
+<dt><code>-msqc, --mmseqs-query-cov &lt;float&gt;</code></dt>
+<dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
+<dt><code>-mstc, --mmseqs-target-cov &lt;float&gt;</code></dt>
+<dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
+<dt><code>-msf, --mmseqs-fident &lt;float&gt;</code></dt>
+<dd>MMseqs search fident (fraction of identical matches) cutoff
+[default: 0.2]</dd>
+<dt><code>-mse, --mmseqs-evalue</code></dt>
+<dd>MMseqs search evalue cutoff [default: 1e-5]</dd>
+</dl>
+<h3 id="optional-arguments-others_2">Optional arguments | others</h3>
+<dl>
+<dt><code>-o &lt;name&gt;</code></dt>
+<dd>Output dir name. It will be created if it does not exist.
+[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]</dd>
+<dt><code>-c &lt;standard|&lt;file.cfg&gt;</code></dt>
+<dd>Path to a configuration file or name of a premade config file
+[default: standard]</dd>
+</dl>
+<h3 id="miscellaneous-arguments_3">Miscellaneous arguments</h3>
+<dl>
+<dt><code>--debug</code></dt>
+<dd>Provide a detailed stack trace for debugging purposes.</dd>
+<dt><code>-q, --quiet</code></dt>
+<dd>Don't show progress messages.</dd>
+</dl>
+<hr />
 
               
             </article>

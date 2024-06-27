@@ -405,8 +405,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#description-is-under-construction" class="md-nav__link">
-    Description is under construction...
+  <a href="#detailed-description-is-under-construction" class="md-nav__link">
+    Detailed description is under construction...
   </a>
   
 </li>
@@ -574,10 +574,71 @@
 
 
 <h1 id="configuration-file-parameters">Configuration file parameters</h1>
-<p>ilund4u configuration file allows detailed customization of the tool's parameters.</p>
+<p>iLund4u configuration file allows detailed customization of the tool's parameters.</p>
 <p><strong><em>Note:</em></strong><br />
 You can copy the <em>lovis4u_data</em> folder that contains the config files to your wiking directory with <code>ilund4u --data</code> command and safely edit and use them without affecting 'internal' config. If you want to use a copied config file, use <code>-c path_to_config</code>.</p>
-<h5 id="description-is-under-construction">Description is under construction...</h5>
+<h5 id="detailed-description-is-under-construction">Detailed description is under construction...</h5>
+<hr />
+<p><strong>;[Data Loading and processing]</strong><br />
+default_transl_table = 11<br />
+gff_CDS_name_source = product<br />
+min_proteome_size = 15<br />
+proteome_uniqueness_cutoff = 0.7<br />
+proteome_similarity_cutoff = 0.7<br />
+leiden_resolution_parameter_p = 0.5<br />
+min_proteome_community_size = 10<br />
+circular_genomes = True<br />
+variable_protein_cluster_cutoff = 0.25<br />
+conserved_protein_cluster_cutoff = 0.75<br />
+neighbours_max_distance = 8<br />
+neighbours_one_side_max_size = 5<br />
+neighbours_min_size = 5<br />
+island_neighbours_similarity_cutoff = 0.65<br />
+leiden_resolution_parameter_i = 0.55<br />
+deduplicate_proteomes_within_hotspot = True<br />
+hotspot_presence_cutoff = 0.3<br />
+hotspot_signature_presence_cutoff = 0.75<br />
+hotspot_similarity_cutoff = 0.65<br />
+leiden_resolution_parameter_h = 0.55<br />
+protein_search_target_mode = group  </p>
+<p><strong>;[mmseqs parameters]</strong><br />
+mmseqs_cluster_mode = 0<br />
+mmseqs_cov_mode = 0<br />
+mmseqs_min_seq_id = 0.25<br />
+mmseqs_c = 0.8<br />
+mmseqs_s = 7<br />
+mmseqs_search_qcov = 0.6<br />
+mmseqs_search_tcov = 0.6<br />
+mmseqs_search_fident = 0.2<br />
+mmseqs_search_evalue = 1e-5  </p>
+<p><strong>;[pyhmmer hmmscan parameters]</strong><br />
+hmmscan_query_coverage_cutoff = 0.7<br />
+hmmscan_hmm_coverage_cutoff = 0.5  </p>
+<p><strong>;[visualisation]</strong><br />
+show_hmmscan_hits_on_full_proteomes = True<br />
+lovis4u_hotspot_vis_figure_width = 8<br />
+lovis4u_hotspot_mm_per_nt = 0.0125<br />
+lovis4u_proteome_mm_per_nt = 0.005<br />
+index_only_for_hypothetical_proteins = auto<br />
+island_size_cutoff_to_show_index_only = 7<br />
+max_number_of_seqs_to_redefine_order = 300  </p>
+<p><strong>;[HMM]</strong><br />
+hmm_defence= {internal}/HMMs/DefenceFinder_CasFinder<br />
+hmm_virulence =  {internal}/HMMs/VFDB<br />
+hmm_anti_defence = {internal}/HMMs/dbAPIS_Acr<br />
+hmm_amr = {internal}/HMMs/AMRFinderPlus<br />
+database_names = Defence,Virulence,Anti-defence,AMR  </p>
+<p><strong>;[Other paths]</strong><br />
+mmseqs_binary = {internal}/bin/mmseqs_mac/bin/mmseqs<br />
+category_colors = {internal}/category_colors_proteome_groups.tsv  </p>
+<p><strong>;[Output]</strong><br />
+verbose = True<br />
+debug = False<br />
+output_dir = ilund4u_{current_date}  </p>
+<p><strong>;[URLs]</strong><br />
+hmm_models = <a href="https://data-sharing.atkinson-lab.com/iLund4u/HMMs.tar.gz">https://data-sharing.atkinson-lab.com/iLund4u/HMMs.tar.gz</a><br />
+plasmids_db = <a href="https://data-sharing.atkinson-lab.com/iLund4u/iLund4u_DB-plasmids.tar.gz">https://data-sharing.atkinson-lab.com/iLund4u/iLund4u_DB-plasmids.tar.gz</a><br />
+phages_db = <a href="https://data-sharing.atkinson-lab.com/iLund4u/iLund4u_DB-phages.tar.gz">https://data-sharing.atkinson-lab.com/iLund4u/iLund4u_DB-phages.tar.gz</a>  </p>
 
               
             </article>
