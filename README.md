@@ -21,7 +21,7 @@
 <img  src="docs/img/ilundu4_pipeline.png" width="100%"/>
 
 
-## Installation 🛠️
+## Installation 
 
 - iLund4u can be installed directly from pypi:
 
@@ -60,16 +60,16 @@ ilund4u --database plasmids
 **Database sizes:** Phages: 6.2GB; Plasmids: 1.12GB 
 
 
-## Reference 📃
+## Reference 
 
 If you find iLund4u useful, please cite:  
 Artyom. A. Egorov, Gemma C. Atkinson, **iLund4u: ---**, *---*
 
-## Contact 📇
+## Contact 
 
 Please contact us by e-mail _artem**dot**egorov**AT**med**dot**lu**dot**se_ or use [Issues](https://github.com/art-egorov/ilund4u/issues?q=) to report any technical problems.  
 You can also use [Discussions section](https://github.com/art-egorov/ilund4u/discussions) for sharing your ideas or feature requests! 
 
-## Authors 👨🏻‍💻
+## Authors 
 
 iLund4u is developed by Artyom Egorov at [the Atkinson Lab](https://atkinson-lab.com), Department of Experimental Medical Science, Lund University, Sweden. We are open for suggestions to extend and improve iLund4u functionality. Please don't hesitate to share your ideas or feature requests.
