@@ -37,11 +37,7 @@ nav:
     - Configuration file parameters: Parameters/config_parameters.md
   - API:
     - Usage examples: API/usage_examples.md
-    - Data processing: API/data_processing.md
-    - Manager: API/manager.md
-    - Data manager: API/data_manager.md
-    - Methods: API/methods.md
-    - Drawing: API/drawing.md
+    - Library: API/package.md
   - Version log: VersionLog/versions.md
 
 markdown_extensions:

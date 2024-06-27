@@ -401,7 +401,9 @@ As we mentioned above we also have LoVis4u visualisation of each hotspot with on
 
 ## iLund4u databases
 
-![p_com](cmd_guide/img/ilund4u_dbs_wo_header.png){align=right loading=lazy .responsive-image1}  
+
+<p></p> 
+![db_fig](cmd_guide/img/ilund4u_dbs_wo_header.png){ align=right loading=lazy .responsive-image1 }  
 
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
 The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~800K sequences, version of June 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  

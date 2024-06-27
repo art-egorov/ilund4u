@@ -1,19 +1,27 @@
-# data processing module
+## data processing module
 
 ::: ilund4u.data_processing
 
-# manager module
+---
+
+## manager module
 
 ::: ilund4u.manager 
 
-# data manager module
+---
+
+## data manager module
 
 ::: ilund4u.data_manager 
 
-# methods module
+---
+
+## methods module
 
 ::: ilund4u.methods 
 
-# draweing module
+---
+
+## drawing module
 
 ::: ilund4u.drawing 

@@ -1,12 +1,12 @@
 iLund4u
-Home page and documentation: https://art-egorov.github.io/iLund4u/
+Home page and documentation: https://art-egorov.github.io/ilund4u/
 The Atkinson Lab 4U | AE
 -------- PROTEOME MODE --------
 -------------------------------
     COMMAND-LINE PARAMETERS
 -------------------------------
 [MANDATORY ARGUMENTS]
--ff <path>
+-gff <path>
     Path to a query proteome gff file.
     (designed to handle pharokka/prokka produced annotation files).
 -db <path>
