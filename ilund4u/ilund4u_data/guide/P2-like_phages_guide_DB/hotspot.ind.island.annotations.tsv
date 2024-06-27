@@ -1,0 +1,138 @@
+island	island_index	island_size	proteome	strength	degree	Defence_cargo	Defence_flanking	Virulence_cargo	Virulence_flanking	Anti-defence_cargo	Anti-defence_flanking	AMR_cargo	AMR_flanking	hotspot_id
+MGV-GENOME-0168725:1	0	1	MGV-GENOME-0168725	69.975	71									0-0
+MGV-GENOME-0171006:2	2	2	MGV-GENOME-0171006	69.975	71									0-0
+MGV-GENOME-0205381:2	3	2	MGV-GENOME-0205381	69.975	71									0-0
+TemPhD_cluster_15215:1	6	1	TemPhD_cluster_15215	69.975	71									0-0
+TemPhD_cluster_38311:1	8	1	TemPhD_cluster_38311	69.975	71									0-0
+MGV-GENOME-0227212:1	11	1	MGV-GENOME-0227212	69.975	71	RloC__RloC								0-0
+TemPhD_cluster_28453:2	13	2	TemPhD_cluster_28453	69.975	71									0-0
+NC_055846.1:2	15	2	NC_055846.1	69.975	71									0-0
+NC_004745.1:2	17	2	NC_004745.1	69.975	71									0-0
+TemPhD_cluster_52275:2	19	3	TemPhD_cluster_52275	63.37499999999993	71									0-0
+TemPhD_cluster_52349:1	21	1	TemPhD_cluster_52349	69.975	71									0-0
+TemPhD_cluster_33809:3	24	3	TemPhD_cluster_33809	56.27499999999995	71									0-0
+MGV-GENOME-0216186:4	27	6	MGV-GENOME-0216186	69.975	71	Retron_I_B__ATPase_TOPRIM_COG3593								0-0
+TemPhD_cluster_52382:2	29	2	TemPhD_cluster_52382	69.975	71	RloC__RloC								0-0
+TemPhD_cluster_33805:2	32	2	TemPhD_cluster_33805	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+TemPhD_cluster_63038:2	34	2	TemPhD_cluster_63038	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+MGV-GENOME-4406672:2	37	2	MGV-GENOME-4406672	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_9963:3	39	3	TemPhD_cluster_9963	69.975	71									0-0
+TemPhD_cluster_63155:1	41	1	TemPhD_cluster_63155	69.975	71									0-0
+TemPhD_cluster_9973:3	45	3	TemPhD_cluster_9973	69.975	71									0-0
+TemPhD_cluster_52222:2	48	2	TemPhD_cluster_52222	69.975	71									0-0
+TemPhD_cluster_23882:3	50	3	TemPhD_cluster_23882	69.975	71	Druantia_II__DruM,Menshen__NsnA								0-0
+TemPhD_cluster_62958:3	52	3	TemPhD_cluster_62958	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_33725:3	54	3	TemPhD_cluster_33725	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_23865:2	56	2	TemPhD_cluster_23865	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+NC_055844.1:2	59	2	NC_055844.1	69.975	71									0-0
+TemPhD_cluster_20023:2	62	3	TemPhD_cluster_20023	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+TemPhD_cluster_63057:3	64	3	TemPhD_cluster_63057	69.975	71	Druantia_II__DruM,Menshen__NsnA								0-0
+TemPhD_cluster_51960:2	66	2	TemPhD_cluster_51960	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+TemPhD_cluster_23866:1	68	1	TemPhD_cluster_23866	69.975	71									0-0
+TemPhD_cluster_33833:3	71	3	TemPhD_cluster_33833	69.975	71									0-0
+TemPhD_cluster_51656:2	74	2	TemPhD_cluster_51656	69.975	71	ShosTA__ShosT,ShosTA__ShosA	cysH_IV-B_1							0-0
+TemPhD_cluster_33807:1	78	1	TemPhD_cluster_33807	69.975	71									0-0
+TemPhD_cluster_52155:2	81	2	TemPhD_cluster_52155	69.975	71									0-0
+MGV-GENOME-0232811:2	85	2	MGV-GENOME-0232811	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+TemPhD_cluster_51932:2	87	2	TemPhD_cluster_51932	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_28372:2	90	2	TemPhD_cluster_28372	69.975	71	RloC__RloC								0-0
+TemPhD_cluster_37938:2	92	3	TemPhD_cluster_37938	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+TemPhD_cluster_63096:3	95	3	TemPhD_cluster_63096	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_62933:2	97	3	TemPhD_cluster_62933	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+TemPhD_cluster_52112:2	100	2	TemPhD_cluster_52112	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+TemPhD_cluster_38170:3	103	3	TemPhD_cluster_38170	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_52209:2	105	3	TemPhD_cluster_52209	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+TemPhD_cluster_37844:2	107	2	TemPhD_cluster_37844	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_37906:3	110	4	TemPhD_cluster_37906	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_51953:3	112	3	TemPhD_cluster_51953	63.47499999999993	71	Druantia_II__DruM,Menshen__NsnA								0-0
+NC_049461.1:2	116	2	NC_049461.1	69.975	71									0-0
+TemPhD_cluster_52018:2	119	3	TemPhD_cluster_52018	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+TemPhD_cluster_37904:4	121	4	TemPhD_cluster_37904	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_52262:3	123	3	TemPhD_cluster_52262	69.975	71	Druantia_II__DruM,Menshen__NsnA								0-0
+TemPhD_cluster_62821:4	125	4	TemPhD_cluster_62821	69.975	71	Druantia_II__DruM,Menshen__NsnA								0-0
+uvig_315197:3	127	3	uvig_315197	69.975	71									0-0
+NC_005056.1:3	129	4	NC_005056.1	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_37825:3	131	4	TemPhD_cluster_37825	69.975	71	PD-Lambda-5__PD-Lambda-5_B								0-0
+TemPhD_cluster_38191:3	134	3	TemPhD_cluster_38191	69.975	71									0-0
+TemPhD_cluster_51929:2	136	2	TemPhD_cluster_51929	69.975	71	DEDDh_I_II_III_IV_V_VI_1								0-0
+TemPhD_cluster_38190:3	139	3	TemPhD_cluster_38190	69.975	71									0-0
+TemPhD_cluster_62992:4	141	5	TemPhD_cluster_62992	69.975	71	Druantia_II__DruM,Shedu__SduA								0-0
+TemPhD_cluster_62953:4	143	5	TemPhD_cluster_62953	69.975	71	PD-Lambda-5__PD-Lambda-5_B								0-0
+MGV-GENOME-0230591:4	145	5	MGV-GENOME-0230591	69.975	71	Druantia_II__DruM								0-0
+MGV-GENOME-0230157:4	148	5	MGV-GENOME-0230157	63.48749999999993	71	Druantia_II__DruM								0-0
+TemPhD_cluster_52091:2	151	3	TemPhD_cluster_52091	69.975	71	Lamassu-Fam__LmuA_effector_Lipase,Lamassu-Fam__LmuC_acc_Lipase,Lamassu-Fam__LmuB_SMC_Lipase								0-0
+TemPhD_cluster_62972:3	153	3	TemPhD_cluster_62972	69.975	71									0-0
+TemPhD_cluster_52379:3	156	5	TemPhD_cluster_52379	69.975	71	Retron_VI__HTH								0-0
+TemPhD_cluster_20685:2	158	2	TemPhD_cluster_20685	69.975	71									0-0
+NC_022750.1:2	161	3	NC_022750.1	69.975	71			Sb-CDT (VF0987),Sb-CDT (VF0987),Sb-CDT (VF0987)						0-0
+SAMN09781779_a1_ct39878:4	164	5	SAMN09781779_a1_ct39878	69.975	71	Druantia_II__DruM								0-0
+TemPhD_cluster_62779:3	167	5	TemPhD_cluster_62779	69.975	71	Rst_2TM_1TM_TIR__Rst_2TM_TIR,Rst_2TM_1TM_TIR__Rst_1TM_TIR,Rst_2TM_1TM_TIR__Rst_TIR_tm								0-0
+NC_049457.1:4	169	5	NC_049457.1	63.47499999999993	71	Druantia_II__DruM								0-0
+TemPhD_cluster_28392:4	173	6	TemPhD_cluster_28392	69.975	71	Retron_VI__HTH								0-0
+MGV-GENOME-0205381:23	4	1	MGV-GENOME-0205381	44.79999999999996	57	RloC__RloC								0-1
+TemPhD_cluster_15215:21	7	2	TemPhD_cluster_15215	60.999999999999936	68									0-1
+TemPhD_cluster_38311:20	9	2	TemPhD_cluster_38311	55.49999999999995	66									0-1
+MGV-GENOME-0227212:22	12	1	MGV-GENOME-0227212	64.09999999999997	68									0-1
+TemPhD_cluster_28453:23	14	1	TemPhD_cluster_28453	64.09999999999997	68									0-1
+NC_055846.1:23	16	1	NC_055846.1	64.09999999999997	68									0-1
+NC_004745.1:23	18	1	NC_004745.1	64.09999999999997	68									0-1
+TemPhD_cluster_52275:23	20	1	TemPhD_cluster_52275	64.09999999999997	68									0-1
+TemPhD_cluster_52349:22	22	1	TemPhD_cluster_52349	64.09999999999997	68									0-1
+TemPhD_cluster_33809:24	25	2	TemPhD_cluster_33809	60.999999999999936	68									0-1
+MGV-GENOME-0216186:27	28	1	MGV-GENOME-0216186	44.79999999999996	57									0-1
+TemPhD_cluster_52382:23	31	1	TemPhD_cluster_52382	60.69999999999993	68									0-1
+TemPhD_cluster_33805:23	33	1	TemPhD_cluster_33805	64.09999999999997	68									0-1
+TemPhD_cluster_63038:23	35	1	TemPhD_cluster_63038	64.09999999999997	68									0-1
+MGV-GENOME-4406672:23	38	1	MGV-GENOME-4406672	64.09999999999997	68									0-1
+TemPhD_cluster_9963:24	40	1	TemPhD_cluster_9963	64.09999999999997	68	PD-T4-8__PD-T4-8								0-1
+TemPhD_cluster_63155:22	42	2	TemPhD_cluster_63155	53.199999999999946	66									0-1
+TemPhD_cluster_9973:23	46	2	TemPhD_cluster_9973	55.49999999999995	66									0-1
+TemPhD_cluster_52222:23	49	1	TemPhD_cluster_52222	64.09999999999997	68									0-1
+TemPhD_cluster_23882:24	51	1	TemPhD_cluster_23882	64.09999999999997	68									0-1
+TemPhD_cluster_62958:24	53	2	TemPhD_cluster_62958	60.999999999999936	68									0-1
+TemPhD_cluster_33725:24	55	1	TemPhD_cluster_33725	64.09999999999997	68									0-1
+TemPhD_cluster_23865:24	58	1	TemPhD_cluster_23865	64.09999999999997	68									0-1
+NC_055844.1:23	60	1	NC_055844.1	64.09999999999997	68									0-1
+TemPhD_cluster_20023:24	63	1	TemPhD_cluster_20023	64.09999999999997	68	Protein of unknown function (Retron_VII_2__DUF3800)								0-1
+TemPhD_cluster_63057:24	65	1	TemPhD_cluster_63057	64.09999999999997	68	FS_GIY_YIG__GIY_YIG								0-1
+TemPhD_cluster_51960:23	67	3	TemPhD_cluster_51960	60.999999999999936	68	Dnd__DndB								0-1
+TemPhD_cluster_23866:22	69	2	TemPhD_cluster_23866	60.999999999999936	68									0-1
+TemPhD_cluster_33833:25	73	1	TemPhD_cluster_33833	64.09999999999997	68									0-1
+TemPhD_cluster_51656:24	76	2	TemPhD_cluster_51656	60.999999999999936	68									0-1
+TemPhD_cluster_33807:24	80	3	TemPhD_cluster_33807	64.09999999999997	68									0-1
+TemPhD_cluster_52155:24	83	1	TemPhD_cluster_52155	64.09999999999997	68									0-1
+MGV-GENOME-0232811:24	86	2	MGV-GENOME-0232811	64.09999999999997	68	Protein of unknown function (Retron_VII_2__DUF3800)								0-1
+TemPhD_cluster_51932:24	89	1	TemPhD_cluster_51932	64.09999999999997	68									0-1
+TemPhD_cluster_28372:23	91	5	TemPhD_cluster_28372	55.49999999999995	66									0-1
+TemPhD_cluster_37938:24	93	1	TemPhD_cluster_37938	64.09999999999997	68									0-1
+TemPhD_cluster_63096:24	96	1	TemPhD_cluster_63096	64.09999999999997	68									0-1
+TemPhD_cluster_62933:24	98	1	TemPhD_cluster_62933	64.09999999999997	68									0-1
+TemPhD_cluster_52112:24	102	1	TemPhD_cluster_52112	64.09999999999997	68									0-1
+TemPhD_cluster_38170:24	104	4	TemPhD_cluster_38170	55.49999999999995	66									0-1
+TemPhD_cluster_52209:24	106	1	TemPhD_cluster_52209	64.09999999999997	68									0-1
+TemPhD_cluster_37844:24	109	1	TemPhD_cluster_37844	64.09999999999997	68									0-1
+TemPhD_cluster_37906:25	111	1	TemPhD_cluster_37906	64.09999999999997	68									0-1
+TemPhD_cluster_51953:26	115	1	TemPhD_cluster_51953	60.69999999999993	68									0-1
+NC_049461.1:25	118	3	NC_049461.1	64.09999999999997	68									0-1
+TemPhD_cluster_52018:25	120	3	TemPhD_cluster_52018	64.09999999999997	68									0-1
+TemPhD_cluster_37904:25	122	1	TemPhD_cluster_37904	64.09999999999997	68									0-1
+TemPhD_cluster_52262:24	124	5	TemPhD_cluster_52262	55.49999999999995	66									0-1
+TemPhD_cluster_62821:26	126	2	TemPhD_cluster_62821	64.09999999999997	68									0-1
+NC_005056.1:25	130	1	NC_005056.1	64.09999999999997	68									0-1
+TemPhD_cluster_37825:26	133	1	TemPhD_cluster_37825	64.09999999999997	68									0-1
+TemPhD_cluster_38191:24	135	5	TemPhD_cluster_38191	55.49999999999995	66									0-1
+TemPhD_cluster_51929:25	138	3	TemPhD_cluster_51929	64.09999999999997	68									0-1
+TemPhD_cluster_38190:24	140	5	TemPhD_cluster_38190	55.49999999999995	66									0-1
+TemPhD_cluster_62992:26	142	1	TemPhD_cluster_62992	64.09999999999997	68									0-1
+TemPhD_cluster_62953:26	144	1	TemPhD_cluster_62953	64.09999999999997	68									0-1
+MGV-GENOME-0230591:26	146	1	MGV-GENOME-0230591	64.09999999999997	68									0-1
+MGV-GENOME-0230157:27	150	1	MGV-GENOME-0230157	64.09999999999997	68									0-1
+TemPhD_cluster_52091:24	152	5	TemPhD_cluster_52091	55.49999999999995	66									0-1
+TemPhD_cluster_62972:26	155	3	TemPhD_cluster_62972	64.09999999999997	68									0-1
+TemPhD_cluster_52379:26	157	4	TemPhD_cluster_52379	55.49999999999995	66									0-1
+TemPhD_cluster_20685:25	160	3	TemPhD_cluster_20685	64.09999999999997	68									0-1
+NC_022750.1:24	162	1	NC_022750.1	64.09999999999997	68	Protein of unknown function (Retron_VII_2__DUF3800)								0-1
+SAMN09781779_a1_ct39878:27	166	1	SAMN09781779_a1_ct39878	64.09999999999997	68									0-1
+TemPhD_cluster_62779:27	168	3	TemPhD_cluster_62779	64.09999999999997	68									0-1
+NC_049457.1:28	172	1	NC_049457.1	64.09999999999997	68									0-1
+TemPhD_cluster_28392:27	174	5	TemPhD_cluster_28392	49.300000000000026	66									0-1

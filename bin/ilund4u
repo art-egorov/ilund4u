@@ -4,7 +4,6 @@ import sys
 
 import ilund4u
 
-
 try:
     parameters = ilund4u.manager.Parameters()
     parameters.parse_cmd_arguments()
@@ -27,18 +26,20 @@ try:
         hotspots.calculate_hotspot_statistics_and_get_annotation(proteomes)
         hotspots.get_each_protein_group_statistics(proteomes)
 
-        drawing_manager = ilund4u.drawing.DrawingManager(proteomes, hotspots, parameters)
-        drawing_manager.plot_hotspot_communities()
-        drawing_manager.plot_proteome_communities()
-
         if parameters.args["output_database"]:
             database_manager = ilund4u.data_manager.DatabaseManager(parameters)
             database_manager.build_database(proteomes, hotspots, parameters.args["output_database"])
+
+        drawing_manager = ilund4u.drawing.DrawingManager(proteomes, hotspots, parameters)
+        drawing_manager.plot_hotspot_communities(
+            shortest_labels=parameters.args["index_only_for_hypothetical_proteins"])
+        drawing_manager.plot_proteome_communities()
+
     elif parameters.args["mode"] == "protein":
 
         database_manager = ilund4u.data_manager.DatabaseManager(parameters)
         database = database_manager.load_database(db_path=parameters.args["database"])
-        database.protein_search_mode(query_fasta=parameters.args["fa"], query_label = parameters.args["query_label"])
+        database.protein_search_mode(query_fasta=parameters.args["fa"], query_label=parameters.args["query_label"])
 
     elif parameters.args["mode"] == "proteome":
         database_manager = ilund4u.data_manager.DatabaseManager(parameters)
@@ -54,4 +55,3 @@ except:
         for i in (traceback.format_exc()).split('\n'):
             if "ilund4uError:" in i:
                 print(f"ilund4uError:{i.split(':')[1]}", file=sys.stderr)
-                

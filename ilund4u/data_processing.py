@@ -357,8 +357,14 @@ class Island:
             list: Indexes of island locus CDSs.
 
         """
-        island_left_border_cds_ind = self.left_cons_neighbours[0]
-        island_right_border_cds_ind = self.right_cons_neighbours[-1]
+        if self.left_cons_neighbours:
+            island_left_border_cds_ind = self.left_cons_neighbours[0]
+        else:
+            island_left_border_cds_ind = self.indexes[0]
+        if self.right_cons_neighbours:
+            island_right_border_cds_ind = self.right_cons_neighbours[-1]
+        else:
+            island_right_border_cds_ind = self.indexes[-1]
         if island_left_border_cds_ind < island_right_border_cds_ind:
             island_cdss_indexes = [i for i in range(island_left_border_cds_ind, island_right_border_cds_ind + 1)]
         else:
@@ -448,7 +454,7 @@ class Proteomes:
                 for proteome_id in proteomes:
                     proteome = self.proteomes.at[proteome_id]
                     proteome_db_ind.append(proteome.get_proteome_db_row())
-                    os.system(f"cp {proteome.gff_file} {os.path.join(db_folder, 'gff')}/")
+                    os.system(f"cp '{proteome.gff_file}' {os.path.join(db_folder, 'gff')}/")
                     for cds in proteome.cdss.to_list():
                         cds_ids.append(cds.cds_id)
                         cdss_db_ind.append(cds.get_cds_db_row())
@@ -563,7 +569,7 @@ class Proteomes:
         except Exception as error:
             raise ilund4u.manager.ilund4uError(f"Unable to read Proteomes from the database.") from error
 
-    def load_sequences_from_extended_gff(self, input_f: typing.Union[str, list], genome_annotation = None) -> None:
+    def load_sequences_from_extended_gff(self, input_f: typing.Union[str, list], genome_annotation=None) -> None:
         """Load proteomes from gff files.
 
         Arguments:
@@ -597,7 +603,7 @@ class Proteomes:
             genome_circularity_dict = dict()
             if genome_annotation:
                 try:
-                    genome_annotation_table = pd.read_table(genome_annotation, sep = "\t").set_index("id")
+                    genome_annotation_table = pd.read_table(genome_annotation, sep="\t").set_index("id")
                     genome_circularity_dict = genome_annotation_table["circular"].to_dict()
                 except:
                     print("○ Warning: unable to read genome annotation table. Check the format.")
@@ -607,55 +613,63 @@ class Proteomes:
             if len(gff_files) > 1 and self.prms.args["verbose"]:
                 bar = progress.bar.FillingCirclesBar(" ", max=num_of_gff_files, suffix='%(index)d/%(max)d')
             proteome_list, annotation_rows = [], []
+            gff_records_batch = []
             for gff_file_index, gff_file_path in enumerate(gff_files):
-                if len(gff_files) > 1 and self.prms.args["verbose"]:
-                    bar.next()
-                gff_records = list(BCBio.GFF.parse(gff_file_path, limit_info=dict(gff_type=["CDS"])))
-                if len(gff_records) != 1:
-                    raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} does not contain information for only"
-                                                       f" 1 sequence.")
-                gff_record = gff_records[0]
                 try:
-                    record_locus_sequence = gff_record.seq
-                except Bio.Seq.UndefinedSequenceError as error:
-                    raise ilund4u.manager.ilund4uError(f"gff file doesn't contain corresponding sequences.") from error
-                features_ids = [i.id for i in gff_record.features]
-                if len(features_ids) != len(set(features_ids)):
-                    raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature ids while"
-                                                       f" only unique are allowed.")
-                if len(features_ids) > self.prms.args["min_proteome_size"]:
-                    if gff_record.id in genome_circularity_dict.keys():
-                        circular = int(genome_circularity_dict[gff_record.id])
-                    else:
-                        circular = int(self.prms.args["circular_genomes"])
-                    record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
-                                               circular=circular)
-                    record_cdss = []
-                    gff_records = []
-                    for gff_feature in gff_record.features:
-                        cds_id = gff_feature.id.replace(";", ",")
-                        if gff_record.id not in cds_id:
-                            # cds_id = f"{gff_record.id}-{cds_id}" # Attention
-                            pass
-                        transl_table = self.prms.args["default_transl_table"]
-                        if "transl_table" in gff_feature.qualifiers.keys():
-                            transl_table = int(gff_feature.qualifiers["transl_table"][0])
-                        name = ""
-                        if self.prms.args["gff_CDS_name_source"] in gff_feature.qualifiers:
-                            name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
+                    if len(gff_files) > 1 and self.prms.args["verbose"]:
+                        bar.next()
+                    gff_records = list(BCBio.GFF.parse(gff_file_path, limit_info=dict(gff_type=["CDS"])))
+                    if len(gff_records) != 1:
+                        print(f"\n○ Warning: gff file {gff_file_path} contains information for more than 1 "
+                              f"sequence. File will be skipped.")
+                        continue
+                    gff_record = gff_records[0]
+                    try:
+                        record_locus_sequence = gff_record.seq
+                    except Bio.Seq.UndefinedSequenceError as error:
+                        raise ilund4u.manager.ilund4uError(f"gff file doesn't contain corresponding "
+                                                           f"sequences.") from error
+                    features_ids = [i.id for i in gff_record.features]
+                    if len(features_ids) != len(set(features_ids)):
+                        raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature "
+                                                           f"ids while only unique are allowed.")
+                    if len(features_ids) > self.prms.args["min_proteome_size"]:
+                        if gff_record.id in genome_circularity_dict.keys():
+                            circular = int(genome_circularity_dict[gff_record.id])
+                        else:
+                            circular = int(self.prms.args["circular_genomes"])
+                        record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
+                                                   circular=circular)
+                        record_cdss = []
+                        gff_records = []
+                        for gff_feature in gff_record.features:
+                            cds_id = gff_feature.id.replace(";", ",")
+                            if gff_record.id not in cds_id:
+                                cds_id = f"{gff_record.id}-{cds_id}"  # Attention
+                            transl_table = self.prms.args["default_transl_table"]
+                            if "transl_table" in gff_feature.qualifiers.keys():
+                                transl_table = int(gff_feature.qualifiers["transl_table"][0])
+                            name = ""
+                            if self.prms.args["gff_CDS_name_source"] in gff_feature.qualifiers:
+                                name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
 
-                        sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
-                        gff_records.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
-                        cds = CDS(cds_id=cds_id, proteome_id=gff_record.id, start=int(gff_feature.location.start) + 1,
-                                  end=int(gff_feature.location.end), strand=gff_feature.location.strand, name=name)
-                        record_cdss.append(cds)
-                    record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
-                    proteome_list.append(record_proteome)
-                    with open(self.proteins_fasta_file, "a") as handle:
-                        Bio.SeqIO.write(gff_records, handle, "fasta")
-                    annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
-                                                proteome_size=len(features_ids),
-                                                proteome_size_unique="", protein_clusters=""))
+                            sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
+                            gff_records_batch.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
+                            cds = CDS(cds_id=cds_id, proteome_id=gff_record.id,
+                                      start=int(gff_feature.location.start) + 1, end=int(gff_feature.location.end),
+                                      strand=gff_feature.location.strand, name=name)
+                            record_cdss.append(cds)
+                        record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
+                        proteome_list.append(record_proteome)
+                        annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
+                                                    proteome_size=len(features_ids),
+                                                    proteome_size_unique="", protein_clusters=""))
+                    if gff_file_index % 1000 == 0 or gff_file_index == len(gff_files) - 1:
+                        with open(self.proteins_fasta_file, "a") as handle:
+                            Bio.SeqIO.write(gff_records_batch, handle, "fasta")
+                        gff_records_batch = []
+                except:
+                    print(f"○ Warning: gff file {gff_file_path} was not read properly")
             if len(gff_files) > 1 and self.prms.args["verbose"]:
                 bar.finish()
             self.proteomes = pd.Series(proteome_list, index=[pr.proteome_id for pr in proteome_list])
@@ -1055,6 +1069,7 @@ class Proteomes:
                 graph = igraph.Graph(len(com_island_n_sizes.index), edges, directed=False)
                 graph.vs["index"] = com_island_n_sizes.index.to_list()
                 graph.vs["island_id"] = [isl.island_id for isl in islands_list]
+                graph.vs["island_size"] = [isl.size for isl in islands_list]
                 graph.vs["proteome_id"] = [isl.proteome for isl in islands_list]
                 graph.es["weight"] = weights
                 graph.save(os.path.join(output_network_folder, f"{com_id}.gml"))
@@ -1104,8 +1119,10 @@ class Proteomes:
                     hotspot_presence = hotspot_uniq_size / com_size
                     if hotspot_presence > self.prms.args["hotspot_presence_cutoff"]:
                         island_indexes, island_ids = subgraph.vs["index"], subgraph.vs["island_id"]
+                        island_size = subgraph.vs["island_size"]
                         strength, degree = subgraph.strength(weights="weight"), subgraph.degree()
                         island_annotation = pd.DataFrame(dict(island=island_ids, island_index=island_indexes,
+                                                              island_size=island_size,
                                                               proteome=proteomes, strength=strength,
                                                               degree=degree)).set_index("island")
                         if self.prms.args["deduplicate_proteomes_within_hotspot"]:  # To update usage wo it
@@ -1225,7 +1242,7 @@ class Hotspot:
                 r_types = ["cargo", "flanking"]
                 for r_type in r_types:
                     self.island_annotation.at[island.island_id, f"{db_name}_{r_type}"] = \
-                        ",".join(island_dbstat[db_name]["cargo"].values())
+                        ",".join(island_dbstat[db_name][r_type].values())
                     hotspot_stat[db_name][r_type].update(island_dbstat[db_name][r_type])
         return hotspot_stat
 
@@ -1338,9 +1355,9 @@ class Hotspots:
                     bar.next()
                 hotspot_dict["island_annotation"] = island_annotation[
                     island_annotation["hotspot_id"] == hotspot_dict["hotspot_id"]].copy()
-                hotspot_proteomes = proteomes.proteomes.loc[proteomes.communities[hotspot_dict["proteome_community"]]]
-                islands_list = [island for proteome in hotspot_proteomes.to_list() for island in
-                                proteome.islands.to_list()]
+                hotspot_proteomes = proteomes.proteomes.loc[
+                    proteomes.communities[hotspot_dict["proteome_community"]]].to_list()
+                islands_list = [island for proteome in hotspot_proteomes for island in proteome.islands.to_list()]
                 islands_series = pd.Series(islands_list, index=[island.island_id for island in islands_list])
                 hotspot_dict["islands"] = islands_series.loc[hotspot_dict["island_annotation"].index].to_list()
                 hotspot_list.append(Hotspot(**hotspot_dict))
@@ -1381,7 +1398,10 @@ class Hotspots:
             initial_fasta_file = Bio.SeqIO.index(proteomes.proteins_fasta_file, "fasta")
             with open(self.island_rep_proteins_fasta, "wb") as out_handle:
                 for acc in hotspots_repr_proteins:
-                    out_handle.write(initial_fasta_file.get_raw(acc))
+                    try:
+                        out_handle.write(initial_fasta_file.get_raw(acc))
+                    except:
+                        pass
 
             alignment_table = ilund4u.methods.run_pyhmmer(self.island_rep_proteins_fasta, len(hotspots_repr_proteins),
                                                           self.prms)
@@ -1513,7 +1533,9 @@ class Hotspots:
                 h_com_stat = collections.defaultdict(lambda: collections.defaultdict(dict))
                 hotspot_com_groups = dict(cargo=set(), flanking=set())
                 hotspots = self.hotspots.loc[hotspot_ids].to_list()
+                n_islands = 0
                 for hotspot in hotspots:
+                    n_islands += hotspot.size
                     hotspot_groups = hotspot.get_hotspot_groups(proteomes)
                     db_stat = hotspot.calculate_database_hits_stats(proteomes, self.prms)
                     for r_type in r_types:
@@ -1524,7 +1546,8 @@ class Hotspots:
                             h_com_stat[db_name][r_type].update(db_stat[db_name][r_type])
                             self.annotation.at[hotspot.hotspot_id, f"N_{db_name}_{r_type}_groups"] = \
                                 len(set(db_stat[db_name][r_type].values()))
-                hc_annot_row = dict(com_id=h_com, size=len(hotspot_ids), hotspots=",".join(hotspot_ids))
+                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_islands=n_islands,
+                                    hotspots=",".join(hotspot_ids), pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
                 for r_type in r_types:
                     hc_annot_row[f"N_{r_type}_groups"] = len(hotspot_com_groups[r_type])
                 for db_name in self.prms.args["database_names"]:
@@ -1544,6 +1567,21 @@ class Hotspots:
                                    index_label="hotspot_id")
             hotspot_community_annot.to_csv(os.path.join(self.prms.args["output_dir"],
                                                         "hotspot_community_annotation.tsv"), sep="\t", index=False)
+
+            # Save island annotation table
+            island_annotation_table = pd.DataFrame()
+            for hotspot in self.hotspots.to_list():
+                h_island_annot = hotspot.island_annotation.copy()
+                h_island_annot = h_island_annot.drop(columns=["degree", "strength", "island_index"])
+                h_island_annot["hotspot_id"] = hotspot.hotspot_id
+                columns = list(h_island_annot.columns)
+                columns.insert(0, columns.pop(columns.index("hotspot_id")))
+                h_island_annot = h_island_annot[columns]
+                island_annotation_table = pd.concat([island_annotation_table, h_island_annot])
+
+            island_annotation_table.to_csv(os.path.join(self.prms.args["output_dir"], "island_annotation.tsv"),
+                                           sep="\t", index_label="island")
+
             return hotspot_community_annot
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to calculate hotspot and hotspot community statistics based "
@@ -1753,7 +1791,7 @@ class Database:
                 print(f"○ Searching for hotspots with your query protein homologues...", file=sys.stdout)
             found_hotspots = collections.defaultdict(list)
             island_annotations = []
-            location_stat = dict(flanking = 0, cargo = 0)
+            location_stat = dict(flanking=0, cargo=0)
             for hotspot in self.hotspots.hotspots.to_list():
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
@@ -1789,6 +1827,10 @@ class Database:
                         island_annotation.at["query_homologues"] = ",".join(overlapping)
                         island_annotations.append(island_annotation)
                         found_hotspots[hotspot.hotspot_id].append(island)
+            if sum(location_stat.values()) == 0:
+                print("○ Termination since no homologous protein was found in hotspots (neither as flanking or cargo)",
+                      file=sys.stdout)
+                return None
             found_islands = [island.island_id for islands in found_hotspots.values() for island in islands]
             island_annotations = pd.DataFrame(island_annotations)
             island_annotations.to_csv(os.path.join(os.path.join(self.prms.args["output_dir"],
@@ -2115,7 +2157,7 @@ class Database:
                     print(f"○ Lovis4u visualisation found hotspots..", file=sys.stdout)
                 if len(hotspot_hits_statistic.index) > 0:
                     vis_output_folders = [os.path.join(self.prms.args["output_dir"], "lovis4u_hotspot_full"),
-                                          os.path.join(self.prms.args["output_dir"], "lovis4u_hotspot_with_queery")]
+                                          os.path.join(self.prms.args["output_dir"], "lovis4u_hotspot_with_query")]
                     for vis_output_folder in vis_output_folders:
                         if os.path.exists(vis_output_folder):
                             shutil.rmtree(vis_output_folder)
@@ -2125,14 +2167,14 @@ class Database:
                     query_island = row["query_island_id"]
                     for hc, c_hotspots in self.hotspots.communities.items():
                         if hotspot_id in c_hotspots:
+                            drawing_manager.plot_hotspots([hotspot_id],
+                                                          output_folder=os.path.join(self.prms.args["output_dir"],
+                                                                                     "lovis4u_hotspot_with_query"),
+                                                          island_ids=[query_island])
                             drawing_manager.plot_hotspots(c_hotspots,
                                                           output_folder=os.path.join(self.prms.args["output_dir"],
                                                                                      "lovis4u_hotspot_full"),
                                                           keep_while_deduplication=[query_island])
-                            drawing_manager.plot_hotspots([hotspot_id],
-                                                          output_folder=os.path.join(self.prms.args["output_dir"],
-                                                                                     "lovis4u_hotspot_with_queery"),
-                                                          island_ids=[query_island])
             if self.prms.args["verbose"]:
                 print(f"⦿ Done!")
         except Exception as error:

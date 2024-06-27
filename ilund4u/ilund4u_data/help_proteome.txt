@@ -27,7 +27,7 @@ Note: MMseqs arguments below are used for assigning homology
     MMseqs search fident (fraction of identical matches) cutoff
     [default: 0.2]
 -mse, --mmseqs-evalue
-    MMseqs search evalut cutoff [default: 1e-5]
+    MMseqs search evalue cutoff [default: 1e-5]
 -------------------------------
 [OPTIONAL ARGUMENTS | OTHERS]
 -o <name>

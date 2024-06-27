@@ -41,11 +41,14 @@ class DrawingManager:
         self.hotspots = hotspots
         self.prms = parameters
 
-    def plot_hotspot_communities(self, communities: typing.Union[None, list] = None) -> None:
+    def plot_hotspot_communities(self, communities: typing.Union[None, list] = None,
+                                 shortest_labels="auto") -> None:
         """Run visualisation of hotspot list for each hotspot community.
 
         Arguments:
             communities (None | list): list of communities to be plotted.
+            shortest_labels (bool | auto): Whether to put 1-based cds index only instead of CDS id for hypothetical
+                proteins.
 
         Returns:
             None
@@ -63,7 +66,7 @@ class DrawingManager:
             bar = progress.bar.FillingCirclesBar(" ", max=len(communities),
                                                  suffix='%(index)d/%(max)d')
             for hc in communities:
-                self.plot_hotspots(hc, vis_output_folder)
+                self.plot_hotspots(hc, vis_output_folder, shortest_labels=shortest_labels)
                 bar.next()
             bar.finish()
             return None
@@ -72,7 +75,8 @@ class DrawingManager:
 
     def plot_hotspots(self, hotspot_ids: list, output_folder: str = "default",
                       island_ids: typing.Union[None, list] = None,
-                      additional_annotation: typing.Union[None, dict] = None, keep_while_deduplication: list = []):
+                      additional_annotation: typing.Union[None, dict] = None, keep_while_deduplication: list = [],
+                      shortest_labels="auto"):
         """Visualise set of hotspots using Lovis4u.
 
         Arguments:
@@ -81,6 +85,8 @@ class DrawingManager:
             island_ids (None | list): List of island ids. In case it's specified only listed islands will be plotted.
             additional_annotation (dict): Additional LoVis4u feature annotation dict.
             keep_while_deduplication (list): List of island ids to be kept during deduplication.
+            shortest_labels (bool| auto): Whether to put 1-based cds index only instead of CDS id for hypothetical
+                proteins.
 
         Returns:
             None
@@ -128,7 +134,7 @@ class DrawingManager:
                     loci_annotation_rows.append(loci_annotation_row)
                     for cds_ind, cds in enumerate(proteome_cdss):
                         if cds_ind in locus_indexes:
-                            short_id = cds.cds_id.replace(proteome.proteome_id, "").strip().strip("_")
+                            short_id = cds.cds_id.replace(proteome.proteome_id, "").strip().strip("_").strip("-")
                             if cds_ind not in h_island.indexes:
                                 if cds.g_class == "conserved":
                                     group_type = "shell/core"
@@ -165,7 +171,12 @@ class DrawingManager:
                             if feature_annotation_row["name"]:
                                 feature_annotation_row["name"] += f" ({short_id})"
                             else:
-                                feature_annotation_row["name"] = short_id
+                                if shortest_labels == True or \
+                                        (shortest_labels == "auto" and len(h_island.indexes) >= self.prms.args[
+                                            "island_size_cutoff_to_show_index_only"]):
+                                    feature_annotation_row["name"] = str(cds_ind + 1)
+                                else:
+                                    feature_annotation_row["name"] = str(short_id)
                             feature_annotation_rows.append(feature_annotation_row)
 
                         mmseqs_results_rows.append(dict(cluster=cds.group, protein_id=cds.cds_id))
@@ -185,9 +196,10 @@ class DrawingManager:
 
             l_parameters = lovis4u.Manager.Parameters()
             l_parameters.load_config()
-            # l_parameters.args["mm_per_nt"] = 0.014
+            l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_hotspot_mm_per_nt"]
+            #l_parameters.args["figure_width"] = self.prms.args["lovis4u_hotspot_vis_figure_width"]
+
             l_parameters.args["locus_label_style"] = "id"
-            l_parameters.args["figure_width"] = self.prms.args["lovis4u_hotspot_vis_figure_width"]
             l_parameters.args["verbose"] = False
             l_parameters.args["draw_individual_x_axis"] = True
 
@@ -200,9 +212,9 @@ class DrawingManager:
             loci.load_loci_annotation_file(temp_input_l.name)
 
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
-            loci.load_loci_from_extended_gff(gff_files)
-            loci.cluster_sequences(mmseqs_results_t)
-            loci.reorient_loci()
+            loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
+            loci.cluster_sequences(mmseqs_results_t, same_cluster=True)
+            loci.reorient_loci(ilund4u_mode=True)
             loci.set_feature_colors_based_on_groups()
             loci.set_category_colors()
             loci.define_labels_to_be_shown()
@@ -300,10 +312,10 @@ class DrawingManager:
                         if cds.cds_id in island_proteins_d.keys():
                             fcolor = colors_dict[island_proteins_d[cds.cds_id]]
                         else:
-                            if group_type == "conserved":
+                            if cds.g_class == "conserved":
                                 fcolor = "#BDC6CA"
                             else:
-                                fcolor = "#9AA3A7"
+                                fcolor = "#8C9295"
                     feature_annotation_row = dict(feature_id=cds.cds_id, group=cds.group, group_type=group_type)
                     if mode == "hotspot":
                         feature_annotation_row["show_label"] = 0
@@ -342,9 +354,10 @@ class DrawingManager:
             feature_annotation_t.to_csv(temp_input_f.name, sep="\t", index=False)
             loci.load_features_annotation_file(temp_input_f.name)
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
-            loci.load_loci_from_extended_gff(gff_files)
-            loci.cluster_sequences(mmseqs_results_t)
-            loci.reorient_loci()
+            loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
+            if len(gff_files) <= self.prms.args["max_number_of_seqs_to_redefine_order"]:
+                loci.cluster_sequences(mmseqs_results_t, same_cluster=True)
+            loci.reorient_loci(ilund4u_mode=True)
             if mode == "regular" or n_of_added_proteomes == 1:
                 loci.define_labels_to_be_shown()
             loci.set_feature_colors_based_on_groups()

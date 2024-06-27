@@ -1,0 +1,3 @@
+hotspot_id	size	uniqueness	number_of_unique_islands	proteome_community	hotspot_community	N_cargo_groups	N_Defence_cargo_groups	N_Virulence_cargo_groups	N_Anti-defence_cargo_groups	N_AMR_cargo_groups	N_flanking_groups	N_Defence_flanking_groups	N_Virulence_flanking_groups	N_Anti-defence_flanking_groups	N_AMR_flanking_groups	Defence_cargo_normalised	Virulence_cargo_normalised	Anti-defence_cargo_normalised	AMR_cargo_normalised
+0-0	70	0.529	37	0	0	63	16	1	0	0	20	1	0	0	0	0.254	0.0159	0.0	0.0
+0-1	67	0.448	30	0	1	40	5	0	0	0	22	0	0	0	0	0.125	0.0	0.0	0.0

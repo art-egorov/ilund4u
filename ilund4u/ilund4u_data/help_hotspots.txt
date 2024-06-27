@@ -19,7 +19,7 @@ The Atkinson Lab 4U | AE
     Path to a table containing information for each genome about whether
     it is circular or not.
     Format: tab-separated; column names: id, circular. Values 1 or 0.
-    For genomes in which id is not listed, the default value will be used.
+    For genomes which id is not listed, the default value will be used.
     [default: circular; use -ncg/--non-circular-genomes to change]
 -psc, --proteome-sim-cutoff <float>
     Minimal fraction of shared homologous proteins between two
@@ -46,10 +46,10 @@ The Atkinson Lab 4U | AE
     [default: 0.3]
 -------------------------------
 [OPTIONAL ARGUMENTS | OTHERS]
--o <name>
+-o <dir name>
     Output dir name. This will be created if it does not exist.
 	[default: ilund4u_{current_date}; e.g. ilund4u_2022_07_25-20_41]
--o-db, --output-database
+-o-db, --output-database <dirname>
     Output dir name for the database.
     If not specified then no database will be saved.
 -c <standard|<file.cfg>

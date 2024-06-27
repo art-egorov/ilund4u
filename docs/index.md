@@ -1,5 +1,5 @@
 
-<img  src="img/ilund4u_logo.png" width="300"/>
+![logo](img/ilund4u_logo.png){loading=lazy width="265" }  
 #
 ## Description
 
@@ -17,7 +17,7 @@
 
 ## Workflow
 
-<img  src="img/ilundu4_pipeline.png" width="90%"/>
+![pipeline](img/ilundu4_pipeline.png){loading=lazy width="100%" }  
 
 
 ## Installation 

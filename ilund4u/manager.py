@@ -137,7 +137,7 @@ class Parameters:
             sys.exit()
         if args["get_database"]:
             self.load_config()
-            ilund4u.methods.get_ilund4u_db(self.args, args["database"])
+            ilund4u.methods.get_ilund4u_db(self.args, args["get_database"])
             sys.exit()
         if args["help"]:
             if not args["mode"]:

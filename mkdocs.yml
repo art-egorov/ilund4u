@@ -12,8 +12,8 @@ theme:
     palette:
     # Palette toggle for light mode
       - scheme: default
-        primary: grey
-        accent: yellow
+        primary: ilund4u_blue
+        accent: ilund4u_yellow
     icon:
       logo: lovis4u_small
 
@@ -46,6 +46,7 @@ nav:
 
 markdown_extensions:
  - def_list
+ - md_in_html
  - pymdownx.tasklist:
        custom_checkbox: true
  - admonition
@@ -70,11 +71,15 @@ markdown_extensions:
  - pymdownx.caret
  - pymdownx.keys
  - pymdownx.mark
+ - attr_list
  - pymdownx.tilde
+ - pymdownx.details
+ - pymdownx.superfences
 
 plugins:
  - search
  - table-reader
+ - glightbox
  - markdown-exec
  - section-index
  - autorefs
