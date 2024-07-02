@@ -29,7 +29,6 @@
 }
 
 
-
 .responsive-image1 {
     width: 50%;
     max-width: 100%;
@@ -39,6 +38,20 @@
     .responsive-image1 {
         width: 100%;
     }
+}
+
+
+.responsive-image2 {
+    float: right;
+    margin: 0;
+    padding: 0;
+    width: 70%;
+    max-width: 400px;
+}
+
+.responsive-image2 img {
+    width: 100%;
+    height: auto;
 }
 
 :root {
