@@ -24,13 +24,9 @@ theme:
         - toc.integrate
         - header.autohide
 
-extra_css:
-- css/material.css
-- css/mkdocstrings.css
-
-
 nav:
   - Home: index.md
+  - Algorithm description: Algorithm/algorithm.md
   - Example-driven guide: ExampleDrivenGuide/cmd_guide.md
   - Parameters:
     - Command-line parameters: Parameters/cmd_parameters.md
@@ -71,6 +67,19 @@ markdown_extensions:
  - pymdownx.tilde
  - pymdownx.details
  - pymdownx.superfences
+ - pymdownx.arithmatex:
+     generic: true
+
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+ - css/material.css
+ - css/mkdocstrings.css
+ - https://unpkg.com/katex@0/dist/katex.min.css
 
 plugins:
  - search
@@ -81,7 +90,7 @@ plugins:
  - autorefs
  - mkdocstrings:
     watch: 
-      - lovis4u
+      - ilund4u
     handlers:
       python:
         import:
@@ -106,4 +115,4 @@ extra:
   generator: false
   analytics:
     provider: google
-    property: G-2MTBEQBNY
+    property: G-2MTBEQBNYC

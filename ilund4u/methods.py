@@ -1,5 +1,5 @@
 """
-This module provides some methods (e.g. color transformation, data copying, etc.) used by the tool.
+This module provides some methods (e.g. colour transformation, data copying, etc.) used by the tool.
 """
 import matplotlib.colors
 import shutil
@@ -84,15 +84,15 @@ def get_color(name: str, parameters: dict) -> str:
     return hex_c
 
 
-def get_color_rgba(name: str, parameters: dict) -> tuple:
-    """Get rgba color by its name
+def get_colour_rgba(name: str, parameters: dict) -> tuple:
+    """Get rgba colour by its name
 
     Arguments:
-        name (str): name of a color.
+        name (str): name of a colour.
         parameters (dict): Parameters' object dict.
 
     Returns:
-        tuple: RGBA color
+        tuple: RGBA colour
 
     """
     return *matplotlib.colors.hex2color(get_color(name, parameters)), parameters.args[f"{name}_alpha"]

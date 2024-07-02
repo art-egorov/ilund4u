@@ -97,7 +97,7 @@ class DrawingManager:
                 output_folder = os.path.join(self.prms.args["output_dir"], "lovis4u_hotspots")
             if not os.path.exists(output_folder):
                 os.mkdir(output_folder)
-            loci_annotation_rows, feature_annotation_rows, mmseqs_results_rows, gff_files = [], [], [], []
+            locus_annotation_rows, feature_annotation_rows, mmseqs_results_rows, gff_files = [], [], [], []
             cds_table_rows = []
             already_added_groups = []
             hotspot_subset = self.hotspots.hotspots.loc[hotspot_ids].to_list()
@@ -127,25 +127,25 @@ class DrawingManager:
                         sequence_coordinate = f"{start_coordinate}:{end_coordinate}:1"
                     else:
                         sequence_coordinate = f"{start_coordinate}:{proteome_annotation['length']}:1,1:{end_coordinate}:1"
-                    loci_annotation_row = dict(sequence_id=h_island.proteome, coordinates=sequence_coordinate,
+                    locus_annotation_row = dict(sequence_id=h_island.proteome, coordinates=sequence_coordinate,
                                                circular=proteome.circular, group=hotspot.proteome_community)
                     if len(hotspot_ids) > 1:
-                        loci_annotation_row["description"] = f"proteome community: {hotspot.proteome_community}"
-                    loci_annotation_rows.append(loci_annotation_row)
+                        locus_annotation_row["description"] = f"proteome community: {hotspot.proteome_community}"
+                    locus_annotation_rows.append(locus_annotation_row)
                     for cds_ind, cds in enumerate(proteome_cdss):
                         if cds_ind in locus_indexes:
                             short_id = cds.cds_id.replace(proteome.proteome_id, "").strip().strip("_").strip("-")
                             if cds_ind not in h_island.indexes:
                                 if cds.g_class == "conserved":
                                     group_type = "shell/core"
-                                    fcolor = "default"  # attention
+                                    fcolour = "default"  # attention
                                 else:
                                     group_type = "shell/core"
-                                    fcolor = "#D3D5D6"
-                                scolor = "#000000"
+                                    fcolour = "#D3D5D6"
+                                scolour = "#000000"
                             else:
-                                fcolor = "default"
-                                scolor = "default"
+                                fcolour = "default"
+                                scolour = "default"
                                 group_type = "variable"
                                 cds_table_row = dict(hotspot=hotspot.hotspot_id, sequence=h_island.proteome,
                                                      island_index=h_island.indexes.index(cds_ind),
@@ -158,7 +158,7 @@ class DrawingManager:
                                     cds_table_row["category"] = cds.hmmscan_results["db"]
                                 cds_table_rows.append(cds_table_row)
                             feature_annotation_row = dict(feature_id=cds.cds_id, group=cds.group, group_type=group_type,
-                                                          fill_color=fcolor, stroke_color=scolor,
+                                                          fill_colour=fcolour, stroke_colour=scolour,
                                                           name=cds.name)
                             if feature_annotation_row["name"] == "hypothetical protein":
                                 feature_annotation_row["name"] = ""
@@ -187,11 +187,11 @@ class DrawingManager:
             cds_table = pd.DataFrame(cds_table_rows)
             cds_table.to_csv(os.path.join(cds_tables_folder, f"{'_'.join(hotspot_ids)}.tsv"), sep="\t", index=False)
 
-            loci_annotation_t = pd.DataFrame(loci_annotation_rows)
+            locus_annotation_t = pd.DataFrame(locus_annotation_rows)
             feature_annotation_t = pd.DataFrame(feature_annotation_rows)
             temp_input_f = tempfile.NamedTemporaryFile()
             temp_input_l = tempfile.NamedTemporaryFile()
-            loci_annotation_t.to_csv(temp_input_l.name, sep="\t", index=False)
+            locus_annotation_t.to_csv(temp_input_l.name, sep="\t", index=False)
             feature_annotation_t.to_csv(temp_input_f.name, sep="\t", index=False)
 
             l_parameters = lovis4u.Manager.Parameters()
@@ -204,25 +204,25 @@ class DrawingManager:
             l_parameters.args["draw_individual_x_axis"] = True
 
             l_parameters.args["draw_middle_line"] = False
-            l_parameters.args["category_colors"] = self.prms.args["category_colors"]
+            l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
 
             loci = lovis4u.DataProcessing.Loci(parameters=l_parameters)
-            loci.load_features_annotation_file(temp_input_f.name)
-            loci.load_loci_annotation_file(temp_input_l.name)
+            loci.load_feature_annotation_file(temp_input_f.name)
+            loci.load_locus_annotation_file(temp_input_l.name)
 
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
             loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
             loci.cluster_sequences(mmseqs_results_t, same_cluster=True)
             loci.reorient_loci(ilund4u_mode=True)
-            loci.set_feature_colors_based_on_groups()
-            loci.set_category_colors()
+            loci.set_feature_colours_based_on_groups()
+            loci.set_category_colours()
             loci.define_labels_to_be_shown()
             canvas_manager = lovis4u.Manager.CanvasManager(l_parameters)
             canvas_manager.define_layout(loci)
             canvas_manager.add_loci_tracks(loci)
             canvas_manager.add_scale_line_track()
-            canvas_manager.add_categories_color_legend_track(loci)
+            canvas_manager.add_categories_colour_legend_track(loci)
             canvas_manager.add_homology_track()
             pdf_name = f"{'_'.join(hotspot_ids)}.pdf"
             canvas_manager.plot(pdf_name)
@@ -280,9 +280,9 @@ class DrawingManager:
                 hotspot_annotation_com = self.hotspots.annotation[
                     self.hotspots.annotation["proteome_community"] == community]
                 num_of_hotspots = len(hotspot_annotation_com.index)
-                colors_rgb = seaborn.color_palette("husl", num_of_hotspots, desat=1)
-                colors = list(map(lambda x: matplotlib.colors.rgb2hex(x), colors_rgb))
-                colors_dict = ({g: c for g, c in zip(list(hotspot_annotation_com.index.to_list()), colors)})
+                colours_rgb = seaborn.color_palette("husl", num_of_hotspots, desat=1)
+                colours = list(map(lambda x: matplotlib.colors.rgb2hex(x), colours_rgb))
+                colours_dict = ({g: c for g, c in zip(list(hotspot_annotation_com.index.to_list()), colours)})
                 com_hotspots = self.hotspots.hotspots.loc[hotspot_annotation_com.index]
                 island_proteins_d = dict()
                 for hotspot in com_hotspots.to_list():
@@ -310,17 +310,17 @@ class DrawingManager:
                         group_type = "variable"
                     if mode == "hotspot":
                         if cds.cds_id in island_proteins_d.keys():
-                            fcolor = colors_dict[island_proteins_d[cds.cds_id]]
+                            fcolour = colours_dict[island_proteins_d[cds.cds_id]]
                         else:
                             if cds.g_class == "conserved":
-                                fcolor = "#BDC6CA"
+                                fcolour = "#BDC6CA"
                             else:
-                                fcolor = "#8C9295"
+                                fcolour = "#8C9295"
                     feature_annotation_row = dict(feature_id=cds.cds_id, group=cds.group, group_type=group_type)
                     if mode == "hotspot":
                         feature_annotation_row["show_label"] = 0
-                        feature_annotation_row["stroke_color"] = "#000000"
-                        feature_annotation_row["fill_color"] = fcolor
+                        feature_annotation_row["stroke_colour"] = "#000000"
+                        feature_annotation_row["fill_colour"] = fcolour
                     if cds.hmmscan_results and self.prms.args["show_hmmscan_hits_on_full_proteomes"]:
                         feature_annotation_row["name"] = cds.hmmscan_results["target"]
                         feature_annotation_row["category"] = cds.hmmscan_results["db"]
@@ -343,7 +343,7 @@ class DrawingManager:
             if mode == "hotspot" and n_of_added_proteomes != 1:
                 l_parameters.args["gff_CDS_category_source"] = "-"
             l_parameters.args["draw_middle_line"] = False
-            l_parameters.args["category_colors"] = self.prms.args["category_colors"]
+            l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
             if os.path.exists(l_parameters.args["output_dir"]):
                 shutil.rmtree(l_parameters.args["output_dir"])
@@ -352,7 +352,7 @@ class DrawingManager:
             feature_annotation_t = pd.DataFrame(feature_annotation_rows)
             temp_input_f = tempfile.NamedTemporaryFile()
             feature_annotation_t.to_csv(temp_input_f.name, sep="\t", index=False)
-            loci.load_features_annotation_file(temp_input_f.name)
+            loci.load_feature_annotation_file(temp_input_f.name)
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
             loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
             if len(gff_files) <= self.prms.args["max_number_of_seqs_to_redefine_order"]:
@@ -360,15 +360,15 @@ class DrawingManager:
             loci.reorient_loci(ilund4u_mode=True)
             if mode == "regular" or n_of_added_proteomes == 1:
                 loci.define_labels_to_be_shown()
-            loci.set_feature_colors_based_on_groups()
-            loci.set_category_colors()
-            loci.save_features_annotation_table()
+            loci.set_feature_colours_based_on_groups()
+            loci.set_category_colours()
+            loci.save_feature_annotation_table()
             canvas_manager = lovis4u.Manager.CanvasManager(l_parameters)
             canvas_manager.define_layout(loci)
             canvas_manager.add_loci_tracks(loci)
             if n_of_added_proteomes > 1:
                 canvas_manager.add_scale_line_track()
-            canvas_manager.add_categories_color_legend_track(loci)
+            canvas_manager.add_categories_colour_legend_track(loci)
             canvas_manager.add_homology_track()
             if not filename:
                 filename = f"{community}.pdf"

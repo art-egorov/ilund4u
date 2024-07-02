@@ -12,7 +12,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.3 (June 2024)
+**Version:** 0.0.4 (July 2024)
 
 
 ## Workflow
@@ -36,7 +36,7 @@ cd ilund4u
 python3 -m pip install --upgrade pip
 python3 -m pip install setuptools wheel
 python3 setup.py sdist
-python3 -m pip install  .
+python3 -m pip install .
 ```
 
 **!** If you're a linux user, run `ilund4u --linux` post-install command once to update paths in the premade config files that set by default for MacOS users.

@@ -13,21 +13,21 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.3 (June 2024)
+**Version:** 0.0.4 (July 2024)
 
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
 
-## Reference 📃
+## Reference
 
 If you find iLund4u useful, please cite:  
 Artyom. A. Egorov, Gemma C. Atkinson, **iLund4u: ---**, *---*
 
-## Contact 📇
+## Contact
 
 Please contact us by e-mail _artem**dot**egorov**AT**med**dot**lu**dot**se_ or use [Issues](https://github.com/art-egorov/ilund4u/issues?q=) to report any technical problems.  
 You can also use [Discussions section](https://github.com/art-egorov/ilund4u/discussions) for sharing your ideas or feature requests! 
 
-## Authors 👨🏻‍💻
+## Authors
 
 iLund4u is developed by Artyom Egorov at [the Atkinson Lab](https://atkinson-lab.com), Department of Experimental Medical Science, Lund University, Sweden. We are open for suggestions to extend and improve iLund4u functionality. Please don't hesitate to share your ideas or feature requests.

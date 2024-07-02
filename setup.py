@@ -17,10 +17,10 @@ extra_files = package_files("ilund4u/ilund4u_data")
 extra_files.append("../docs/pypi.md")
 
 setuptools.setup(name="ilund4u",
-                 version="0.0.3.0",
+                 version="0.0.4.0",
                  python_requires='>=3.8',
                  description="description",
-                 url="https://art-egorov.github.io/iLund4u/",
+                 url="https://art-egorov.github.io/ilund4u/",
                  author="Artyom Egorov",
                  author_email="artem.egorov@med.lu.se",
                  license="WTFPL",

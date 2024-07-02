@@ -68,7 +68,7 @@ database_names = Defence,Virulence,Anti-defence,AMR
 
 **;[Other paths]**  
 mmseqs_binary = {internal}/bin/mmseqs_mac/bin/mmseqs  
-category_colors = {internal}/category_colors_proteome_groups.tsv  
+category_colours = {internal}/category_colours_proteome_groups.tsv  
 
 **;[Output]**  
 verbose = True  

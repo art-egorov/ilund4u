@@ -1721,7 +1721,7 @@ class Database:
                             os.path.join(mmseqs_output_folder_db, "search_res_db"),
                             os.path.join(mmseqs_output_folder, "tmp"), "-e",
                             str(self.prms.args["mmseqs_search_evalue"]),
-                            "-s", "5"], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
+                            "-s",  str(self.prms.args["mmseqs_search_s"])], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
             subprocess.run([self.prms.args["mmseqs_binary"], "convertalis",
                             os.path.join(mmseqs_output_folder_db, "query_seq_db"),
                             self.db_paths["proteins_db"],
@@ -1879,7 +1879,7 @@ class Database:
                 os.mkdir(vis_output_folder)
             additional_annotation = dict()
             for hpid in homologous_protein_ids:
-                additional_annotation[hpid] = dict(stroke_color="#000000", fill_color="#000000")
+                additional_annotation[hpid] = dict(stroke_colour="#000000", fill_colour="#000000")
                 if query_label:
                     additional_annotation[hpid]["name"] = query_label
             drawing_manager = ilund4u.drawing.DrawingManager(self.proteomes, self.hotspots, self.prms)
