@@ -12,7 +12,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.4 (July 2024)
+**Version:** 0.0.5 (July 2024)
 
 
 ## Workflow

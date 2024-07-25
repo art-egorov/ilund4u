@@ -75,6 +75,7 @@ class DrawingManager:
 
     def plot_hotspots(self, hotspot_ids: list, output_folder: str = "default",
                       island_ids: typing.Union[None, list] = None,
+                      proteome_ids: typing.Union[None, list] = None,
                       additional_annotation: typing.Union[None, dict] = None, keep_while_deduplication: list = [],
                       shortest_labels="auto"):
         """Visualise set of hotspots using Lovis4u.
@@ -83,6 +84,8 @@ class DrawingManager:
             hotspot_ids (list): List of hotspot ids to be plotted.
             output_folder (str): Output folder to save pdf file.
             island_ids (None | list): List of island ids. In case it's specified only listed islands will be plotted.
+            proteome_ids (None | list): List of proteome ids. In case it's specifiedd only listed proteome will
+                be plotted.
             additional_annotation (dict): Additional LoVis4u feature annotation dict.
             keep_while_deduplication (list): List of island ids to be kept during deduplication.
             shortest_labels (bool| auto): Whether to put 1-based cds index only instead of CDS id for hypothetical
@@ -108,6 +111,9 @@ class DrawingManager:
                         if h_island.island_id not in island_ids:
                             continue
                     proteome = self.proteomes.proteomes.at[h_island.proteome]
+                    if proteome_ids:
+                        if proteome.proteome_id not in proteome_ids:
+                            continue
                     if proteome.proteome_id in added_proteomes:
                         continue
                     added_proteomes.append(proteome.proteome_id)
@@ -123,6 +129,8 @@ class DrawingManager:
                     gff_files.append(proteome.gff_file)
                     start_coordinate = proteome_cdss[locus_indexes[0]].start
                     end_coordinate = proteome_cdss[locus_indexes[-1]].end
+                    #start_coordinate = proteome_cdss[h_island.indexes[0] - 1].start
+                    #end_coordinate = proteome_cdss[h_island.indexes[-1] + 1].end
                     if end_coordinate > start_coordinate:
                         sequence_coordinate = f"{start_coordinate}:{end_coordinate}:1"
                     else:
@@ -137,10 +145,10 @@ class DrawingManager:
                             short_id = cds.cds_id.replace(proteome.proteome_id, "").strip().strip("_").strip("-")
                             if cds_ind not in h_island.indexes:
                                 if cds.g_class == "conserved":
-                                    group_type = "shell/core"
-                                    fcolour = "default"  # attention
+                                    group_type = "conserved"
+                                    fcolour = "#8B9697"  # attention
                                 else:
-                                    group_type = "shell/core"
+                                    group_type = "conserved"
                                     fcolour = "#D3D5D6"
                                 scolour = "#000000"
                             else:
@@ -175,10 +183,10 @@ class DrawingManager:
                                         (shortest_labels == "auto" and len(h_island.indexes) >= self.prms.args[
                                             "island_size_cutoff_to_show_index_only"]):
                                     feature_annotation_row["name"] = str(cds_ind + 1)
+                                    # feature_annotation_row["name"] = "" #!
                                 else:
                                     feature_annotation_row["name"] = str(short_id)
                             feature_annotation_rows.append(feature_annotation_row)
-
                         mmseqs_results_rows.append(dict(cluster=cds.group, protein_id=cds.cds_id))
 
             cds_tables_folder = os.path.join(self.prms.args["output_dir"], "lovis4u_hotspots_annotation")
@@ -196,12 +204,18 @@ class DrawingManager:
 
             l_parameters = lovis4u.Manager.Parameters()
             l_parameters.load_config()
-            l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_hotspot_mm_per_nt"]
-            #l_parameters.args["figure_width"] = self.prms.args["lovis4u_hotspot_vis_figure_width"]
+            #l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_hotspot_mm_per_nt"]
+            l_parameters.args["figure_width"] = self.prms.args["lovis4u_hotspot_vis_figure_width"]
+
+            #l_parameters.args["feature_group_types_to_show_label_on_first_occurrence"] = ["conserved", "variable"] #!
+            #l_parameters.args["feature_group_types_to_show_label"] = []
+            #l_parameters.args["locus_label_size"] = 0.4
+            #l_parameters.args["feature_label_size"] = 0.55
 
             l_parameters.args["locus_label_style"] = "id"
             l_parameters.args["verbose"] = False
             l_parameters.args["draw_individual_x_axis"] = True
+            # l_parameters.args["draw_individual_x_axis"] = False
 
             l_parameters.args["draw_middle_line"] = False
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
@@ -218,16 +232,20 @@ class DrawingManager:
             loci.set_feature_colours_based_on_groups()
             loci.set_category_colours()
             loci.define_labels_to_be_shown()
+
             canvas_manager = lovis4u.Manager.CanvasManager(l_parameters)
             canvas_manager.define_layout(loci)
             canvas_manager.add_loci_tracks(loci)
             canvas_manager.add_scale_line_track()
             canvas_manager.add_categories_colour_legend_track(loci)
             canvas_manager.add_homology_track()
-            pdf_name = f"{'_'.join(hotspot_ids)}.pdf"
+            pdf_name = f"{'_'.join(hotspot_ids)}"
+            if len(pdf_name) > 250:
+                pdf_name = f"{pdf_name[:250]}---"
+            pdf_name += ".pdf"
             canvas_manager.plot(pdf_name)
             os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name} {output_folder}/")
-            shutil.rmtree(l_parameters.args["output_dir"])
+            shutil.rmtree(l_parameters.args["output_dir"]) #!
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to plot set of hotspots using LoVis4u.") from error
 
@@ -305,7 +323,7 @@ class DrawingManager:
                 gff_files.append(proteome.gff_file)
                 for cds_ind, cds in enumerate(proteome.cdss.to_list()):
                     if cds.g_class == "conserved":
-                        group_type = "shell/core"
+                        group_type = "conserved"
                     else:
                         group_type = "variable"
                     if mode == "hotspot":
@@ -333,7 +351,7 @@ class DrawingManager:
             l_parameters = lovis4u.Manager.Parameters()
             l_parameters.load_config()
             l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_proteome_mm_per_nt"]
-            # l_parameters.args["figure-width"] = 21
+            #l_parameters.args["figure_width"] = 8 #!
             if n_of_added_proteomes > 1:
                 l_parameters.args["draw_individual_x_axis"] = False
             else:

@@ -1902,7 +1902,7 @@ class Database:
         """Run proteome annotation mode which searches for similar proteomes in the database and annotate hotspots and
             variable proteins in the query proteome in case a community with similar proteomes was found in the database.
 
-        Arguments:
+        Arguments:f
             query_gff (str): GFF with query proteome.
 
         Returns:

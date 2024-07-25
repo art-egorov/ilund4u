@@ -1,5 +1,8 @@
 # Version log
 
+* **Ver 0.0.5** - 25 July 2024 
+	- Long pdf file name bug is fixed.
+
 * Ver 0.0.4 - 27 June 2024 
 	- Minor fixes and parameter name changes.
 

@@ -296,7 +296,7 @@ Below you can see visualisation of the same 0-0 and 0-1 hotspots with highlighte
 Additionally, iLund4u returns visualisation (on one figure) of all loci where only query protein homologues are found (Fig. 7):
 
 <figure markdown="span" style="align:center; margin-top: 0; margin-bottom: 0;">
-	![0-0_0-1](cmd_guide/img/0-0_0-1.png){loading=lazy width="100%" }  
+	![0-0_0-1](cmd_guide/img/0-0_0-1.png){loading=lazy width="900" }  
 	<figcaption style="margin-top: 0; margin-bottom: 0;">Figure 7</figcaption>
 </figure>
 
