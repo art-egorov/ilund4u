@@ -1,6 +1,9 @@
 # Version log
 
-* **Ver 0.0.5** - 25 July 2024 
+* **Ver 0.0.5.1** - 25 July 2024 
+	- Long table file name bug is fixed (adjusment to the 0.0.5 v. update).
+
+* Ver 0.0.5 - 25 July 2024 
 	- Long pdf file name bug is fixed.
 
 * Ver 0.0.4 - 27 June 2024 

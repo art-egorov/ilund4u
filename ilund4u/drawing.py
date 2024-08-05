@@ -193,7 +193,10 @@ class DrawingManager:
             if not os.path.exists(cds_tables_folder):
                 os.mkdir(cds_tables_folder)
             cds_table = pd.DataFrame(cds_table_rows)
-            cds_table.to_csv(os.path.join(cds_tables_folder, f"{'_'.join(hotspot_ids)}.tsv"), sep="\t", index=False)
+            table_name = f"{'_'.join(hotspot_ids)}"
+            if len(table_name) > 250:
+                table_name = f"{table_name[:250]}---"
+            cds_table.to_csv(os.path.join(cds_tables_folder, f"{table_name}.tsv"), sep="\t", index=False)
 
             locus_annotation_t = pd.DataFrame(locus_annotation_rows)
             feature_annotation_t = pd.DataFrame(feature_annotation_rows)
@@ -242,9 +245,8 @@ class DrawingManager:
             pdf_name = f"{'_'.join(hotspot_ids)}"
             if len(pdf_name) > 250:
                 pdf_name = f"{pdf_name[:250]}---"
-            pdf_name += ".pdf"
-            canvas_manager.plot(pdf_name)
-            os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name} {output_folder}/")
+            canvas_manager.plot(f"{pdf_name}.pdf")
+            os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name}.pdf {output_folder}/")
             shutil.rmtree(l_parameters.args["output_dir"]) #!
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to plot set of hotspots using LoVis4u.") from error
