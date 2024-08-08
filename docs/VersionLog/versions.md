@@ -1,6 +1,10 @@
 # Version log
 
-* **Ver 0.0.5.1** - 25 July 2024 
+
+* **Ver 0.0.5.2** - 8 August 2024 
+	- Adjusment to the 0.0.5.1 v. update
+
+* Ver 0.0.5.1 - 5 August 2024 
 	- Long table file name bug is fixed (adjusment to the 0.0.5 v. update).
 
 * Ver 0.0.5 - 25 July 2024 

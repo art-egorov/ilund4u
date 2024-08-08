@@ -194,9 +194,10 @@ class DrawingManager:
                 os.mkdir(cds_tables_folder)
             cds_table = pd.DataFrame(cds_table_rows)
             table_name = f"{'_'.join(hotspot_ids)}"
-            if len(table_name) > 250:
-                table_name = f"{table_name[:250]}---"
+            if len(table_name) > 200:
+                table_name = f"{table_name[:200]}..._{hotspot_ids[-1]}"
             cds_table.to_csv(os.path.join(cds_tables_folder, f"{table_name}.tsv"), sep="\t", index=False)
+
 
             locus_annotation_t = pd.DataFrame(locus_annotation_rows)
             feature_annotation_t = pd.DataFrame(feature_annotation_rows)
@@ -243,8 +244,8 @@ class DrawingManager:
             canvas_manager.add_categories_colour_legend_track(loci)
             canvas_manager.add_homology_track()
             pdf_name = f"{'_'.join(hotspot_ids)}"
-            if len(pdf_name) > 250:
-                pdf_name = f"{pdf_name[:250]}---"
+            if len(pdf_name) > 200:
+                pdf_name = f"{pdf_name[:200]}..._{hotspot_ids[-1]}"
             canvas_manager.plot(f"{pdf_name}.pdf")
             os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name}.pdf {output_folder}/")
             shutil.rmtree(l_parameters.args["output_dir"]) #!
