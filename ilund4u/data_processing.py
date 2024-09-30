@@ -142,9 +142,9 @@ class Proteome:
                 island_size = len(var_indexes)
                 island_center = var_indexes[int(island_size / 2)]
                 island_id = f"{self.proteome_id}:{island_center}"
-                island = Island(island_id=island_id, proteome=self.proteome_id, center=island_center,
-                                indexes=region, var_indexes=var_indexes, left_cons_neighbours=left_cons_neighbours,
-                                right_cons_neighbours=right_cons_neighbours)
+                island = Island(island_id=island_id, proteome=self.proteome_id, circular_proteome=self.circular,
+                                center=island_center, indexes=region, var_indexes=var_indexes,
+                                left_cons_neighbours=left_cons_neighbours, right_cons_neighbours=right_cons_neighbours)
                 proteome_islands_l.append(island)
             self.islands = pd.Series(proteome_islands_l, index=[pi.island_id for pi in proteome_islands_l])
             return None
@@ -215,17 +215,21 @@ class Island:
     Attributes:
         island_id (str): Island identifier.
         proteome (str): Proteome identifier where island is annotated.
+        circular_proteome (int): [1 or 0] int value whether locus is circular or not. If genome is circular then
+                first and last genes are considered as neighbours.
         center (int): CDS index of the island center.
         indexes (list): CDS indexes of the island.
         size (int): Length of the island (number of CDSs).
         var_indexes (list): Indexes of CDS which g_class is "variable".
         left_cons_neighbours (list): Indexes of conserved neighbours on the left.
         right_cons_neighbours (list): Indexes of conserved neighbours on the right.
+        flanked (int): Whether island is flanked by conserved genes or not [1 or 0].
         databases_hits_stat (dict): Statistics from hmmscan annotation.
 
     """
 
-    def __init__(self, island_id: str, proteome: str, center: int, indexes: list, var_indexes: list,
+    def __init__(self, island_id: str, proteome: str,
+                 circular_proteome: int, center: int, indexes: list, var_indexes: list,
                  left_cons_neighbours: list, right_cons_neighbours: list,
                  databases_hits_stat: typing.Union[None, dict] = None):
         """Island class constructor.
@@ -233,6 +237,8 @@ class Island:
         Arguments:
             island_id (str): Island identifier.
             proteome (str): Proteome identifier where island is annotated.
+            circular_proteome (int): [1 or 0] int value whether locus is circular or not. If genome is circular then
+                first and last genes are considered as neighbours.
             center (int): CDS index of the island center.
             indexes (list): CDS indexes of the island.
             var_indexes (list): Indexes of CDS which g_class is "variable".
@@ -243,12 +249,17 @@ class Island:
         """
         self.island_id = island_id
         self.proteome = proteome
+        self.circular_proteome = circular_proteome
         self.center = center
         self.indexes = indexes
         self.size = len(indexes)
         self.var_indexes = var_indexes
         self.left_cons_neighbours = left_cons_neighbours
         self.right_cons_neighbours = right_cons_neighbours
+        if (not left_cons_neighbours or not right_cons_neighbours) and not circular_proteome:
+            self.flanked = 0
+        else:
+            self.flanked = 1
         if databases_hits_stat is None:
             databases_hits_stat = collections.defaultdict(lambda: collections.defaultdict(dict))
         self.databases_hits_stat = databases_hits_stat
@@ -260,7 +271,7 @@ class Island:
             dict: object's attributes.
 
         """
-        attributes_to_ignore = ["size"]
+        attributes_to_ignore = ["size", "flanked"]
         attributes = {k: v for k, v in self.__dict__.items() if k not in attributes_to_ignore}
         return attributes
 
@@ -641,7 +652,6 @@ class Proteomes:
                         record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
                                                    circular=circular)
                         record_cdss = []
-                        gff_records = []
                         for gff_feature in gff_record.features:
                             cds_id = gff_feature.id.replace(";", ",")
                             if gff_record.id not in cds_id:
@@ -1070,6 +1080,7 @@ class Proteomes:
                 graph.vs["index"] = com_island_n_sizes.index.to_list()
                 graph.vs["island_id"] = [isl.island_id for isl in islands_list]
                 graph.vs["island_size"] = [isl.size for isl in islands_list]
+                graph.vs["flanked"] = [isl.flanked for isl in islands_list]
                 graph.vs["proteome_id"] = [isl.proteome for isl in islands_list]
                 graph.es["weight"] = weights
                 graph.save(os.path.join(output_network_folder, f"{com_id}.gml"))
@@ -1119,11 +1130,11 @@ class Proteomes:
                     hotspot_presence = hotspot_uniq_size / com_size
                     if hotspot_presence > self.prms.args["hotspot_presence_cutoff"]:
                         island_indexes, island_ids = subgraph.vs["index"], subgraph.vs["island_id"]
-                        island_size = subgraph.vs["island_size"]
+                        island_size, island_flanked = subgraph.vs["island_size"], subgraph.vs["flanked"]
                         strength, degree = subgraph.strength(weights="weight"), subgraph.degree()
                         island_annotation = pd.DataFrame(dict(island=island_ids, island_index=island_indexes,
-                                                              island_size=island_size,
-                                                              proteome=proteomes, strength=strength,
+                                                              island_size=island_size, proteome=proteomes,
+                                                              flanked=island_flanked, strength=strength,
                                                               degree=degree)).set_index("island")
                         if self.prms.args["deduplicate_proteomes_within_hotspot"]:  # To update usage wo it
                             island_annotation = island_annotation.sort_values(by="strength", ascending=False)
@@ -1134,7 +1145,9 @@ class Proteomes:
                         islands = [islands_list[ind] for ind in island_annotation["island_index"].to_list()]
                         unique_island_cds_groups = []
                         conserved_island_groups_count = collections.defaultdict(int)
+                        flanked_count = 0
                         for island in islands:
+                            flanked_count += island.flanked
                             island_proteome_cdss = com_proteomes.at[island.proteome].cdss
                             island_cds_groups = island_proteome_cdss.iloc[island.indexes].apply(
                                 lambda isl: isl.group).to_list()
@@ -1145,20 +1158,27 @@ class Proteomes:
                                 unique_island_cds_groups.append(set(island_cds_groups))
                             for icg in set(island_conserved_groups):
                                 conserved_island_groups_count[icg] += 1
+                        if max(1, int(flanked_count / hotspot_uniq_size)) >= 0.1:
+                            flanked_hotspot = 1
+                        else:
+                            flanked_hotspot = 0
+                        if not self.prms.args["report_not_flanked"] and not flanked_hotspot:
+                            continue
 
                         signature_cutoff = int(self.prms.args["hotspot_signature_presence_cutoff"] * hotspot_uniq_size)
                         hotspot_conserved_signature = [g for g, c in conserved_island_groups_count.items() if
                                                        c >= signature_cutoff]
-
                         number_of_unique_islands = len(unique_island_cds_groups)
+
                         hotspot = Hotspot(hotspot_id=f"{com_id}-{icom_ind}", proteome_community=com_id,
                                           size=hotspot_uniq_size, islands=islands,
                                           conserved_signature=hotspot_conserved_signature,
-                                          island_annotation=island_annotation)
+                                          island_annotation=island_annotation, flanked=flanked_hotspot)
                         h_annotation_row = dict(hotspot_id=f"{com_id}-{icom_ind}", size=hotspot_uniq_size,
                                                 uniqueness=round(number_of_unique_islands / hotspot_uniq_size, 3),
                                                 number_of_unique_islands=number_of_unique_islands,
-                                                proteome_community=com_id)
+                                                proteome_community=com_id, flanked=flanked_hotspot,
+                                                flanked_fraction=round(flanked_count / hotspot_uniq_size, 3))
                         h_annotation_rows.append(h_annotation_row)
                         hotspots_l.append(hotspot)
             if self.prms.args["verbose"]:
@@ -1167,9 +1187,12 @@ class Proteomes:
             hotspots_s = pd.Series(hotspots_l, index=[hotspot.hotspot_id for hotspot in hotspots_l])
             hotspots_obj = Hotspots(hotspots_s, h_annotation, parameters=self.prms)
             num_of_hotspots = len(hotspots_l)
+            num_of_flanked = sum([hotspot.flanked for hotspot in hotspots_l])
             if self.prms.args["verbose"]:
                 print(f"  ⦿ {num_of_hotspots} hotspots were found in {number_of_communities} proteome communities"
-                      f"  (Avg: {round(num_of_hotspots / number_of_communities, 3)} per community)",
+                      f"  (Avg: {round(num_of_hotspots / number_of_communities, 3)} per community)\n"
+                      f"  {num_of_flanked}/{num_of_hotspots} hotspots are flanked (consist of islands that have "
+                      f"conserved genes on both sides)",
                       file=sys.stdout)
             return hotspots_obj
         except Exception as error:
@@ -1186,11 +1209,13 @@ class Hotspot:
         islands (list): List of islands.
         conserved_signature (list): Conserved flanking proteins that are usually found in islands.
         island_annotation (pd.DataFrame): Annotation table of islands.
+        flanked (int): Whether hotspot consists of flanked islands or not (that have conserved genes on both sides)
+            [int: 1 or 0]
 
     """
 
     def __init__(self, hotspot_id: str, size: int, proteome_community: int, islands: list,
-                 conserved_signature: list, island_annotation: pd.DataFrame):
+                 conserved_signature: list, island_annotation: pd.DataFrame, flanked: int):
         """Hotspot class constructor.
 
         Arguments:
@@ -1200,6 +1225,8 @@ class Hotspot:
             islands (list): List of islands.
             conserved_signature (list): Conserved flanking proteins that are usually found in islands.
             island_annotation (pd.DataFrame): Annotation table of islands.
+            flanked (int): Whether hotspot consists of flanked islands or not (that have conserved genes on both sides)
+                [int: 1 or 0]
 
         """
         self.hotspot_id = hotspot_id
@@ -1208,6 +1235,7 @@ class Hotspot:
         self.islands = islands
         self.island_annotation = island_annotation
         self.conserved_signature = conserved_signature
+        self.flanked = flanked
 
     def get_hotspot_db_row(self) -> dict:
         """Database building method for saving object's attributes.
@@ -1469,6 +1497,7 @@ class Hotspots:
             graph = igraph.Graph(len(hotspot_signature_sizes.index), edges, directed=False)
             graph.vs["index"] = hotspot_signature_sizes.index.to_list()
             graph.vs["hotspot_id"] = [h.hotspot_id for h in self.hotspots]
+            graph.vs["flanked"] = [h.flanked for h in self.hotspots]
             graph.es["weight"] = weights
             graph.save(os.path.join(self.prms.args["output_dir"], f"hotspot_network.gml"))
             partition_leiden = leidenalg.find_partition(graph, leidenalg.CPMVertexPartition,
@@ -1483,6 +1512,7 @@ class Hotspots:
                 community_size = len(community)
                 subgraph = graph.subgraph(community)
                 hotspots = subgraph.vs["hotspot_id"]
+                n_flanked = sum(subgraph.vs["flanked"])
                 self.communities[community_index] = hotspots
                 self.annotation.loc[hotspots, "hotspot_community"] = community_index
                 if community_size > 1:
@@ -1495,16 +1525,16 @@ class Hotspots:
                     max_identity = max(weights)
                 else:
                     num_of_edges, num_of_edges_fr, avg_weight, max_identity = "", "", "", ""
-                hotspot_communities_annot_rows.append([community_index, community_size, avg_weight, max_identity,
-                                                       num_of_edges_fr, ";".join(hotspots)])
+                hotspot_communities_annot_rows.append([community_index, community_size, avg_weight, n_flanked,
+                                                       max_identity, num_of_edges_fr, ";".join(hotspots)])
             communities_annot = pd.DataFrame(hotspot_communities_annot_rows, columns=["id", "size", "avg_weight",
-                                                                                      "max_weight", "fr_edges",
-                                                                                      "hotspots"])
+                                                                                      "n_flanked", "max_weight",
+                                                                                      "fr_edges", "hotspots"])
             communities_annot.to_csv(os.path.join(os.path.join(self.prms.args["output_dir"],
                                                                "hotspot_communities.tsv")),
                                      sep="\t", index=False)
             if self.prms.args["verbose"]:
-                print(f"  ⦿  {sum(communities_sizes)} hotspots were merged to {len(communities_sizes)} not singleton "
+                print(f"  ⦿ {sum(communities_sizes)} hotspots were merged to {len(communities_sizes)} not singleton "
                       f"communities")
             return None
         except Exception as error:
@@ -1533,9 +1563,10 @@ class Hotspots:
                 h_com_stat = collections.defaultdict(lambda: collections.defaultdict(dict))
                 hotspot_com_groups = dict(cargo=set(), flanking=set())
                 hotspots = self.hotspots.loc[hotspot_ids].to_list()
-                n_islands = 0
+                n_islands, n_flanked = 0, 0
                 for hotspot in hotspots:
                     n_islands += hotspot.size
+                    n_flanked += hotspot.flanked
                     hotspot_groups = hotspot.get_hotspot_groups(proteomes)
                     db_stat = hotspot.calculate_database_hits_stats(proteomes, self.prms)
                     for r_type in r_types:
@@ -1546,8 +1577,9 @@ class Hotspots:
                             h_com_stat[db_name][r_type].update(db_stat[db_name][r_type])
                             self.annotation.at[hotspot.hotspot_id, f"N_{db_name}_{r_type}_groups"] = \
                                 len(set(db_stat[db_name][r_type].values()))
-                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_islands=n_islands,
-                                    hotspots=",".join(hotspot_ids), pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
+                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_flanked = n_flanked,
+                                    N_islands=n_islands, hotspots=",".join(hotspot_ids),
+                                    pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
                 for r_type in r_types:
                     hc_annot_row[f"N_{r_type}_groups"] = len(hotspot_com_groups[r_type])
                 for db_name in self.prms.args["database_names"]:
@@ -1581,7 +1613,6 @@ class Hotspots:
 
             island_annotation_table.to_csv(os.path.join(self.prms.args["output_dir"], "island_annotation.tsv"),
                                            sep="\t", index_label="island")
-
             return hotspot_community_annot
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to calculate hotspot and hotspot community statistics based "
@@ -1604,7 +1635,7 @@ class Hotspots:
                 bar = progress.bar.FillingCirclesBar(" ", max=len(self.hotspots.index), suffix='%(index)d/%(max)d')
             protein_group_statistics_dict = collections.defaultdict(
                 lambda: {"Hotspot_communities": set(), "Hotspots": set(), "Islands": set(),
-                         "Proteome_communities": set(),
+                         "Proteome_communities": set(), "Flanked_islands": set(),
                          "Counts": 0, "db": "None", "db_hit": "None", "Name": "", "RepLength": 0})
             for h_com, hotspots_ids in self.communities.items():
                 hotspots = self.hotspots.loc[hotspots_ids].to_list()
@@ -1629,6 +1660,7 @@ class Hotspots:
                             protein_group_statistics_dict[ispg]["Proteome_communities"].add(hotspot.proteome_community)
                             protein_group_statistics_dict[ispg]["Hotspots"].add(hotspot.hotspot_id)
                             protein_group_statistics_dict[ispg]["Islands"].add(island.island_id)
+                            protein_group_statistics_dict[ispg]["Flanked_islands"].add(island.island_id)
             if self.prms.args["verbose"]:
                 bar.finish()
             statistic_rows = []
@@ -1721,7 +1753,7 @@ class Database:
                             os.path.join(mmseqs_output_folder_db, "search_res_db"),
                             os.path.join(mmseqs_output_folder, "tmp"), "-e",
                             str(self.prms.args["mmseqs_search_evalue"]),
-                            "-s",  str(self.prms.args["mmseqs_search_s"])], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
+                            "-s", str(self.prms.args["mmseqs_search_s"])], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
             subprocess.run([self.prms.args["mmseqs_binary"], "convertalis",
                             os.path.join(mmseqs_output_folder_db, "query_seq_db"),
                             self.db_paths["proteins_db"],
@@ -1792,7 +1824,10 @@ class Database:
             found_hotspots = collections.defaultdict(list)
             island_annotations = []
             location_stat = dict(flanking=0, cargo=0)
+            n_flanked = 0
             for hotspot in self.hotspots.hotspots.to_list():
+                if not self.prms.args["report_not_flanked"] and not hotspot.flanked:
+                    continue
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
                     if self.prms.args["protein_search_target_mode"] == "proteins":
@@ -1810,12 +1845,12 @@ class Database:
                                     homologous_protein_ids_island.append(lp)
                                     homologous_protein_ids.append(lp)
                             overlapping = homologous_protein_ids_island
-
                         isl_groups = island.get_island_groups(proteome.cdss)
                         isl_proteins = island.get_island_proteins(proteome.cdss)
                         for op in overlapping:
                             if op in isl_proteins:
                                 location_stat["cargo"] += 1
+                                n_flanked += 1
                             else:
                                 location_stat["flanking"] += 1
                         island_annotation = hotspot.island_annotation.loc[island.island_id].copy()
@@ -1845,7 +1880,9 @@ class Database:
                       f"communit{'y' if len(found_hotspot_communities) == 1 else 'ies'} "
                       f"({len(found_hotspots.keys())} hotspot{'s' if len(found_hotspots.keys()) > 1 else ''}) on "
                       f"{len(found_islands)} island{'s' if len(found_islands) > 1 else ''}\n"
-                      f"    Found as cargo: {location_stat['cargo']}, as flanking gene: {location_stat['flanking']}",
+                      f"    Found as cargo: {location_stat['cargo']}, as flanking gene: {location_stat['flanking']}"
+                      f"\n    {n_flanked}/{len(found_islands)} island{'s' if len(found_islands) > 1 else ''} where found"
+                      f" as cargo are both side flanked (have conserved genes on both sides)",
                       file=sys.stdout)
             homologous_protein_fasta = os.path.join(self.prms.args["output_dir"], "homologous_proteins.fa")
             full_fasta_file = Bio.SeqIO.index(self.proteomes.proteins_fasta_file, "fasta")
@@ -2035,6 +2072,9 @@ class Database:
             # Connect query proteome islands to the island network
             community_hotspots = [h for h in self.hotspots.hotspots.to_list() if
                                   h.proteome_community == query_proteome_community]
+            if not self.prms.args["report_not_flanked"]:
+                community_hotspots_flanked = [h for h in community_hotspots if h.flanked == 1]
+                community_hotspots = community_hotspots_flanked
             if community_hotspots:
                 hotspots_islands = [island for hotspot in community_hotspots for island in hotspot.islands]
                 island_id_to_index = {isl.island_id: ind for ind, isl in enumerate(hotspots_islands)}

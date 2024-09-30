@@ -63,8 +63,7 @@ class DrawingManager:
                 communities = self.hotspots.communities.values()
             if self.prms.args["verbose"]:
                 print(f"○ Visualisation of hotspot communities using lovis4u...", file=sys.stdout)
-            bar = progress.bar.FillingCirclesBar(" ", max=len(communities),
-                                                 suffix='%(index)d/%(max)d')
+            bar = progress.bar.FillingCirclesBar(" ", max=len(communities), suffix='%(index)d/%(max)d')
             for hc in communities:
                 self.plot_hotspots(hc, vis_output_folder, shortest_labels=shortest_labels)
                 bar.next()
@@ -77,7 +76,7 @@ class DrawingManager:
                       island_ids: typing.Union[None, list] = None,
                       proteome_ids: typing.Union[None, list] = None,
                       additional_annotation: typing.Union[None, dict] = None, keep_while_deduplication: list = [],
-                      shortest_labels="auto"):
+                      shortest_labels: typing.Union[str, bool]="auto", compact_mode: bool = False):
         """Visualise set of hotspots using Lovis4u.
 
         Arguments:
@@ -129,14 +128,15 @@ class DrawingManager:
                     gff_files.append(proteome.gff_file)
                     start_coordinate = proteome_cdss[locus_indexes[0]].start
                     end_coordinate = proteome_cdss[locus_indexes[-1]].end
-                    #start_coordinate = proteome_cdss[h_island.indexes[0] - 1].start
-                    #end_coordinate = proteome_cdss[h_island.indexes[-1] + 1].end
+                    if compact_mode:
+                        start_coordinate = proteome_cdss[h_island.indexes[0] - 1].start  #
+                        end_coordinate = proteome_cdss[h_island.indexes[-1] + 1].end  #
                     if end_coordinate > start_coordinate:
                         sequence_coordinate = f"{start_coordinate}:{end_coordinate}:1"
                     else:
                         sequence_coordinate = f"{start_coordinate}:{proteome_annotation['length']}:1,1:{end_coordinate}:1"
                     locus_annotation_row = dict(sequence_id=h_island.proteome, coordinates=sequence_coordinate,
-                                               circular=proteome.circular, group=hotspot.proteome_community)
+                                                circular=proteome.circular, group=hotspot.proteome_community)
                     if len(hotspot_ids) > 1:
                         locus_annotation_row["description"] = f"proteome community: {hotspot.proteome_community}"
                     locus_annotation_rows.append(locus_annotation_row)
@@ -177,13 +177,15 @@ class DrawingManager:
                                 if cds.cds_id in additional_annotation.keys():
                                     feature_annotation_row.update(additional_annotation[cds.cds_id])
                             if feature_annotation_row["name"]:
-                                feature_annotation_row["name"] += f" ({short_id})"
+                                if not compact_mode:
+                                    feature_annotation_row["name"] += f" ({short_id})"
                             else:
                                 if shortest_labels == True or \
                                         (shortest_labels == "auto" and len(h_island.indexes) >= self.prms.args[
                                             "island_size_cutoff_to_show_index_only"]):
                                     feature_annotation_row["name"] = str(cds_ind + 1)
-                                    # feature_annotation_row["name"] = "" #!
+                                    if compact_mode:
+                                        feature_annotation_row["name"] = ""
                                 else:
                                     feature_annotation_row["name"] = str(short_id)
                             feature_annotation_rows.append(feature_annotation_row)
@@ -198,7 +200,6 @@ class DrawingManager:
                 table_name = f"{table_name[:200]}..._{hotspot_ids[-1]}"
             cds_table.to_csv(os.path.join(cds_tables_folder, f"{table_name}.tsv"), sep="\t", index=False)
 
-
             locus_annotation_t = pd.DataFrame(locus_annotation_rows)
             feature_annotation_t = pd.DataFrame(feature_annotation_rows)
             temp_input_f = tempfile.NamedTemporaryFile()
@@ -207,23 +208,24 @@ class DrawingManager:
             feature_annotation_t.to_csv(temp_input_f.name, sep="\t", index=False)
 
             l_parameters = lovis4u.Manager.Parameters()
-            l_parameters.load_config()
-            #l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_hotspot_mm_per_nt"]
-            l_parameters.args["figure_width"] = self.prms.args["lovis4u_hotspot_vis_figure_width"]
-
-            #l_parameters.args["feature_group_types_to_show_label_on_first_occurrence"] = ["conserved", "variable"] #!
-            #l_parameters.args["feature_group_types_to_show_label"] = []
-            #l_parameters.args["locus_label_size"] = 0.4
-            #l_parameters.args["feature_label_size"] = 0.55
-
+            if compact_mode:
+                l_parameters.load_config("A4p1")
+            else:
+                l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
+            l_parameters.args["cluster_all_proteins"] = False
             l_parameters.args["locus_label_style"] = "id"
+            l_parameters.args["locus_label_position"] = "bottom"
             l_parameters.args["verbose"] = False
-            l_parameters.args["draw_individual_x_axis"] = True
-            # l_parameters.args["draw_individual_x_axis"] = False
+            l_parameters.args["draw_individual_x_axis"] = False
 
-            l_parameters.args["draw_middle_line"] = False
+            l_parameters.args["draw_middle_line"] = True
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
+
+            if compact_mode:
+                l_parameters.args["feature_group_types_to_show_label"] = []
+                l_parameters.args["feature_group_types_to_show_label_on_first_occurrence"] = ["conserved", "variable"]
+                l_parameters.args["draw_individual_x_axis"] = False
 
             loci = lovis4u.DataProcessing.Loci(parameters=l_parameters)
             loci.load_feature_annotation_file(temp_input_f.name)
@@ -231,7 +233,7 @@ class DrawingManager:
 
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
             loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
-            loci.cluster_sequences(mmseqs_results_t, same_cluster=True)
+            loci.cluster_sequences(mmseqs_results_t, one_cluster=True)
             loci.reorient_loci(ilund4u_mode=True)
             loci.set_feature_colours_based_on_groups()
             loci.set_category_colours()
@@ -248,7 +250,7 @@ class DrawingManager:
                 pdf_name = f"{pdf_name[:200]}..._{hotspot_ids[-1]}"
             canvas_manager.plot(f"{pdf_name}.pdf")
             os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name}.pdf {output_folder}/")
-            shutil.rmtree(l_parameters.args["output_dir"]) #!
+            shutil.rmtree(l_parameters.args["output_dir"])  # !
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to plot set of hotspots using LoVis4u.") from error
 
@@ -352,9 +354,8 @@ class DrawingManager:
                     mmseqs_results_rows.append(dict(cluster=cds.group, protein_id=cds.cds_id))
 
             l_parameters = lovis4u.Manager.Parameters()
-            l_parameters.load_config()
-            l_parameters.args["mm_per_nt"] = self.prms.args["lovis4u_proteome_mm_per_nt"]
-            #l_parameters.args["figure_width"] = 8 #!
+            l_parameters.load_config(self.prms.args["lovis4u_proteome_config_filename"])
+            l_parameters.args["cluster_all_proteins"] = False
             if n_of_added_proteomes > 1:
                 l_parameters.args["draw_individual_x_axis"] = False
             else:
@@ -377,7 +378,7 @@ class DrawingManager:
             mmseqs_results_t = pd.DataFrame(mmseqs_results_rows).set_index("protein_id")
             loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
             if len(gff_files) <= self.prms.args["max_number_of_seqs_to_redefine_order"]:
-                loci.cluster_sequences(mmseqs_results_t, same_cluster=True)
+                loci.cluster_sequences(mmseqs_results_t, one_cluster=True)
             loci.reorient_loci(ilund4u_mode=True)
             if mode == "regular" or n_of_added_proteomes == 1:
                 loci.define_labels_to_be_shown()

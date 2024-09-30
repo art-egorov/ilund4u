@@ -36,14 +36,21 @@ The Atkinson Lab 4U | AE
     Lower limit of fraction of proteomes in which a protein homology
     group should be found within a proteome community to be called
     "conserved". [default: 0.75]
+-cg, --circular-genomes
+    Consider each input genome as circular. That means that first
+    and last proteins will be considered as neighbours.
+    [default: non circular]
 -ncg, --non-circular-genomes
     Consider each input genome as non-circular. That means that first
     and last proteins won't be considered as neighbours.
-    [default: circular]
+    [default: non circular]
 -hpc, --hotspot-presence-cutoff
     Fraction of proteomes within a proteome community in which clustered
     variable islands should be found to be considered as a hotspot.
     [default: 0.3]
+-rnf, --report-not-flanked
+    Report in results hotspots that have flanked conserved genes only on one
+    side (located on the end of non-circular sequences) [default: False]
 -------------------------------
 [OPTIONAL ARGUMENTS | OTHERS]
 -o <dir name>

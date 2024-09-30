@@ -2,6 +2,8 @@
 This module provides data managing classes and methods for the tool.
 """
 import shutil
+import json
+import time
 import sys
 import os
 
@@ -38,12 +40,20 @@ class DatabaseManager:
 
         """
         if os.path.exists(db_path):
+            if self.prms.args["verbose"]:
+                print("○ Warning: database folder will be rewritten.")
             shutil.rmtree(db_path)
         os.mkdir(db_path)
         if self.prms.args["verbose"]:
             print(f"○ Database building...", file=sys.stdout)
         proteomes.save_as_db(db_path)
         hotspots.save_as_db(db_path)
+        database_info_txt = f"Date and time of building: {time.strftime('%Y.%m.%d-%H:%M')}\n" \
+                            f"iLund4u version: {self.prms.args['version']}"
+        with open(os.path.join(db_path, "db_info.txt"), "w") as db_info:
+            db_info.write(database_info_txt)
+        with open(os.path.join(db_path, "parameters.json"), "w") as parameters:
+            json.dump(self.prms.args, parameters)
         if self.prms.args["verbose"]:
             print(f"  ⦿ Database was successfully saved to {db_path}", file=sys.stdout)
         return None

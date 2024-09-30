@@ -58,7 +58,7 @@ class Parameters:
         parser = argparse.ArgumentParser(prog="ilund4u", add_help=False)
         parser.add_argument("-data", "--data", dest="ilund4u_data", action="store_true")
         parser.add_argument("-get-hmms", "--get-hmms", dest="get_hmms", action="store_true")
-        parser.add_argument("-database", "--database", dest="get_database", default=None, type = str,
+        parser.add_argument("-database", "--database", dest="get_database", default=None, type=str,
                             choices=["phages", "plasmids", "enterophages"])
 
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
@@ -80,10 +80,14 @@ class Parameters:
                                default=None)
         parser_hm.add_argument("-cpc", "--conserved-protein-cutoff", dest="conserved_protein_cluster_cutoff",
                                type=float, default=None)
-        parser_hm.add_argument("-ncg", "--non-circular-genomes", dest="circular_genomes", default=True,
+        parser_hm.add_argument("-cg", "--circular-genomes", dest="circular_genomes", default=None,
+                               action="store_true")
+        parser_hm.add_argument("-ncg", "--non-circular-genomes", dest="circular_genomes", default=None,
                                action="store_false")
         parser_hm.add_argument("-hpc", "--hotspot-presence-cutoff", dest="hotspot_presence_cutoff",
                                type=float, default=None)
+        parser_hm.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
+                               default=None)
         parser_hm.add_argument("-o-db", "--output-database", dest="output_database", type=str, default=None)
         parser_hm.add_argument("-o", dest="output_dir", type=str, default=None)
         parser_hm.add_argument("-c", dest="config_file", type=str, default="standard")
@@ -100,6 +104,8 @@ class Parameters:
         parser_ps.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_ps.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_ps.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
+        parser_ps.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
+                               default=None)
         parser_ps.add_argument("-c", dest="config_file", type=str, default="standard")
         parser_ps.add_argument("-o", dest="output_dir", type=str, default=None)
         parser_ps.add_argument("-q", "--quiet", dest="verbose", default=True, action="store_false")
@@ -114,6 +120,8 @@ class Parameters:
         parser_pa.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_pa.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_pa.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
+        parser_pa.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
+                               default=None)
         parser_pa.add_argument("-c", dest="config_file", type=str, default="standard")
         parser_pa.add_argument("-o", dest="output_dir", type=str, default=None)
         parser_pa.add_argument("-q", "--quiet", dest="verbose", default=True, action="store_false")
