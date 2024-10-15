@@ -191,14 +191,14 @@ The name of the output folder can be changed with `-o <output_folder_name>`.
 	<figcaption style="margin: 0; padding: 0;">Figure 2</figcaption>
 </figure>
 
-In the example above we used 70 P2-like phages that are known to be in one community (group of related proteomes) based on our iLund4u hotspot annotation, run on all available phage sequences. As expected we find all guide sequences to be members of one community of proteomes with average proteome composition similarity (fraction of shared protein homologues) equal to 0.856 (see *proteome_communities.tsv* table and *proteome_network.gml* network files).
+In the example above we used 70 P2-like phages that are known to be in one community (group of related proteomes) based on our iLund4u hotspot annotation run on 873K phage sequences. As expected we find all sequences to be members of one community of proteomes with average proteome composition similarity (fraction of shared protein homologues) equal to 0.856 (see *proteome_communities.tsv* table and *proteome_network.gml* network files).
 
 
 On the visualisation of full length sequences from the proteome community (Fig. 2) built with [LoVis4u](https://art-egorov.github.io/lovis4u/) we can see two annotated hotspots highlighted.  
 The presence of hotspots in P2-like phages has previously been reported and it is known that these hotspots (highlighted in red is known as *old/tin*-encoding, while highlighted in blue as *Z/fun*-encoding) contain diverse anti-phage defence cargo proteins  *(See [Francois, et al., 2022](https://doi.org/10.1016/j.chom.2022.02.018); [Vassallo, et. Al, 2022](https://doi.org/10.1038/s41564-022-01219-4))*.  
-iLund4u indicates that some genomes contain virulence factors (cytolethal distending toxin (CDT) [VF0987]) in the same hotspot locus (also were reported in  *[Francois, et al., 2022](https://doi.org/10.1016/j.chom.2022.02.018)))*.
+iLund4u indicates that some genomes contain virulence factors (cytolethal distending toxin (CDT) [VF0987]) in the same hotspot locus (it was reported in  *[Francois, et al., 2022](https://doi.org/10.1016/j.chom.2022.02.018)))*.
 
-On the proteome community figure (Fig. 2) you can see that most of the differences in terms of protein composition between phages are concentrated in these two hotspots. However, there are also other variable regions with at least one non-conserved protein coding gene distributed across genomes, however, iLund4u does not merge these with other hotspots due to these regions lacking conserved flanking genes or not passing the presence cutoff. Such genes are shown with in dark grey while conserved (or core) protein coding genes are light grey.
+On the proteome community figure (Fig. 2) you can see that most of the differences in terms of proteome composition between phages are concentrated in these two hotspots. However, there are also other variable regions with at least one non-conserved protein coding gene distributed across genomes. However, iLund4u does not merge these with other hotspots due to not passing the presence cutoff. Such genes are shown with in dark grey while conserved (or core) protein coding genes are light grey.
 
 Below you can see LoVis4u visualisation of each hotspot loci - cargo proteins and up to 10 conserved flanking genes. 
 
@@ -222,10 +222,10 @@ This database, which is built on a guide set of 70 P2-like phages annotation gff
 
 ### Specifying the circularity of sequences 
 
-Another important optional argument is  `-gct, --genome-circularity-table <path>` which takes path to a table containing information for each genome about whether it is circular or not. Format: tab-separated; column names: *id*, *circular*. Values 1 or 0. For genomes in which the id is not listed in this table, the default value will be 0 (non circular) ; You can use -ncg/--non-circular-genomes to change the default value to 0 (non circular).  
+Another important optional argument is  `-gct, --genome-circularity-table <path>` which takes path to a table containing information for each genome about whether it is circular or not. Format: tab-separated; column names: *id*, *circular*. Values 1 or 0. For genomes in which the id is not listed in this table, the default value will be 0 (non circular) ; You can use `-cg/--circular-genomes` to change the default value to 1 (circular).  
 This parameter is important since if the genome is circular then the first and last proteins will be considered as neighbours, which affects the flanking gene sets of proteins located near the ends of sequences. Since for these phages in the example we have circular genomes and this value is default, you can see that the breaks between the end and start of contigs are ignored for hotspot 0-0 (Fig. 3).  
 
-**Please be aware** that if a genome is not considered circular, islands located at the ends of sequences (flanked from only one side) **will NOT be considered** in clustering to hotspots by default. This is the standard iLund4u behaviour. However, you can force to consider them by using the `-rnf, --report-not-flanked` parameter. Note that each result table (for islands, hotspots, hotspot communities, and protein groups) includes a column indicating whether the object is flanked or not.
+**Please be aware** that if a genome is not considered circular, islands located at the ends of sequences (flanked from only one side) will **NOT** be considered in clustering to hotspots by default. This is the standard iLund4u behaviour. However, you can force to consider them by using the `-rnf, --report-not-flanked` parameter. Note that each result table (for islands, hotspots, hotspot communities, and protein groups) includes a column indicating whether the object is flanked or not.
 
 ---
 

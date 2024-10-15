@@ -1,6 +1,9 @@
 # Version log
 
-* **Ver 0.0.7** - 15 October 2024
+* **Ver 0.0.7.1** - 15 October 2024
+	- `-use-filename-as-id` and `--parsing-deubg` parameters were added
+
+* Ver 0.0.7 - 15 October 2024
 	- Minor bug fixes
 	- Visualisation adjusment
 

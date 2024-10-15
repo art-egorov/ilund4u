@@ -64,6 +64,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 ### Optional arguments | data processing
 
+`-ufid, --use-filename-as-id`
+:    Use filename (wo extension) as contig id instead
+     of the contig id written in a gff file.
+
 `-mps, --min-proteome-size <int>`
 :    Minimal number of proteins in a genome to be taken in analysis.
      [default: 15]
@@ -257,6 +261,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `--debug`
 :    Provide a detailed stack trace for debugging purposes.
+
+`--parsing-debug`
+:    Provide detailed stack trace for debugging purposes
+     for failed reading of gff files.
 
 `-q, --quiet`
 :    Don't show progress messages.

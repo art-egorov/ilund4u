@@ -600,15 +600,14 @@ class Proteomes:
                 input_folder = input_f
                 if not os.path.exists(input_folder):
                     raise ilund4u.manager.ilund4uError(f"Folder {input_folder} does not exist.")
-                gff_files = [os.path.join(input_folder, f) for f in os.listdir(input_folder) if
-                             os.path.splitext(f)[-1].lower() == ".gff"]
+                gff_files = [os.path.join(input_folder, f) for f in os.listdir(input_folder)]
             elif isinstance(input_f, list):
                 gff_files = input_f
             else:
                 raise ilund4u.manager.ilund4uError(f"The input for the GFF parsing function must be either a folder or "
                                                    f"a list of files.")
             if not gff_files:
-                raise ilund4u.manager.ilund4uError(f"Folder {input_f} does not contain .gff(.GFF) files.")
+                raise ilund4u.manager.ilund4uError(f"Folder {input_f} does not contain files.")
             if not os.path.exists(self.prms.args["output_dir"]):
                 os.mkdir(self.prms.args["output_dir"])
             else:
@@ -620,19 +619,18 @@ class Proteomes:
                     genome_annotation_table = pd.read_table(genome_annotation, sep="\t").set_index("id")
                     genome_circularity_dict = genome_annotation_table["circular"].to_dict()
                 except:
-                    print("○ Warning: unable to read genome annotation table. Check the format.")
+                    raise ilund4u.manager.ilund4uError("○ Warning: unable to read genome annotation table. "
+                                                       "Check the format.")
             num_of_gff_files = len(gff_files)
             if self.prms.args["verbose"]:
                 print(f"○ Reading gff file{'s' if len(gff_files) > 1 else ''}...", file=sys.stdout)
-            if len(gff_files) > 1 and self.prms.args["verbose"]:
+            if num_of_gff_files > 1 and self.prms.args["verbose"]:
                 bar = progress.bar.FillingCirclesBar(" ", max=num_of_gff_files, suffix='%(index)d/%(max)d')
             proteome_list, annotation_rows = [], []
             gff_records_batch = []
             for gff_file_index, gff_file_path in enumerate(gff_files):
-               # if gff_file_index >= 252000:
-               # try:
-                    n_files = len(gff_files)
-                    if n_files > 1 and self.prms.args["verbose"]:
+                try:
+                    if num_of_gff_files > 1 and self.prms.args["verbose"]:
                         bar.next()
                     gff_records = list(BCBio.GFF.parse(gff_file_path, limit_info=dict(gff_type=["CDS"])))
                     if len(gff_records) != 1:
@@ -646,6 +644,8 @@ class Proteomes:
                     except Bio.Seq.UndefinedSequenceError as error:
                         raise ilund4u.manager.ilund4uError(f"gff file doesn't contain corresponding "
                                                            f"sequences.") from error
+                    if self.prms.args["use_filename_as_contig_id"]:
+                        gff_record.id = os.path.splitext(os.path.basename(gff_file_path))[0]
                     features_ids = [i.id for i in gff_record.features]
                     if len(features_ids) != len(set(features_ids)):
                         raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature "
@@ -689,20 +689,31 @@ class Proteomes:
                                                         proteome_size=len(features_ids),
                                                         proteome_size_unique="", protein_clusters=""))
                         else:
-                            print(gff_record.id)
-                    if gff_file_index % 1000 == 0 or gff_file_index == n_files - 1:
+                            raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains not defined feature")
+                    if gff_file_index % 1000 == 0 or gff_file_index == num_of_gff_files - 1:
                         with open(self.proteins_fasta_file, "a") as handle:
                             Bio.SeqIO.write(gff_records_batch, handle, "fasta")
                         gff_records_batch = []
-               # except:
-                #    print(f"○ Warning: gff file {gff_file_path} was not read properly")
+                except:
+                    print(f"○ Warning: gff file {gff_file_path} was not read properly and skipped")
+                    if self.prms.args["parsing_debug"]:
+                        self.prms.args["debug"] = True
+                        raise ilund4u.manager.ilund4uError("Gff file {gff_file_path} was not read properly")
             if len(gff_files) > 1 and self.prms.args["verbose"]:
                 bar.finish()
+            proteome_ids = [pr.proteome_id for pr in proteome_list]
+            if len(proteome_ids) != len(set(proteome_ids)):
+                raise ilund4u.manager.ilund4uError(f"The input gff files have duplicated contig ids.\n  "
+                                                   f"You can use `--use-filename-as-id` parameter to use file name "
+                                                   f"as contig id which can help to fix the problem.")
             self.proteomes = pd.Series(proteome_list, index=[pr.proteome_id for pr in proteome_list])
             self.annotation = pd.DataFrame(annotation_rows).set_index("id")
             self.__col_to_ind = {col: idx for idx, col in enumerate(self.annotation.columns)}
             self.annotation = self.annotation.sort_values(by="proteome_size")
             self.proteomes = self.proteomes.loc[self.annotation.index]
+            if self.prms.args["verbose"]:
+                print(f"  ⦿ {len(proteome_list)} {'locus was' if len(proteome_list) == 1 else 'loci were'} loaded from"
+                      f" the gff files folder", file=sys.stdout)
             return None
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to load proteomes from gff files.") from error
@@ -1447,7 +1458,6 @@ class Hotspots:
                         out_handle.write(initial_fasta_file.get_raw(acc))
                     except:
                         pass
-
             alignment_table = ilund4u.methods.run_pyhmmer(self.island_rep_proteins_fasta, len(hotspots_repr_proteins),
                                                           self.prms)
             if not alignment_table.empty:

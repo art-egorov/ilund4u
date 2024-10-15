@@ -12,6 +12,9 @@ The Atkinson Lab 4U | AE
     (designed to handle pharokka/prokka produced annotation files).
 -------------------------------
 [OPTIONAL ARGUMENTS | DATA PROCESSING]
+-ufid, --use-filename-as-id
+    Use filename (wo extension) as contig id instead
+    of the contig id written in a gff file.
 -mps, --min-proteome-size <int>
     Minimal number of proteins in a genome to be taken in analysis.
     [default: 15]
@@ -66,6 +69,9 @@ The Atkinson Lab 4U | AE
 [MISCELLANEOUS ARGUMENTS]
 --debug
     Provide a detailed stack trace for debugging purposes.
+--parsing-debug
+    Provide detailed stack trace for debugging purposes
+    for failed reading of gff files.
 -q, --quiet
     Don't show progress messages.
 -------------------------------

@@ -64,12 +64,14 @@ class Parameters:
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
         parser.add_argument("-mac", "--mac", dest="mac", action="store_true", default=None)
         parser.add_argument("-h", "--help", dest="help", action="store_true")
-        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.7")
+        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.7.1")
 
         subparsers = parser.add_subparsers(dest="mode")
 
         parser_hm = subparsers.add_parser("hotspots")
         parser_hm.add_argument("-gff", "--gff", dest="gff", type=str, default=None)
+        parser_hm.add_argument("-ufid", "--use-filename-as-id", dest="use_filename_as_contig_id", action="store_true",
+                                default=None)
         parser_hm.add_argument("-mps", "--min-proteome-size", dest="min_proteome_size", type=int, default=None)
         parser_hm.add_argument("-gct", "--genome-circularity-table", dest="genome_annotation", type=str, default=None)
         parser_hm.add_argument("-psc", "--proteome-sim-cutoff", dest="proteome_similarity_cutoff", type=float,
@@ -93,6 +95,8 @@ class Parameters:
         parser_hm.add_argument("-c", dest="config_file", type=str, default="standard")
         parser_hm.add_argument("-q", "--quiet", dest="verbose", default=True, action="store_false")
         parser_hm.add_argument("--debug", "-debug", dest="debug", action="store_true")
+        parser_hm.add_argument("--parsing-debug", "-parsing-debug", dest="parsing_debug", action="store_true")
+
 
         parser_ps = subparsers.add_parser("protein")
         parser_ps.add_argument("-fa", "--fa", dest="fa", type=str, default=None)
