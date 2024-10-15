@@ -35,6 +35,7 @@ nav:
     - Usage examples: API/usage_examples.md
     - Library: API/package.md
   - Version log: VersionLog/versions.md
+  - FAQ: FAQ/FAQ.md
 
 markdown_extensions:
  - def_list

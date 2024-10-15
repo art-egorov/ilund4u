@@ -1,5 +1,7 @@
 # Version log
 
+* Preprint release ✨
+
 * **Ver 0.0.7.1** - 15 October 2024
 	- `-use-filename-as-id` and `--parsing-deubg` parameters were added
 
@@ -21,7 +23,7 @@
 	- Long pdf file name bug is fixed.
 
 * Ver 0.0.4 - 27 June 2024 
-	- Minor fixes and para/Users/aegorov/Desktop/LU_Lab_Projects/LociVIsualisation/lovis4u/docs/VersionLog/versions.mdmeter name changes.
+	- Minor fixes and parameter name changes.
 
 * Ver 0.0.3 - 27 June 2024 
 	- Minor fixes.
