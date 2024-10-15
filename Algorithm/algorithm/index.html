@@ -825,7 +825,7 @@ where <span class="arithmatex">\(|G_i|\)</span>, <span class="arithmatex">\(|G_j
 </ul>
 <h3 id="lovis4u-visualisation">LoVis4u visualisation</h3>
 <p>The last step of the algorithm is using of our tool <a href="https://art-egorov.github.io/lovis4u/">LoVis4u</a> for visualisation of each hotspot community and proteome community. We recommend you to read the <a href="https://art-egorov.github.io/ilund4u/ExampleDrivenGuide/cmd_guide/">Example-driven guide page</a> for examples of visualisation with detailed descriptions. However, there is one step in the visualisation of hotspot communities we want to highlight here: we can expect that some variable islands of one hotspot community from different proteomes could have the same set of cargo and flanking protein groups. In that case iLund4u keeps only one of them for visualisation in order to avoid duplication on visualisation. The full list of hotspot loci is available in annotation tables.</p>
-<p>You can see an example with visualisation of proteome community that consists of 736 proteomes (<a href="../../img/10.pdf" target="_blank"><strong><em>LoVis4u community visualisation</em></strong></a>). The community has one hotspot containing 888 diverse cargo protein groups with 24 of them being annotated as Defence related proteins, 15 as virulence factors, 1 as anti-defence and 1 AMR gene (<a href="../../img/10-0_537-0.pdf" target="_blank"><strong><em>LoVis4u hotspot visualisation</em></strong></a>).</p>
+<p>You can see an example with visualisation of proteome community that consists of 716 proteomes (<a href="../../img/15.pdf" target="_blank"><strong><em>LoVis4u community visualisation</em></strong></a>). The community has one hotspot containing 875 diverse cargo protein groups with 16 of them being annotated as Defence related proteins, 6 as virulence factors, 5 as AMR proteins, and 2 as anti-defence  (<a href="../../img/15-0_300-0.pdf" target="_blank"><strong><em>LoVis4u hotspot visualisation</em></strong></a>).</p>
 <hr />
 <h2 id="ilund4u-database">iLund4u database</h2>
 <p>Optionally during the hotspot annotation step you can build the corresponding to results iLund4u database that holds proteome and hotspot objects and can be used as query for two other modes: protein and proteome annotation. iLund4u database consists of the set of files (non-binary) that holds information about protein, proteome, CDS, island and hotspot objects.</p>
@@ -834,8 +834,8 @@ where <span class="arithmatex">\(|G_i|\)</span>, <span class="arithmatex">\(|G_j
     <figcaption style="width: 100; margin: 0; padding: 0;">Figure 3</figcaption>
 </figure>
 <p>iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.<br />
-The database of phages was built by running hotspot annotation mode on all available <a href="https://phagescope.deepomics.org">PhageScope database</a> sequences (~800K sequences, version of June 2024). For the plasmids database we took <a href="https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html">IMG/PR database of plasmids</a> (~700K sequences, version of June 2024).  </p>
-<p><strong>Database sizes:</strong> Phages: 6.2GB; Plasmids: 1.12GB </p>
+The database of phages was built by running hotspot annotation mode on all available <a href="https://phagescope.deepomics.org">PhageScope database</a> sequences (~870K sequences, version of September 2024). For the plasmids database we took <a href="https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html">IMG/PR database of plasmids</a> (~700K sequences, version of June 2024).  </p>
+<p><strong>Database sizes:</strong> Phages: 6.48GB; Plasmids: 1.07GB </p>
 <div style="clear: both;"></div>
 
 <p>See the <a href="https://art-egorov.github.io/ilund4u/ExampleDrivenGuide/cmd_guide/">Example-driven guide page</a> for details about database building and downloading.</p>
