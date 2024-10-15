@@ -73,7 +73,7 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
      it is circular or not.
      Format: tab-separated; column names: id, circular. Values 1 or 0.
      For genomes which id is not listed, the default value will be used.
-     [default: circular; use `-ncg/--non-circular-genomes` to change]
+     [default: non circular; use `-cg/--circular-genomes` to change]
 
 `-psc, --proteome-sim-cutoff <float>`
 :    Minimal fraction of shared homologous proteins between two
@@ -94,6 +94,11 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
     group should be found within a proteome community to be called
     "conserved". [default: 0.75]
 
+`-cg, --circular-genomes`
+:    Consider each input genome as circular. That means that first
+    and last proteins will be considered as neighbours.
+    [default: non circular]
+
 `-ncg, --non-circular-genomes`
 :    Consider each input genome as non-circular. That means that first
     and last proteins won't be considered as neighbours.
@@ -103,6 +108,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 :    Fraction of proteomes within a proteome community in which clustered
     variable islands should be found to be considered as a hotspot.
     [default: 0.3]
+
+`-rnf, --report-not-flanked`
+:    Report in results hotspots that have flanked conserved genes only on one
+    side (located on the end of non-circular sequences) [default: False]
 
 ### Optional arguments | others
 
@@ -165,6 +174,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
 
+`-rnf, --report-not-flanked`
+:    Report in results hotspots that have flanked conserved genes only on one
+    side (located on the end of non-circular sequences) [default: False]
+
 `-ql, --query-label <str>`
  :   Label for query protein homologues on LoVis4u visualisation.
     [default: database protein names]
@@ -223,6 +236,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
+
+`-rnf, --report-not-flanked`
+:    Report in results hotspots that have flanked conserved genes only on one
+    side (located on the end of non-circular sequences) [default: False]
 
 
 ### Optional arguments | others

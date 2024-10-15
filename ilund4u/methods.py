@@ -39,6 +39,7 @@ def adjust_paths(to: str) -> None:
                     os.system(f"unzip -q -d {os.path.join(internal_dir, 'bin/')} "
                               f"{os.path.join(internal_dir, 'bin/mmseqs_linux.zip')}")
                 config_txt = re.sub(r"mmseqs_mac/bin/mmseqs", "mmseqs_linux/bin/mmseqs", config.read())
+                os.system("msa4u --linux >> /dev/null")
             else:
                 config_txt = re.sub(r"mmseqs_linux/bin/mmseqs", "mmseqs_mac/bin/mmseqs", config.read())
             config.seek(0)

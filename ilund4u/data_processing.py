@@ -221,6 +221,7 @@ class Island:
         indexes (list): CDS indexes of the island.
         size (int): Length of the island (number of CDSs).
         var_indexes (list): Indexes of CDS which g_class is "variable".
+        hotspot_id (str): Hotspot id if Island was attributed to one of them or "-" value if not.
         left_cons_neighbours (list): Indexes of conserved neighbours on the left.
         right_cons_neighbours (list): Indexes of conserved neighbours on the right.
         flanked (int): Whether island is flanked by conserved genes or not [1 or 0].
@@ -231,7 +232,7 @@ class Island:
     def __init__(self, island_id: str, proteome: str,
                  circular_proteome: int, center: int, indexes: list, var_indexes: list,
                  left_cons_neighbours: list, right_cons_neighbours: list,
-                 databases_hits_stat: typing.Union[None, dict] = None):
+                 hotspot_id = "-", databases_hits_stat: typing.Union[None, dict] = None):
         """Island class constructor.
 
         Arguments:
@@ -244,12 +245,14 @@ class Island:
             var_indexes (list): Indexes of CDS which g_class is "variable".
             left_cons_neighbours (list): Indexes of conserved neighbours on the left.
             right_cons_neighbours (list): Indexes of conserved neighbours on the right.
+            hotspot_id (str): Hotspot id if Island was attributed to one of them or "-" value if not.
             databases_hits_stat (dict): Statistics from hmmscan annotation.
 
         """
         self.island_id = island_id
         self.proteome = proteome
         self.circular_proteome = circular_proteome
+        self.hotspot_id = hotspot_id
         self.center = center
         self.indexes = indexes
         self.size = len(indexes)
@@ -626,14 +629,17 @@ class Proteomes:
             proteome_list, annotation_rows = [], []
             gff_records_batch = []
             for gff_file_index, gff_file_path in enumerate(gff_files):
-                try:
-                    if len(gff_files) > 1 and self.prms.args["verbose"]:
+               # if gff_file_index >= 252000:
+               # try:
+                    n_files = len(gff_files)
+                    if n_files > 1 and self.prms.args["verbose"]:
                         bar.next()
                     gff_records = list(BCBio.GFF.parse(gff_file_path, limit_info=dict(gff_type=["CDS"])))
                     if len(gff_records) != 1:
                         print(f"\n○ Warning: gff file {gff_file_path} contains information for more than 1 "
                               f"sequence. File will be skipped.")
                         continue
+                    current_gff_records = []
                     gff_record = gff_records[0]
                     try:
                         record_locus_sequence = gff_record.seq
@@ -652,6 +658,7 @@ class Proteomes:
                         record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
                                                    circular=circular)
                         record_cdss = []
+                        all_defined = True
                         for gff_feature in gff_record.features:
                             cds_id = gff_feature.id.replace(";", ",")
                             if gff_record.id not in cds_id:
@@ -664,22 +671,31 @@ class Proteomes:
                                 name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
 
                             sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
-                            gff_records_batch.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
+
+                            if not sequence.defined:
+                                all_defined = False
+                                continue
+
+                            current_gff_records.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
                             cds = CDS(cds_id=cds_id, proteome_id=gff_record.id,
                                       start=int(gff_feature.location.start) + 1, end=int(gff_feature.location.end),
                                       strand=gff_feature.location.strand, name=name)
                             record_cdss.append(cds)
-                        record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
-                        proteome_list.append(record_proteome)
-                        annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
-                                                    proteome_size=len(features_ids),
-                                                    proteome_size_unique="", protein_clusters=""))
-                    if gff_file_index % 1000 == 0 or gff_file_index == len(gff_files) - 1:
+                        if all_defined:
+                            gff_records_batch += current_gff_records
+                            record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
+                            proteome_list.append(record_proteome)
+                            annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
+                                                        proteome_size=len(features_ids),
+                                                        proteome_size_unique="", protein_clusters=""))
+                        else:
+                            print(gff_record.id)
+                    if gff_file_index % 1000 == 0 or gff_file_index == n_files - 1:
                         with open(self.proteins_fasta_file, "a") as handle:
                             Bio.SeqIO.write(gff_records_batch, handle, "fasta")
                         gff_records_batch = []
-                except:
-                    print(f"○ Warning: gff file {gff_file_path} was not read properly")
+               # except:
+                #    print(f"○ Warning: gff file {gff_file_path} was not read properly")
             if len(gff_files) > 1 and self.prms.args["verbose"]:
                 bar.finish()
             self.proteomes = pd.Series(proteome_list, index=[pr.proteome_id for pr in proteome_list])
@@ -977,7 +993,7 @@ class Proteomes:
                         pc_class = "intermediate"
                     com_protein_classes[pc] = pc_class
                     protein_classes_trows.append(dict(community=com_id, community_size=com_size, protein_group=pc,
-                                                      protein_group_class=pc_class, fraction=pc_fraction,
+                                                      protein_group_class=pc_class, fraction=round(pc_fraction, 3),
                                                       protein_group_counts=counts))
                 com_proteomes = self.proteomes.loc[com_pr_ids]
                 for com_proteome in com_proteomes:
@@ -1158,7 +1174,7 @@ class Proteomes:
                                 unique_island_cds_groups.append(set(island_cds_groups))
                             for icg in set(island_conserved_groups):
                                 conserved_island_groups_count[icg] += 1
-                        if max(1, int(flanked_count / hotspot_uniq_size)) >= 0.1:
+                        if flanked_count / hotspot_uniq_size >= self.prms.args["flanked_fraction_cutoff"]:
                             flanked_hotspot = 1
                         else:
                             flanked_hotspot = 0
@@ -1169,11 +1185,12 @@ class Proteomes:
                         hotspot_conserved_signature = [g for g, c in conserved_island_groups_count.items() if
                                                        c >= signature_cutoff]
                         number_of_unique_islands = len(unique_island_cds_groups)
-
                         hotspot = Hotspot(hotspot_id=f"{com_id}-{icom_ind}", proteome_community=com_id,
                                           size=hotspot_uniq_size, islands=islands,
                                           conserved_signature=hotspot_conserved_signature,
                                           island_annotation=island_annotation, flanked=flanked_hotspot)
+                        for island in islands:
+                            island.hotspot_id = hotspot.hotspot_id
                         h_annotation_row = dict(hotspot_id=f"{com_id}-{icom_ind}", size=hotspot_uniq_size,
                                                 uniqueness=round(number_of_unique_islands / hotspot_uniq_size, 3),
                                                 number_of_unique_islands=number_of_unique_islands,
@@ -1200,7 +1217,7 @@ class Proteomes:
 
 
 class Hotspot:
-    """Hostpot object represent a hotspot as a set of islands.
+    """Hotspot object represent a hotspot as a set of islands.
 
     Attributes:
         hotspot_id (str): Hotspot identifier.
@@ -1372,7 +1389,7 @@ class Hotspots:
             if parameters.args["verbose"]:
                 print(f"○ Loading hotspot objects...", file=sys.stdout)
             island_annotation = pd.read_table(os.path.join(db_path, "hotspot.ind.island.annotations.tsv"),
-                                              sep="\t").set_index("island")
+                                              sep="\t", low_memory = False).set_index("island")
             with open(os.path.join(db_path, "hotspot.ind.attributes.json"), "r") as json_file:
                 hotspot_ind_attributes = json.load(json_file)
             if parameters.args["verbose"]:
@@ -1461,8 +1478,10 @@ class Hotspots:
                 print(f"○ Hotspot network construction...", file=sys.stdout)
             hotspot_signature_sizes = pd.Series()
             hotspot_proteome_community = dict()
+            flanked_stat = dict()
             signature_cluster_to_hotspot = collections.defaultdict(collections.deque)
             for hid, hotspot in enumerate(self.hotspots):
+                flanked_stat[hid] = hotspot.flanked
                 hotspot_proteome_community[hid] = hotspot.proteome_community
                 hotspot_signature_sizes.at[hid] = len(hotspot.conserved_signature)
                 for cs_cluster in hotspot.conserved_signature:
@@ -1490,8 +1509,9 @@ class Hotspots:
                 weights_i = weights_i.mul(norm_factor_i)
                 weights_i = weights_i[weights_i >= self.prms.args["hotspot_similarity_cutoff"]]
                 for j, w in weights_i.items():
-                    edges.append([i, j])
-                    weights.append(round(w, 4))
+                    if flanked_stat[i] == flanked_stat[j]:
+                        edges.append([i, j])
+                        weights.append(round(w, 4))
             bar.finish()
             print("○ Hotspot network partitioning using the Leiden algorithm...")
             graph = igraph.Graph(len(hotspot_signature_sizes.index), edges, directed=False)
@@ -1540,7 +1560,7 @@ class Hotspots:
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to build hotspot network.") from error
 
-    def calculate_hotspot_statistics_and_get_annotation(self, proteomes: Proteomes) -> pd.DataFrame:
+    def calculate_hotspot_and_island_statistics(self, proteomes: Proteomes) -> pd.DataFrame:
         """Calculate hotspot statistics based using hmmscan results and save annotation tables.
 
         Arguments:
@@ -1551,6 +1571,8 @@ class Hotspots:
 
         """
         try:
+            if self.prms.args["verbose"]:
+                print(f"○ Hotspot and island statistics calculation...", file=sys.stdout)
             hotspot_community_annot_rows = []
             r_types = ["cargo", "flanking"]
             # Create new columns
@@ -1577,7 +1599,7 @@ class Hotspots:
                             h_com_stat[db_name][r_type].update(db_stat[db_name][r_type])
                             self.annotation.at[hotspot.hotspot_id, f"N_{db_name}_{r_type}_groups"] = \
                                 len(set(db_stat[db_name][r_type].values()))
-                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_flanked = n_flanked,
+                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_flanked=n_flanked,
                                     N_islands=n_islands, hotspots=",".join(hotspot_ids),
                                     pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
                 for r_type in r_types:
@@ -1599,20 +1621,31 @@ class Hotspots:
                                    index_label="hotspot_id")
             hotspot_community_annot.to_csv(os.path.join(self.prms.args["output_dir"],
                                                         "hotspot_community_annotation.tsv"), sep="\t", index=False)
-
             # Save island annotation table
-            island_annotation_table = pd.DataFrame()
-            for hotspot in self.hotspots.to_list():
-                h_island_annot = hotspot.island_annotation.copy()
-                h_island_annot = h_island_annot.drop(columns=["degree", "strength", "island_index"])
-                h_island_annot["hotspot_id"] = hotspot.hotspot_id
-                columns = list(h_island_annot.columns)
-                columns.insert(0, columns.pop(columns.index("hotspot_id")))
-                h_island_annot = h_island_annot[columns]
-                island_annotation_table = pd.concat([island_annotation_table, h_island_annot])
-
+            # Get non-hotspot island stat
+            island_annotation_table_rows = []
+            for pcom, com_proteomes in proteomes.communities.items():
+                for proteome_id in com_proteomes:
+                    proteome = proteomes.proteomes.at[proteome_id]
+                    for island in proteome.islands.to_list():
+                        island_annot = dict(island=island.island_id, proteome=proteome.proteome_id,
+                                            proteome_commuity=pcom, hotspot_id=island.hotspot_id,
+                                            flanked = island.flanked, island_size=island.size)
+                        island.calculate_database_hits_stat(proteome.cdss)
+                        island_dbstat = island.databases_hits_stat
+                        db_names = self.prms.args["database_names"]
+                        for db_name in db_names:
+                            r_types = ["cargo", "flanking"]
+                            for r_type in r_types:
+                                island_annot[f"N_{db_name}_{r_type}"] = len(island_dbstat[db_name][r_type].values())
+                        isl_groups = island.get_island_groups(proteome.cdss)
+                        isl_proteins = island.get_island_proteins(proteome.cdss)
+                        island_annot["island_proteins"] = ",".join(isl_proteins)
+                        island_annot["island_protein_groups"] = ",".join(isl_groups)
+                        island_annotation_table_rows.append(island_annot)
+            island_annotation_table = pd.DataFrame(island_annotation_table_rows)
             island_annotation_table.to_csv(os.path.join(self.prms.args["output_dir"], "island_annotation.tsv"),
-                                           sep="\t", index_label="island")
+                                           sep="\t", index=False)
             return hotspot_community_annot
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to calculate hotspot and hotspot community statistics based "
@@ -1634,15 +1667,16 @@ class Hotspots:
                 print(f"○ Protein group statistics calculation...", file=sys.stdout)
                 bar = progress.bar.FillingCirclesBar(" ", max=len(self.hotspots.index), suffix='%(index)d/%(max)d')
             protein_group_statistics_dict = collections.defaultdict(
-                lambda: {"Hotspot_communities": set(), "Hotspots": set(), "Islands": set(),
-                         "Proteome_communities": set(), "Flanked_islands": set(),
-                         "Counts": 0, "db": "None", "db_hit": "None", "Name": "", "RepLength": 0})
+                lambda: {"Hotspot_communities": set(), "Hotspots": set(), "Hotpot_islands": set(),
+                         "Non_hotspot_islands": set(), "Proteome_communities": set(), "Flanked_hotspot_islands": set(),
+                         "Flanked_non_hotspot_islands": set(), "Counts": 0, "db": "None", "db_hit": "None", "Name": "",
+                         "RepLength": 0})
+            # Hotspot stat
             for h_com, hotspots_ids in self.communities.items():
                 hotspots = self.hotspots.loc[hotspots_ids].to_list()
                 for hotspot in hotspots:
                     if self.prms.args["verbose"]:
                         bar.next()
-                    # Hotspot stat
                     for island in hotspot.islands:
                         proteome = proteomes.proteomes.at[island.proteome]
                         island_proteins = island.get_island_proteins(proteome.cdss)
@@ -1659,10 +1693,35 @@ class Hotspots:
                             protein_group_statistics_dict[ispg]["Hotspot_communities"].add(h_com)
                             protein_group_statistics_dict[ispg]["Proteome_communities"].add(hotspot.proteome_community)
                             protein_group_statistics_dict[ispg]["Hotspots"].add(hotspot.hotspot_id)
-                            protein_group_statistics_dict[ispg]["Islands"].add(island.island_id)
-                            protein_group_statistics_dict[ispg]["Flanked_islands"].add(island.island_id)
+                            protein_group_statistics_dict[ispg]["Hotpot_islands"].add(island.island_id)
+                            if island.flanked:
+                                protein_group_statistics_dict[ispg]["Flanked_hotspot_islands"].add(island.island_id)
             if self.prms.args["verbose"]:
                 bar.finish()
+            # Other accessory genes
+            for proteome_com, com_proteomes in proteomes.communities.items():
+                for proteome_id in com_proteomes:
+                    proteome = proteomes.proteomes.at[proteome_id]
+                    for island in proteome.islands.to_list():
+                        if island.hotspot_id == "-":
+                            island_proteins = island.get_island_proteins(proteome.cdss)
+                            island_protein_groups = island.get_island_groups(proteome.cdss)
+                            for isp, ispg in zip(island_proteins, island_protein_groups):
+                                if protein_group_statistics_dict[ispg]["Counts"] == 0:
+                                    cds_obj = proteome.cdss.at[isp]
+                                    protein_group_statistics_dict[ispg]["Name"] = cds_obj.name
+                                    protein_group_statistics_dict[ispg]["RepLength"] = cds_obj.length
+                                    if cds_obj.hmmscan_results:
+                                        protein_group_statistics_dict[ispg]["db_hit"] = cds_obj.hmmscan_results[
+                                            "target"]
+                                        protein_group_statistics_dict[ispg]["db"] = cds_obj.hmmscan_results["db"]
+                                protein_group_statistics_dict[ispg]["Counts"] += 1
+                                protein_group_statistics_dict[ispg]["Proteome_communities"].add(proteome_com)
+                                protein_group_statistics_dict[ispg]["Non_hotspot_islands"].add(island.island_id)
+                                if island.flanked:
+                                    protein_group_statistics_dict[ispg]["Flanked_non_hotspot_islands"].add(
+                                        island.island_id)
+
             statistic_rows = []
             for pg, pg_dict in protein_group_statistics_dict.items():
                 row_dict = dict(representative_protein=pg, db=pg_dict["db"], pb_hit=pg_dict["db_hit"],
@@ -1670,23 +1729,26 @@ class Hotspots:
                 for k, v in pg_dict.items():
                     if isinstance(v, set):
                         row_dict[f"N_{k}"] = len(v)
-                for db_name in self.prms.args["database_names"]:
-                    dbsn_norm_values = []
-                    for hotspot in pg_dict["Hotspots"]:
-                        dbsn_norm_value = self.annotation.at[hotspot, f"{db_name}_cargo_normalised"]
-                        if pg_dict["db"] == db_name:
-                            dbsn_norm_value -= 1 / self.annotation.at[hotspot, f"N_cargo_groups"]
-                        dbsn_norm_values.append(dbsn_norm_value)
-                    row_dict[f"{db_name}_avg_cargo_fraction"] = round(np.mean(dbsn_norm_values), 4)
-                    row_dict[f"{db_name}_max_cargo_fraction"] = round(max(dbsn_norm_values), 4)
-                row_dict["hotspots"] = ",".join(pg_dict["Hotspots"])
+                if pg_dict["Hotspots"]:
+                    for db_name in self.prms.args["database_names"]:
+                        dbsn_norm_values = []
+                        for hotspot in pg_dict["Hotspots"]:
+                            dbsn_norm_value = self.annotation.at[hotspot, f"{db_name}_cargo_normalised"]
+                            if pg_dict["db"] == db_name:
+                                dbsn_norm_value -= 1 / self.annotation.at[hotspot, f"N_cargo_groups"]
+                            dbsn_norm_values.append(dbsn_norm_value)
+                        row_dict[f"{db_name}_avg_cargo_fraction"] = round(np.mean(dbsn_norm_values), 4)
+                        row_dict[f"{db_name}_max_cargo_fraction"] = round(max(dbsn_norm_values), 4)
+                    row_dict["hotspots"] = ",".join(pg_dict["Hotspots"])
+                else:
+                    row_dict["hotspots"] = "Non"
 
                 statistic_rows.append(row_dict)
             statistic_table = pd.DataFrame(statistic_rows)
             statistic_table.sort_values(by=["N_Hotspot_communities", "N_Hotspots"], ascending=[False, False],
                                         inplace=True)
-            statistic_table.to_csv(os.path.join(self.prms.args["output_dir"], "protein_group_statistics.tsv"),
-                                   sep="\t", index=False)
+            statistic_table.to_csv(os.path.join(self.prms.args["output_dir"],
+                                                "protein_group_accumulated_statistics.tsv"), sep="\t", index=False)
             return statistic_table
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to calculate protein group statistics.") from error
@@ -1924,7 +1986,7 @@ class Database:
                 drawing_manager.plot_hotspots(self.hotspots.communities[community],
                                               output_folder=os.path.join(self.prms.args["output_dir"], "lovis4u_full"),
                                               additional_annotation=additional_annotation)
-            drawing_manager.plot_hotspots(found_hotspots.keys(),
+            drawing_manager.plot_hotspots(list(found_hotspots.keys()),
                                           output_folder=os.path.join(self.prms.args["output_dir"],
                                                                      "lovis4u_with_query"),
                                           island_ids=found_islands,

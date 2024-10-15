@@ -1,6 +1,10 @@
 # Version log
 
-* **Ver 0.0.6** - 30 September 2024 
+* **Ver 0.0.7** - 15 October 2024
+	- Minor bug fixes
+	- Visualisation adjusment
+
+* Ver 0.0.6 - 30 September 2024 
 	- Hotspots that are located on the end of non-circular chromosomes are now treated separately. 
 	- `-rnf, --report-not-flanked` parameter is added.
 
@@ -14,7 +18,7 @@
 	- Long pdf file name bug is fixed.
 
 * Ver 0.0.4 - 27 June 2024 
-	- Minor fixes and parameter name changes.
+	- Minor fixes and para/Users/aegorov/Desktop/LU_Lab_Projects/LociVIsualisation/lovis4u/docs/VersionLog/versions.mdmeter name changes.
 
 * Ver 0.0.3 - 27 June 2024 
 	- Minor fixes.

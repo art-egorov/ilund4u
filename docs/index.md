@@ -12,12 +12,22 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.6 (September 2024)
+**Version:** 0.0.7 (October 2024)
 
 
 ## Workflow
 
 ![pipeline](img/ilundu4_pipeline.png){loading=lazy width="100%" }  
+
+
+### What you can do with iLund4u
+
+- Cluster up to millions of genomes based on proteome composition similarity
+- Annotate core and accessory genes within each cluster
+- Identify and annotate genomic islands
+- Annotate the functions of accessory proteins encoded within islands
+- Cluster genomic islands to identify variability hotspots
+- Get visualisation of clusters and hotspots with our [LoVis4u library](https://art-egorov.github.io/lovis4u/)
 
 
 ## Installation 
@@ -48,7 +58,7 @@ python3 -m pip install .
 ![db_fig](img/ilund4u_dbs_wo_header.png){ align=right loading=lazy .responsive-image1 }  
 
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
-The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~800K genomes, version of June 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
+The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~870K genomes, version of September 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
 
 <div style="clear: both;"></div>
 
@@ -58,7 +68,7 @@ To download iLund4u database from [our server](https://data-sharing.atkinson-lab
 ilund4u --database plasmids
 ```
 
-**Database sizes:** Phages: 6.2GB; Plasmids: 1.12GB 
+**Database sizes:** Phages: 6.48GB; Plasmids: 1.07GB
 
 
 ## Reference 

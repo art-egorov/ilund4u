@@ -129,8 +129,9 @@ class DrawingManager:
                     start_coordinate = proteome_cdss[locus_indexes[0]].start
                     end_coordinate = proteome_cdss[locus_indexes[-1]].end
                     if compact_mode:
-                        start_coordinate = proteome_cdss[h_island.indexes[0] - 1].start  #
-                        end_coordinate = proteome_cdss[h_island.indexes[-1] + 1].end  #
+                        nf = 1
+                        start_coordinate = proteome_cdss[h_island.indexes[0] - nf].start  #
+                        end_coordinate = proteome_cdss[h_island.indexes[-1] + nf].end  #
                     if end_coordinate > start_coordinate:
                         sequence_coordinate = f"{start_coordinate}:{end_coordinate}:1"
                     else:
@@ -212,6 +213,7 @@ class DrawingManager:
                 l_parameters.load_config("A4p1")
             else:
                 l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
+            #l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
             l_parameters.args["cluster_all_proteins"] = False
             l_parameters.args["locus_label_style"] = "id"
             l_parameters.args["locus_label_position"] = "bottom"

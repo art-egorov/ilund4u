@@ -23,7 +23,7 @@ try:
         hotspots = proteomes.find_hotspots(island_networks)
         hotspots.pyhmmer_annotation(proteomes)
         hotspots.build_hotspot_network()
-        hotspots.calculate_hotspot_statistics_and_get_annotation(proteomes)
+        hotspots.calculate_hotspot_and_island_statistics(proteomes)
         hotspots.get_each_protein_group_statistics(proteomes)
 
         if parameters.args["output_database"]:
@@ -54,4 +54,4 @@ except:
     else:
         for i in (traceback.format_exc()).split('\n'):
             if "ilund4uError:" in i:
-                print(f"ilund4uError:{i.split(':')[1]}", file=sys.stderr)
+                print(f"✖︎ ilund4uError:{i.split(':')[1]}", file=sys.stderr)

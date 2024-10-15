@@ -13,7 +13,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.7 (September 2024)
+**Version:** 0.0.7 (Octover 2024)
 
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
@@ -49,7 +49,7 @@ python3 -m pip install  .
 <img src="docs/img/ilund4u_dbs_wo_header.png" align="right" width="400" max-width="100%" />
 
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
-The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~800K genomes, version of June 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
+The database of phages was built based on running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~870K genomes, version of September 2024). For plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
 
 
 To download iLund4u database from [our server](https://data-sharing.atkinson-lab.com/iLund4u/) you can use the following argument: `--database <phages|plasmids>`. For example, to get plasmids database you need to run:  
@@ -57,7 +57,7 @@ To download iLund4u database from [our server](https://data-sharing.atkinson-lab
 ilund4u --database plasmids
 ```
 
-**Database sizes:** Phages: 6.2GB; Plasmids: 1.12GB 
+**Database sizes:** Phages: 6.48GB; Plasmids: 1.07GB 
 
 
 ## Reference 

@@ -52,7 +52,7 @@ hotspots.pyhmmer_annotation(proteomes)
 hotspots.build_hotspot_network()
 
 # Calculate statistics
-hotspots.calculate_hotspot_statistics_and_get_annotation(proteomes)
+hotspots.calculate_hotspot_and_island_statistics(proteomes)
 hotspots.get_each_protein_group_statistics(proteomes)
 
 # Saving results as database

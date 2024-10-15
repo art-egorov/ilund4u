@@ -110,6 +110,8 @@ After assigning the protein group class to each protein within each proteome com
 
 Here it is important to note that the annotation process also depends on the “circularity” property of a query genome. If a genome is circular then the first and the last genes will be considered to be neighbours. By default we consider each genome as circular, which can be changed with the `-ncg, --non-circular-genomes` parameter. Additionally, the circularity property of each genome can be set independently with `-gct, --genome-circularity-table <path>` (see the [Parameters sections](https://art-egorov.github.io/ilund4u/Parameters/cmd_parameters/) for details). 
 
+In addition, if a genome is not considered circular, islands located at the ends of sequences (flanked from only one side) will not be considered in clustering to hotspots by default in the next steps (even though will be reported in accumulated statistics about all islands). This is the standard iLund4u behaviour. However, you can force to consider them by using the `-rnf, --report-not-flanked` parameter.
+
 The most important island attribute that defines all subsequent steps is a set of its conserved flanking protein groups. When a *variable island* region is defined we iterate over its flanking proteins encoded on both sides. Over iteration we add each “conserved” protein to the attribute of conserved neighbours (either left or right). The iteration on each side stops either when five neighbours (adjustable with *neighbours_one_side_max_size* config parameter) are collected on each side or when we pass over eight neighbour proteins (*neighbours_max_distance* config parameter). The minimal number of collected “conserved” neighbours is set by default as five (*neighbours_min_size* config parameter) and if an island does not reach the total number of five “conserved” neighbours it will not be taken in subsequent steps. The limit on distance from the island is set to avoid cases where an island has only a few “conserved” proteins in flanking genes and the whole locus around consists of variable proteins, which will not allow us to analyse it as a hotspot.
 
 
@@ -120,6 +122,8 @@ $$
 w_{ij}^{c} = \frac{|G_{ic} \cap G_{jc}|\cdot(|G_{ic}|+|G_{jc}|)}{2|G_{ic}||G_{jc}|}
 $$
 where $|G_{ic}|$, $|G_{jc}|$ are lengths (number of unique elements) of the sets of protein groups of $i^{th}$ and $j^{th}$ island "conserved" neighbours, respectively. $|G_{ic} \cap G_{jc}|$ is the number of shared (overlapped) protein groups between $i^{th}$ and $j^{th}$ island "conserved" neighbours. Here the index $c$ representing the proteome community indicates that each proteome community is treated independently and each community has its own network of variable islands. 
+
+We want to note again that islands located at the ends of not circular sequences (flanked from only one side) will **not** be taken for this clustering step. This is the standard iLund4u behaviour. However, you can force to consider them by using the `-rnf, --report-not-flanked` parameter. 
 
 As can be seen from the definition, the network is identical to a network of proteomes if we consider each island as a new proteome with its conserved flanking genes (without cargo proteins) as its proteins. That allows us to apply the same algorithm of network construction and community detection as already was described in the section of proteome network building. We only have minor differences in parameters: instead of minimal weight $w_{ij}\geq 0.7$ in the proteome network construction we have the threshold  $w_{ij}^c\geq 0.65$ (*island_neighbours_similarity_cutoff* config parameter) and the Leiden CPM resolution parameter $\gamma$ is now set as: $\gamma = 0.55$ (*leiden_resolution_parameter_i* config parameter) instead $0.5$ for the proteome network. 
 
@@ -133,10 +137,9 @@ w_{ij} = \frac{|G_i \cap G_i|\cdot(|G_i|+|G_j|)}{2|G_i||G_j|}
 $$
 where $|G_i|$, $|G_j|$ are lengths (number of unique elements) of the set of protein groups of $i^{th}$ and $j^{th}$ hotspot signature, respectively. $|G_{i} \cap G_{j}|$ is the number of shared (overlapped) protein groups between $i^{th}$ and $j^{th}$ hotspot signatures. Network building and community detection parameters set by default are the same as in island network construction and can be adjusted with *hotspot_similarity_cutoff* and *leiden_resolution_parameter_h* config parameters.
 
-
 ### Additional functional annotation
 
-For additional annotation of proteins encoded either as cargo of annotated hotspot islands or as flanking genes we use [pyhmmer API](https://pyhmmer.readthedocs.io/en/stable/). The reason of using pyhmmer instead of MMseqs2 sequence vs profile search is that for several databases that are essential for hotspot protein annotation we have only *[hmmer](http://hmmer.org)* database of profiles available without provided MSA or HMM models compatible with hh-suite or MMseqs.  In order to reduce the running time we use only representative proteins of each protein group as a query set for searching. As was defined above, each cluster of proteins is considered as a set of homologues, then, the search results are attributed to each protein group based on its representative sequence.
+For additional annotation of proteins encoded either as cargo of annotated hotspot islands or as flanking genes we use [pyhmmer API](https://pyhmmer.readthedocs.io/en/stable/). The reason of using pyhmmer instead of MMseqs2 sequence vs profile search is that for several databases that are essential for hotspot protein annotation we have only *[hmmer](http://hmmer.org)* database of profiles available without provided MSA or HMM models compatible with hh-suite or MMseqs 🫤. In order to reduce the running time we use only representative proteins of each protein group as a query set for searching. As was defined above, each cluster of proteins is considered as a set of homologues, then, the search results are attributed to each protein group based on its representative sequence.
 
 The list of used databases and their versions or date of retrieval: 
 
@@ -150,7 +153,7 @@ The list of used databases and their versions or date of retrieval:
 
 The last step of the algorithm is using of our tool [LoVis4u](https://art-egorov.github.io/lovis4u/) for visualisation of each hotspot community and proteome community. We recommend you to read the [Example-driven guide page](https://art-egorov.github.io/ilund4u/ExampleDrivenGuide/cmd_guide/) for examples of visualisation with detailed descriptions. However, there is one step in the visualisation of hotspot communities we want to highlight here: we can expect that some variable islands of one hotspot community from different proteomes could have the same set of cargo and flanking protein groups. In that case iLund4u keeps only one of them for visualisation in order to avoid duplication on visualisation. The full list of hotspot loci is available in annotation tables.
 
-You can see an example with visualisation of proteome community that consists of 736 proteomes ([***LoVis4u community visualisation***](../img/10.pdf){target="_blank"}). The community has one hotspot containing 888 diverse cargo protein groups with 24 of them being annotated as Defence related proteins, 15 as virulence factors, 1 as anti-defence and 1 AMR gene ([***LoVis4u hotspot visualisation***](../img/10-0_537-0.pdf){target="_blank"}).
+You can see an example with visualisation of proteome community that consists of 716 proteomes ([***LoVis4u community visualisation***](../img/15.pdf){target="_blank"}). The community has one hotspot containing 875 diverse cargo protein groups with 16 of them being annotated as Defence related proteins, 6 as virulence factors, 5 as AMR proteins, and 2 as anti-defence  ([***LoVis4u hotspot visualisation***](../img/15-0_300-0.pdf){target="_blank"}).
 
 ---
 
@@ -164,9 +167,9 @@ Optionally during the hotspot annotation step you can build the corresponding to
 </figure>
 
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
-The database of phages was built by running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~800K sequences, version of June 2024). For the plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
+The database of phages was built by running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~870K sequences, version of September 2024). For the plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
 
-**Database sizes:** Phages: 6.2GB; Plasmids: 1.12GB 
+**Database sizes:** Phages: 6.48GB; Plasmids: 1.07GB 
 
 <div style="clear: both;"></div>
 

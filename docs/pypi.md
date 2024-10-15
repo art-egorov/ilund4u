@@ -13,7 +13,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.6 (August 2024)
+**Version:** 0.0.7 (October 2024)
 
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
