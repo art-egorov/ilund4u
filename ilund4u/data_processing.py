@@ -1860,7 +1860,8 @@ class Database:
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to run mmseqs search versus protein database.") from error
 
-    def protein_search_mode(self, query_fasta: str, query_label: typing.Union[None, str] = None) -> None:
+    def protein_search_mode(self, query_fasta: str, query_label: typing.Union[None, str] = None,
+                            predefined_protein_group: typing.Union[None, str] = None) -> None:
         """Run protein search mode which finds homologues of your query proteins in the database and returns
             comprehensive output including visualisation and hotspot annotation.
 
@@ -1873,23 +1874,28 @@ class Database:
         """
         try:
             # Load fasta
-            query_records = list(Bio.SeqIO.parse(query_fasta, "fasta"))
-            if len(query_records) > 1:
-                raise ilund4u.manager.ilund4uError("Only single query protein is allowed for protein mode")
-            query_record = query_records[0]
-            # Run mmseqs for homology search
-            mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta)
-            if len(mmseqs_results.index) == 0:
-                print("○ Termination since no homology to hotspot db proteins was found", file=sys.stdout)
-                return None
-            if self.prms.args["protein_search_target_mode"] == "proteins":
-                homologous_protein_ids = mmseqs_results["target"].to_list()
-            elif self.prms.args["protein_search_target_mode"] == "group":
-                mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"],
-                                           ascending=[True, False, False, False], inplace=True)
-                mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+            if not predefined_protein_group:
+                query_records = list(Bio.SeqIO.parse(query_fasta, "fasta"))
+                if len(query_records) > 1:
+                    raise ilund4u.manager.ilund4uError("Only single query protein is allowed for protein mode")
+                query_record = query_records[0]
+                # Run mmseqs for homology search
+                mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta)
+                if len(mmseqs_results.index) == 0:
+                    print("○ Termination since no homology to hotspot db proteins was found", file=sys.stdout)
+                    return None
+                if self.prms.args["protein_search_target_mode"] == "proteins":
+                    homologous_protein_ids = mmseqs_results["target"].to_list()
+                elif self.prms.args["protein_search_target_mode"] == "group":
+                    mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"],
+                                               ascending=[True, False, False, False], inplace=True)
+                    mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+                    homologous_protein_ids = []
+                    homologous_group = mmseqs_results.at[query_record.id, "group"]
+            else:
+                homologous_group = predefined_protein_group
                 homologous_protein_ids = []
-                homologous_group = mmseqs_results.at[query_record.id, "group"]
+                self.prms.args["protein_search_target_mode"] = "group"
             # Searching for hotspots
             if self.prms.args["verbose"]:
                 print(f"○ Searching for hotspots with your query protein homologues...", file=sys.stdout)
@@ -1959,25 +1965,27 @@ class Database:
             homologous_protein_fasta = os.path.join(self.prms.args["output_dir"], "homologous_proteins.fa")
             full_fasta_file = Bio.SeqIO.index(self.proteomes.proteins_fasta_file, "fasta")
             with open(homologous_protein_fasta, "w") as out_handle:
-                Bio.SeqIO.write(query_record, out_handle, "fasta")
+                if not predefined_protein_group:
+                    Bio.SeqIO.write(query_record, out_handle, "fasta")
                 for acc in homologous_protein_ids:
                     out_handle.write(full_fasta_file.get_raw(acc).decode())
             # MSA visualisation
-            msa4u_p = msa4u.manager.Parameters()
-            msa4u_p.arguments["label"] = "id"
-            msa4u_p.arguments["verbose"] = False
-            msa4u_p.arguments["output_filename"] = os.path.join(self.prms.args["output_dir"],
-                                                                "msa4u_homologous_proteines.pdf")
-            msa4u_p.arguments["output_filename_aln"] = os.path.join(self.prms.args["output_dir"],
-                                                                    "homologous_proteins_aln.fa")
-            fasta = msa4u.manager.Fasta(fasta=homologous_protein_fasta, parameters=msa4u_p)
-            mafft_output = fasta.run_mafft()
-            msa = msa4u.manager.MSA(mafft_output, msa4u_p)
-            msa.plot()
-            if self.prms.args["verbose"]:
-                print(f"⦿ Homologous proteins were saved to {homologous_protein_fasta} and the MSA was visualised with "
-                      f"MSA4u")
-                print(f"○ Visualisation of the hotspot(s) with your query protein homologues using lovis4u...",
+            if len(homologous_protein_ids) > 1 or not predefined_protein_group:
+                msa4u_p = msa4u.manager.Parameters()
+                msa4u_p.arguments["label"] = "id"
+                msa4u_p.arguments["verbose"] = False
+                msa4u_p.arguments["output_filename"] = os.path.join(self.prms.args["output_dir"],
+                                                                    "msa4u_homologous_proteines.pdf")
+                msa4u_p.arguments["output_filename_aln"] = os.path.join(self.prms.args["output_dir"],
+                                                                        "homologous_proteins_aln.fa")
+                fasta = msa4u.manager.Fasta(fasta=homologous_protein_fasta, parameters=msa4u_p)
+                mafft_output = fasta.run_mafft()
+                msa = msa4u.manager.MSA(mafft_output, msa4u_p)
+                msa.plot()
+                if self.prms.args["verbose"]:
+                    print(f"⦿ Homologous proteins were saved to {homologous_protein_fasta} and the MSA was "
+                          f"visualised with MSA4u")
+            print(f"○ Visualisation of the hotspot(s) with your query protein homologues using lovis4u...",
                       file=sys.stdout)
             # lovis4u visualisation
             vis_output_folders = [os.path.join(self.prms.args["output_dir"], "lovis4u_full"),

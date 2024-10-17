@@ -68,13 +68,13 @@ To download iLund4u database from [our server](https://data-sharing.atkinson-lab
 ilund4u --database plasmids
 ```
 
-**Database sizes:** Phages: 6.48GB; Plasmids: 1.07GB
+**Database sizes (compressed):** Phages: 6.48GB; Plasmids: 1.07GB 
 
 
 ## Reference 
 
 If you find iLund4u useful, please cite:  
-Artyom. A. Egorov, Gemma C. Atkinson, **iLund4u: ---**, *---*
+Artyom. A. Egorov, Vasili Hauryliuk, Gemma C. Atkinson, **Systematic annotation of hyper-variability hotspots in phage genomes and plasmids**, *bioRxiv 22024.10.15.618418; doi: [10.1101/2024.10.15.618418](https://doi.org/10.1101/2024.10.15.618418)*
 
 ## Contact 
 

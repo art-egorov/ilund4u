@@ -18,10 +18,11 @@
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
 
-## Reference
+
+## Reference 
 
 If you find iLund4u useful, please cite:  
-Artyom. A. Egorov, Gemma C. Atkinson, **iLund4u: ---**, *---*
+Artyom. A. Egorov, Vasili Hauryliuk, Gemma C. Atkinson, **Systematic annotation of hyper-variability hotspots in phage genomes and plasmids**, *bioRxiv 22024.10.15.618418; doi: [10.1101/2024.10.15.618418](https://doi.org/10.1101/2024.10.15.618418)*
 
 ## Contact
 
