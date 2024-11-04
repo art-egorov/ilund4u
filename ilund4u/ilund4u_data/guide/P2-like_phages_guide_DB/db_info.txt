@@ -1,2 +1,2 @@
-Date and time of building: 2024.10.01-23:50
-iLund4u version: 0.0.6
+Date and time of building: 2024.11.04-23:12
+iLund4u version: 0.0.8

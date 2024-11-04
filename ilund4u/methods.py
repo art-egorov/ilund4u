@@ -135,17 +135,28 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
         shutil.rmtree(hmmscan_output_folder)
     os.mkdir(hmmscan_output_folder)
 
-    databases_cname = ["hmm_defence", "hmm_virulence", "hmm_anti_defence", "hmm_amr"]
-    databases_names = ["DefenceFinder and CasFinder Databases", "Virulence Factor Database",
-                       "Anti-Prokaryotic Immune Systems Database (dbAPIS)", "AMRFinderPlus Database"]
-    databases_short_names = ["Defence", "Virulence", "Anti-defence", "AMR"]
+    databases_cname = prms.args["hmm_config_names"]
+    databases_short_names = prms.args["database_names"]
+
+    databases_names = {"hmm_defence_df": "DefenceFinder and CasFinder databases",
+                       "hmm_defence_padloc": "PADLOC database", "hmm_virulence": "virulence factor database (VFDB)",
+                       "hmm_anti_defence": "anti-prokaryotic immune systems database (dbAPIS)",
+                       "hmm_amr": "AMRFinderPlus Database"}
+    databases_class = {"hmm_defence_df": "defence", "hmm_defence_padloc": "defence", "hmm_virulence": "virulence",
+                       "hmm_anti_defence": "anti-defence",
+                       "hmm_amr": "AMR"}
 
     alignment_table_rows = []
     for db_ind, db_name in enumerate(databases_cname):
+        if prms.args["defence_models"] == "DefenseFinder" and db_name == "hmm_defence_padloc":
+            continue
+        if prms.args["defence_models"] == "PADLOC" and db_name == "hmm_defence_df":
+            continue
         db_alignment_table_rows = []
         db_shortname = databases_short_names[db_ind]
         db_path = prms.args[db_name]
-        db_full_name = databases_names[db_ind]
+        db_full_name = databases_names[db_name]
+        db_class = databases_class[db_name]
         if not os.path.exists(db_path):
             print(f"  ⦿ Database {db_full_name} was not found.", file=sys.stdout)
             continue
@@ -156,16 +167,31 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
         if prms.args["verbose"]:
             print(f"  ⦿ Running pyhmmer hmmscan versus {db_full_name}...", file=sys.stdout)
             bar = progress.bar.FillingCirclesBar("   ", max=num_of_query_proteins, suffix="%(index)d/%(max)d")
-        for hits in pyhmmer.hmmscan(query_proteins, hmms, E=1e-3, cpus=0):
+        for hits in pyhmmer.hmmscan(query_proteins, hmms, E=prms.args["hmmscan_evalue"], cpus=0):
             if prms.args["verbose"]:
                 bar.next()
             for hit in hits:
                 if hit.included:
                     for domain in hit.domains.reported:
-                        if domain.i_evalue < 1e-3:
+                        if domain.i_evalue < prms.args["hmmscan_evalue"]:
                             alignment = domain.alignment
-                            alignment_row = dict(query=alignment.target_name.decode(),
-                                                 target_db=db_shortname, target=hit.name.decode(),
+                            hit_name = hit.name.decode()
+                            hit_description = hit.description
+                            if hit.description:
+                                hit_description = hit_description.decode()
+                                if hit_description == "NA":
+                                    hit_description = ""
+                            else:
+                                hit_description = ""
+                            if hit_name != hit_description and hit_name not in hit_description and hit_description:
+                                hname = f"{hit_name} {hit_description}"
+                            elif hit_description:
+                                hname = hit_description
+                            else:
+                                hname = hit_name
+                            alignment_row = dict(query=alignment.target_name.decode(),  db_class = db_class,
+                                                 target_db=db_shortname, target=hname,t_name=hit_name,
+                                                 t_description=hit_description,
                                                  hit_evalue=hit.evalue, di_evalue=domain.i_evalue,
                                                  q_from=alignment.target_from, q_to=alignment.target_to,
                                                  qlen=alignment.target_length, t_from=alignment.hmm_from,

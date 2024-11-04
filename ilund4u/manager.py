@@ -59,19 +59,19 @@ class Parameters:
         parser.add_argument("-data", "--data", dest="ilund4u_data", action="store_true")
         parser.add_argument("-get-hmms", "--get-hmms", dest="get_hmms", action="store_true")
         parser.add_argument("-database", "--database", dest="get_database", default=None, type=str,
-                            choices=["phages", "plasmids", "enterophages"])
+                            choices=["phages", "plasmids"])
 
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
         parser.add_argument("-mac", "--mac", dest="mac", action="store_true", default=None)
         parser.add_argument("-h", "--help", dest="help", action="store_true")
-        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.7.1")
+        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.8")
 
         subparsers = parser.add_subparsers(dest="mode")
 
         parser_hm = subparsers.add_parser("hotspots")
         parser_hm.add_argument("-gff", "--gff", dest="gff", type=str, default=None)
         parser_hm.add_argument("-ufid", "--use-filename-as-id", dest="use_filename_as_contig_id", action="store_true",
-                                default=None)
+                               default=None)
         parser_hm.add_argument("-mps", "--min-proteome-size", dest="min_proteome_size", type=int, default=None)
         parser_hm.add_argument("-gct", "--genome-circularity-table", dest="genome_annotation", type=str, default=None)
         parser_hm.add_argument("-psc", "--proteome-sim-cutoff", dest="proteome_similarity_cutoff", type=float,
@@ -97,7 +97,6 @@ class Parameters:
         parser_hm.add_argument("--debug", "-debug", dest="debug", action="store_true")
         parser_hm.add_argument("--parsing-debug", "-parsing-debug", dest="parsing_debug", action="store_true")
 
-
         parser_ps = subparsers.add_parser("protein")
         parser_ps.add_argument("-fa", "--fa", dest="fa", type=str, default=None)
         parser_ps.add_argument("-db", "--database", dest="database", type=str, default=None)
@@ -108,6 +107,8 @@ class Parameters:
         parser_ps.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_ps.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_ps.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
+        parser_ps.add_argument("-fm", "--fast-mmseqs", dest="fast_mmseqs_search_mode", action="store_true",
+                               default=None)
         parser_ps.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
                                default=None)
         parser_ps.add_argument("-c", dest="config_file", type=str, default="standard")
@@ -124,6 +125,8 @@ class Parameters:
         parser_pa.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_pa.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_pa.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
+        parser_pa.add_argument("-fm", "--fast-mmseqs", dest="fast_mmseqs_search_mode", action="store_true",
+                               default=None)
         parser_pa.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
                                default=None)
         parser_pa.add_argument("-c", dest="config_file", type=str, default="standard")

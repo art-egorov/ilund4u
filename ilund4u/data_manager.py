@@ -74,6 +74,9 @@ class DatabaseManager:
         hotspots = ilund4u.data_processing.Hotspots.db_init(db_path, proteomes, self.prms)
         db_paths = dict(db_path=db_path, rep_fasta=os.path.join(db_path, "representative_seqs.fa"),
                         proteins_db=os.path.join(db_path, "mmseqs_db", "all_proteins"))
+        if os.path.exists(os.path.join(db_path, "protein_group_accumulated_statistics.tsv")):
+            db_paths["protein_group_stat"] = os.path.join(db_path, "protein_group_accumulated_statistics.tsv")
+
         database = ilund4u.data_processing.Database(proteomes, hotspots, db_paths, self.prms)
         if self.prms.args["verbose"]:
             print(f"⦿ The {db_path} database was successfully loaded", file=sys.stdout)

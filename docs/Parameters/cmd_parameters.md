@@ -178,6 +178,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
 
+`-fm, --fast-mmseqs`
+:    MMseqs search only against a database of representative sequences.
+     [default: False]
+
 `-rnf, --report-not-flanked`
 :    Report in results hotspots that have flanked conserved genes only on one
     side (located on the end of non-circular sequences) [default: False]
@@ -240,6 +244,10 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
+
+`-fm, --fast-mmseqs`
+:    MMseqs search only against a database of representative sequences.
+     [default: False]
 
 `-rnf, --report-not-flanked`
 :    Report in results hotspots that have flanked conserved genes only on one

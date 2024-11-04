@@ -145,7 +145,7 @@ The list of used databases and their versions or date of retrieval:
 
 - Antimicrobial resistance genes (AMR): [AMRFinderPlus](https://www.ncbi.nlm.nih.gov/pathogens/antimicrobial-resistance/AMRFinder/): 02.05.2024.2
 - Anti-Defence: [dbAPIS_Acr](https://bcb.unl.edu/dbAPIS/): 19.09.2023
-- Defence systems: [DefenceFinder](https://defensefinder.mdmlab.fr): 1.2.4, [CasFinder](https://github.com/macsy-models/CasFinder): 3.1.0
+- Defence systems: [DefenceFinder](https://defensefinder.mdmlab.fr): 1.2.4, [CasFinder](https://github.com/macsy-models/CasFinder): 3.1.0; [PADLOC](https://padloc.otago.ac.nz/padloc/): (v. 22.10.2024)
 - Virulence factors: [VFDB](http://www.mgc.ac.cn/VFs/) : 10.05.2024
 
 

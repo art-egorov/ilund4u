@@ -13,7 +13,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.7 (October 2024)
+**Version:** 0.0.8 (November 2024)
 
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**
@@ -43,8 +43,6 @@ python3 -m pip install  .
 **!** If you're a linux user, run `ilund4u --linux` post-install command once to update paths in the premade config files that set by default for MacOS users.
 
 ## Databases
-
-
 
 <img src="docs/img/ilund4u_dbs_wo_header.png" align="right" width="400" max-width="100%" />
 

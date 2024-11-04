@@ -16,7 +16,7 @@ If you run this command for fun and want to change it back you can use `ilund4u 
 
 **Downloading HMM models:** ilund4u uses pyhmmer for additional functional annotation of proteins with hmmscan versus a set of databases. You can download these database from our server ([data-sharing.atkinson-lab.com/iLund4u](https://data-sharing.atkinson-lab.com/iLund4u/)) by running the following command:  
 `ilund4u --get-hmms`  
-List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); Virulence: VFDB (v. 10.05.2024).
+List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); PADLOC (v. 22.10.2024); Virulence: VFDB (v. 10.05.2024).
 
 ^^For this demonstration we will use pharokka-generated gff files with sequences of 70 P2-like phages.  
 Gff files are stored at: *ilund4u_data/guide/gff_files*.^^      
@@ -270,6 +270,7 @@ ilund4u protein -fa  ilund4u_data/guide/RloC.fa -db ilund4u_data/guide/P2-like_p
 	- ***homologous_proteins.fa*** - fasta file containing query protein and identified homologues.
 	- ***homologous_proteins_aln.fa*** - alignment fasta file containing query protein and identified homologues built with MAFFT.
 	- ***msa4u_homologous_proteines.pdf*** - MSA4u visualisation of the protein alignment.
+	- ***protein_group_stat.tsv*** - annotation table of protein group(s) that are homologoues to the query. 
 	- ***found_island_annotation.tsv*** - annotation table of islands containing query protein homologues.
 	- ***found_hotspot_annotation.tsv*** - annotation table of hotspots containing query protein homologues. 
 	- ***lovis4u_full*** - folder containing LoVis4u visualisation of hotspots where query protein homologues are found.
@@ -370,6 +371,7 @@ ilund4u proteome -gff  ilund4u_data/guide/NC_001895.1.gff \
 	- ***hmmscan*** - folder containing additional functional annotation of *all* query sequence proteins versus a set of databases with pyhmmer. 
 	- ***query_proteome_network.tsv*** - sequence id and weights of all edges to the database network of proteomes.
 	- ***similar_proteome_communities.tsv*** - table containing annotation of proteome communities with similar proteomes to your query.	- ***query_protein_clusters.tsv*** - annotation of query sequence protein classes - variable/intermediate/conserved depending on their presence in proteome community.
+	- ***protein_group_stat.tsv*** - annotation table of protein group(s) that are homologoues to the query proteins. 
 	- ***island_to_hotspot_mapping.tsv*** - mapping of variable islands (regions with at least one non-conserved proteins in your query sequence) that were annotation as hotspots in the database.
 	- ***annotation_of_mapped_hotspots.tsv*** - annotation of mapped hotspots containing their description and statistics.
 	- ***lovis4u_proteome_community_hotspots.pdf**** - LoVis4u visualisation of all members of proteome community with your query sequence where hotspots are highlighted.

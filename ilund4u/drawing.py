@@ -76,7 +76,8 @@ class DrawingManager:
                       island_ids: typing.Union[None, list] = None,
                       proteome_ids: typing.Union[None, list] = None,
                       additional_annotation: typing.Union[None, dict] = None, keep_while_deduplication: list = [],
-                      shortest_labels: typing.Union[str, bool]="auto", compact_mode: bool = False):
+                      shortest_labels: typing.Union[str, bool] = "auto", compact_mode: bool = False,
+                      keep_temp_data=True):
         """Visualise set of hotspots using Lovis4u.
 
         Arguments:
@@ -164,7 +165,10 @@ class DrawingManager:
                                                      name=cds.name)
                                 if cds.hmmscan_results:
                                     cds_table_row["name"] = cds.hmmscan_results["target"]
-                                    cds_table_row["category"] = cds.hmmscan_results["db"]
+                                    if "db_name" in cds.hmmscan_results.keys():
+                                        cds_table_row["category"] = cds.hmmscan_results["db_name"]
+                                    else:
+                                        cds_table_row["category"] = cds.hmmscan_results["db"]
                                 cds_table_rows.append(cds_table_row)
                             feature_annotation_row = dict(feature_id=cds.cds_id, group=cds.group, group_type=group_type,
                                                           fill_colour=fcolour, stroke_colour=scolour,
@@ -173,7 +177,10 @@ class DrawingManager:
                                 feature_annotation_row["name"] = ""
                             if cds.hmmscan_results:
                                 feature_annotation_row["name"] = cds.hmmscan_results["target"]
-                                feature_annotation_row["category"] = cds.hmmscan_results["db"]
+                                if "db_name" in cds.hmmscan_results.keys():
+                                    feature_annotation_row["category"] = cds.hmmscan_results["db_name"]
+                                else:
+                                    feature_annotation_row["category"] = cds.hmmscan_results["db"]
                             if additional_annotation:
                                 if cds.cds_id in additional_annotation.keys():
                                     feature_annotation_row.update(additional_annotation[cds.cds_id])
@@ -213,7 +220,7 @@ class DrawingManager:
                 l_parameters.load_config("A4p1")
             else:
                 l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
-            #l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
+            # l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
             l_parameters.args["cluster_all_proteins"] = False
             l_parameters.args["locus_label_style"] = "id"
             l_parameters.args["locus_label_position"] = "bottom"
@@ -241,6 +248,9 @@ class DrawingManager:
             loci.set_category_colours()
             loci.define_labels_to_be_shown()
 
+            loci.save_feature_annotation_table()
+            loci.save_locus_annotation_table()
+
             canvas_manager = lovis4u.Manager.CanvasManager(l_parameters)
             canvas_manager.define_layout(loci)
             canvas_manager.add_loci_tracks(loci)
@@ -252,7 +262,16 @@ class DrawingManager:
                 pdf_name = f"{pdf_name[:200]}..._{hotspot_ids[-1]}"
             canvas_manager.plot(f"{pdf_name}.pdf")
             os.system(f"mv {l_parameters.args['output_dir']}/{pdf_name}.pdf {output_folder}/")
-            shutil.rmtree(l_parameters.args["output_dir"])  # !
+            if keep_temp_data:
+                if not os.path.exists(os.path.join(output_folder, "lovis4u_output")):
+                    os.mkdir(os.path.join(output_folder, "lovis4u_output"))
+                os.system(f"mv {l_parameters.args['output_dir']} "
+                          f"{os.path.join(output_folder, 'lovis4u_output', pdf_name)}")
+                os.mkdir(os.path.join(output_folder, "lovis4u_output", pdf_name, "gff_files"))
+                for gff_file in gff_files:
+                    os.system(f"cp '{gff_file}' {os.path.join(output_folder, 'lovis4u_output', pdf_name, 'gff_files')}/")
+            else:
+                shutil.rmtree(l_parameters.args["output_dir"])
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to plot set of hotspots using LoVis4u.") from error
 
@@ -348,7 +367,10 @@ class DrawingManager:
                         feature_annotation_row["fill_colour"] = fcolour
                     if cds.hmmscan_results and self.prms.args["show_hmmscan_hits_on_full_proteomes"]:
                         feature_annotation_row["name"] = cds.hmmscan_results["target"]
-                        feature_annotation_row["category"] = cds.hmmscan_results["db"]
+                        if "db_name" in cds.hmmscan_results.keys():
+                            feature_annotation_row["category"] = cds.hmmscan_results["db_name"]
+                        else:
+                            feature_annotation_row["category"] = cds.hmmscan_results["db"].lower()
                     if additional_annotation:
                         if cds.cds_id in additional_annotation.keys():
                             feature_annotation_row.update(additional_annotation[cds.cds_id])

@@ -232,7 +232,7 @@ class Island:
     def __init__(self, island_id: str, proteome: str,
                  circular_proteome: int, center: int, indexes: list, var_indexes: list,
                  left_cons_neighbours: list, right_cons_neighbours: list,
-                 hotspot_id = "-", databases_hits_stat: typing.Union[None, dict] = None):
+                 hotspot_id="-", databases_hits_stat: typing.Union[None, dict] = None):
         """Island class constructor.
 
         Arguments:
@@ -1276,8 +1276,8 @@ class Hotspot:
         attributes = {k: v for k, v in self.__dict__.items() if k not in attributes_to_ignore}
         return attributes
 
-    def calculate_database_hits_stats(self, proteomes: Proteomes,
-                                      prms: ilund4u.manager.Parameters) -> collections.defaultdict:
+    def calculate_database_hits_stats(self, proteomes: Proteomes, prms: ilund4u.manager.Parameters,
+                                      protein_mode=False) -> collections.defaultdict:
         """Calculate statistics of pyhmmer annotation for island proteins.
 
         Arguments:
@@ -1293,13 +1293,21 @@ class Hotspot:
             proteome = proteomes.proteomes.at[island.proteome]
             island.calculate_database_hits_stat(proteome.cdss)
             island_dbstat = island.databases_hits_stat
-            db_names = prms.args["database_names"]
+            db_names = prms.args["databases_classes"]
             for db_name in db_names:
                 r_types = ["cargo", "flanking"]
                 for r_type in r_types:
-                    self.island_annotation.at[island.island_id, f"{db_name}_{r_type}"] = \
-                        ",".join(island_dbstat[db_name][r_type].values())
-                    hotspot_stat[db_name][r_type].update(island_dbstat[db_name][r_type])
+                    if not protein_mode:
+                        self.island_annotation.at[island.island_id, f"{db_name}_{r_type}"] = \
+                            ",".join(island_dbstat[db_name][r_type].values())
+                    try:
+                        hotspot_stat[db_name][r_type].update(island_dbstat[db_name][r_type])
+                    except:
+                        # ! For old db version | to remove later
+                        db_name_transform_dict = {"defence": "Defence", "AMR": "AMR",
+                                                  "virulence": "Virulence", "anti-defence": "Anti-defence"}
+                        hotspot_stat[db_name][r_type].update(island_dbstat[db_name_transform_dict[db_name]][r_type])
+
         return hotspot_stat
 
     def get_hotspot_groups(self, proteomes: Proteomes) -> dict:
@@ -1378,6 +1386,9 @@ class Hotspots:
             with open(os.path.join(db_folder, "hotspot.ind.attributes.json"), "w") as json_file:
                 json.dump(hotspot_db_ind, json_file)
 
+            os.system(f"cp {os.path.join(self.prms.args['output_dir'], 'protein_group_accumulated_statistics.tsv')} "
+                      f"{db_folder}")
+
             island_annotation_table.to_csv(os.path.join(db_folder, "hotspot.ind.island.annotations.tsv"), sep="\t",
                                            index_label="island")
         except Exception as error:
@@ -1400,7 +1411,7 @@ class Hotspots:
             if parameters.args["verbose"]:
                 print(f"○ Loading hotspot objects...", file=sys.stdout)
             island_annotation = pd.read_table(os.path.join(db_path, "hotspot.ind.island.annotations.tsv"),
-                                              sep="\t", low_memory = False).set_index("island")
+                                              sep="\t", low_memory=False).set_index("island")
             with open(os.path.join(db_path, "hotspot.ind.attributes.json"), "r") as json_file:
                 hotspot_ind_attributes = json.load(json_file)
             if parameters.args["verbose"]:
@@ -1469,8 +1480,9 @@ class Hotspots:
                         cdss_with_hits = proteome.cdss.loc[proteome_cdss_with_hits].to_list()
                         for cds in cdss_with_hits:
                             alignment_table_row = alignment_table.loc[cds.group]
-                            cds.hmmscan_results = dict(db=alignment_table_row["target_db"],
-                                                       target=alignment_table_row["t_description"],
+                            cds.hmmscan_results = dict(db=alignment_table_row["db_class"],
+                                                       db_name=alignment_table_row["target_db"],
+                                                       target=alignment_table_row["target"],
                                                        evalue=alignment_table_row["hit_evalue"])
             return None
         except Exception as error:
@@ -1588,8 +1600,9 @@ class Hotspots:
             # Create new columns
             for r_type in r_types:
                 self.annotation[f"N_{r_type}_groups"] = pd.Series(dtype='Int64')
-                for db_name in self.prms.args["database_names"]:
+                for db_name in self.prms.args["databases_classes"]:
                     self.annotation[f"N_{db_name}_{r_type}_groups"] = pd.Series(dtype='Int64')
+            self.annotation["conserved_signature"] = pd.Series(dtype="str")
             # Get stat
             for h_com, hotspot_ids in self.communities.items():
                 h_com_stat = collections.defaultdict(lambda: collections.defaultdict(dict))
@@ -1601,10 +1614,12 @@ class Hotspots:
                     n_flanked += hotspot.flanked
                     hotspot_groups = hotspot.get_hotspot_groups(proteomes)
                     db_stat = hotspot.calculate_database_hits_stats(proteomes, self.prms)
+                    self.annotation.at[hotspot.hotspot_id, "conserved_signature"] = ";".join(
+                        hotspot.conserved_signature)
                     for r_type in r_types:
                         hotspot_com_groups[r_type].update(hotspot_groups[r_type])
                         self.annotation.at[hotspot.hotspot_id, f"N_{r_type}_groups"] = len(hotspot_groups[r_type])
-                    for db_name in self.prms.args["database_names"]:
+                    for db_name in self.prms.args["databases_classes"]:
                         for r_type in r_types:
                             h_com_stat[db_name][r_type].update(db_stat[db_name][r_type])
                             self.annotation.at[hotspot.hotspot_id, f"N_{db_name}_{r_type}_groups"] = \
@@ -1614,13 +1629,13 @@ class Hotspots:
                                     pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
                 for r_type in r_types:
                     hc_annot_row[f"N_{r_type}_groups"] = len(hotspot_com_groups[r_type])
-                for db_name in self.prms.args["database_names"]:
+                for db_name in self.prms.args["databases_classes"]:
                     for r_type in r_types:
                         hc_annot_row[f"N_{db_name}_{r_type}_groups"] = len(set(h_com_stat[db_name][r_type].values()))
                 hotspot_community_annot_rows.append(hc_annot_row)
 
             hotspot_community_annot = pd.DataFrame(hotspot_community_annot_rows)
-            for db_name in self.prms.args["database_names"]:
+            for db_name in self.prms.args["databases_classes"]:
                 self.annotation[f"{db_name}_cargo_normalised"] = \
                     self.annotation.apply(lambda row: round(row[f"N_{db_name}_cargo_groups"] / row[f"N_cargo_groups"],
                                                             4), axis=1)
@@ -1640,10 +1655,10 @@ class Hotspots:
                     for island in proteome.islands.to_list():
                         island_annot = dict(island=island.island_id, proteome=proteome.proteome_id,
                                             proteome_commuity=pcom, hotspot_id=island.hotspot_id,
-                                            flanked = island.flanked, island_size=island.size)
+                                            flanked=island.flanked, island_size=island.size)
                         island.calculate_database_hits_stat(proteome.cdss)
                         island_dbstat = island.databases_hits_stat
-                        db_names = self.prms.args["database_names"]
+                        db_names = self.prms.args["databases_classes"]
                         for db_name in db_names:
                             r_types = ["cargo", "flanking"]
                             for r_type in r_types:
@@ -1699,6 +1714,9 @@ class Hotspots:
                                 if cds_obj.hmmscan_results:
                                     protein_group_statistics_dict[ispg]["db_hit"] = cds_obj.hmmscan_results["target"]
                                     protein_group_statistics_dict[ispg]["db"] = cds_obj.hmmscan_results["db"]
+                                    if "db_name" in cds_obj.hmmscan_results.keys():
+                                        protein_group_statistics_dict[ispg]["db_name"] = cds_obj.hmmscan_results[
+                                            "db_name"]
                             protein_group_statistics_dict[ispg]["Counts"] += 1
                             protein_group_statistics_dict[ispg]["Hotspot_communities"].add(h_com)
                             protein_group_statistics_dict[ispg]["Proteome_communities"].add(hotspot.proteome_community)
@@ -1725,6 +1743,9 @@ class Hotspots:
                                         protein_group_statistics_dict[ispg]["db_hit"] = cds_obj.hmmscan_results[
                                             "target"]
                                         protein_group_statistics_dict[ispg]["db"] = cds_obj.hmmscan_results["db"]
+                                        if "db_name" in cds_obj.hmmscan_results.keys():
+                                            protein_group_statistics_dict[ispg]["db_name"] = cds_obj.hmmscan_results[
+                                                "db_name"]
                                 protein_group_statistics_dict[ispg]["Counts"] += 1
                                 protein_group_statistics_dict[ispg]["Proteome_communities"].add(proteome_com)
                                 protein_group_statistics_dict[ispg]["Non_hotspot_islands"].add(island.island_id)
@@ -1740,7 +1761,7 @@ class Hotspots:
                     if isinstance(v, set):
                         row_dict[f"N_{k}"] = len(v)
                 if pg_dict["Hotspots"]:
-                    for db_name in self.prms.args["database_names"]:
+                    for db_name in self.prms.args["databases_classes"]:
                         dbsn_norm_values = []
                         for hotspot in pg_dict["Hotspots"]:
                             dbsn_norm_value = self.annotation.at[hotspot, f"{db_name}_cargo_normalised"]
@@ -1791,11 +1812,12 @@ class Database:
         self.db_paths = db_paths
         self.prms = parameters
 
-    def mmseqs_search_versus_protein_database(self, query_fasta: str) -> pd.DataFrame:
+    def mmseqs_search_versus_protein_database(self, query_fasta: str, fast=False) -> pd.DataFrame:
         """Run mmseqs search versus protein database.
 
         Arguments:
             query_fasta (str): path to a query fasta file with protein sequence(s).
+            fast (bool): if true, then search will be performed only against representative sequences.
 
         Returns:
             pd.DataFrame: mmseqs search results table.
@@ -1803,7 +1825,8 @@ class Database:
         """
         try:
             if self.prms.args["verbose"]:
-                print(f"○ Running mmseqs for protein search versus the database of proteins...",
+                print(f"○ Running mmseqs for protein search versus the {'representative' if fast else 'full'}"
+                      f" database of proteins...",
                       file=sys.stdout)
             if not os.path.exists(self.prms.args["output_dir"]):
                 os.mkdir(self.prms.args["output_dir"])
@@ -1819,9 +1842,15 @@ class Database:
             subprocess.run([self.prms.args["mmseqs_binary"], "createdb", query_fasta,
                             os.path.join(mmseqs_output_folder_db, "query_seq_db")], stdout=mmseqs_stdout,
                            stderr=mmseqs_stderr)
+            target_db = self.db_paths["proteins_db"]
+            if fast:
+                if not os.path.exists(os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")):
+                    subprocess.run([self.prms.args["mmseqs_binary"], "createdb", self.db_paths["rep_fasta"],
+                                    os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")],
+                                   stdout=mmseqs_stdout, stderr=mmseqs_stderr)
+                target_db = os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")
             subprocess.run([self.prms.args["mmseqs_binary"], "search",
-                            os.path.join(mmseqs_output_folder_db, "query_seq_db"),
-                            self.db_paths["proteins_db"],
+                            os.path.join(mmseqs_output_folder_db, "query_seq_db"), target_db,
                             os.path.join(mmseqs_output_folder_db, "search_res_db"),
                             os.path.join(mmseqs_output_folder, "tmp"), "-e",
                             str(self.prms.args["mmseqs_search_evalue"]),
@@ -1880,22 +1909,41 @@ class Database:
                     raise ilund4u.manager.ilund4uError("Only single query protein is allowed for protein mode")
                 query_record = query_records[0]
                 # Run mmseqs for homology search
-                mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta)
+                if self.prms.args["protein_search_target_mode"] == "proteins" and self.prms.args[
+                    "fast_mmseqs_search_mode"]:
+                    print("○ Fast mode is not available with 'proteins' search modea and was deactivated.",
+                          file=sys.stdout)
+                    self.prms.args["fast_mmseqs_search_mode"] = False
+                mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta,
+                                                                            self.prms.args["fast_mmseqs_search_mode"])
                 if len(mmseqs_results.index) == 0:
                     print("○ Termination since no homology to hotspot db proteins was found", file=sys.stdout)
                     return None
                 if self.prms.args["protein_search_target_mode"] == "proteins":
                     homologous_protein_ids = mmseqs_results["target"].to_list()
+                    homologous_groups = mmseqs_results["group"].to_list()
                 elif self.prms.args["protein_search_target_mode"] == "group":
                     mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"],
                                                ascending=[True, False, False, False], inplace=True)
                     mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
                     homologous_protein_ids = []
                     homologous_group = mmseqs_results.at[query_record.id, "group"]
+                    homologous_groups = [homologous_group]
             else:
                 homologous_group = predefined_protein_group
+                homologous_groups = [homologous_group]
                 homologous_protein_ids = []
                 self.prms.args["protein_search_target_mode"] = "group"
+            if "protein_group_stat" in self.db_paths.keys():
+                protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t").set_index(
+                    "representative_protein")
+                groups_to_select = list(protein_group_stat_table.index.intersection(homologous_groups))
+                if groups_to_select:
+                    protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
+                    protein_group_stat_table.to_csv(
+                        os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
+                        sep="\t", index=True, index_label="representative_protein")
+
             # Searching for hotspots
             if self.prms.args["verbose"]:
                 print(f"○ Searching for hotspots with your query protein homologues...", file=sys.stdout)
@@ -1953,6 +2001,43 @@ class Database:
             found_hotspots_annotation.to_csv(os.path.join(self.prms.args["output_dir"], "found_hotspot_annotation.tsv"),
                                              sep="\t", index_label="hotspot_id")
             found_hotspot_communities = list(set(found_hotspots_annotation["hotspot_community"].to_list()))
+            # Get hotspot community stat
+            hotspot_community_annot_rows = []
+            r_types = ["cargo", "flanking"]
+            for h_com, hotspot_ids in self.hotspots.communities.items():
+                if h_com not in found_hotspot_communities:
+                    continue
+                h_com_stat = collections.defaultdict(lambda: collections.defaultdict(dict))
+                hotspot_com_groups = dict(cargo=set(), flanking=set())
+                hotspots = self.hotspots.hotspots.loc[hotspot_ids].to_list()
+                n_islands, n_flanked = 0, 0
+                for hotspot in hotspots:
+                    n_islands += hotspot.size
+                    n_flanked += hotspot.flanked
+                    hotspot_groups = hotspot.get_hotspot_groups(self.proteomes)
+                    db_stat = hotspot.calculate_database_hits_stats(self.proteomes, self.prms, protein_mode=True)
+                    for r_type in r_types:
+                        hotspot_com_groups[r_type].update(hotspot_groups[r_type])
+                    for db_name in self.prms.args["databases_classes"]:
+                        for r_type in r_types:
+                            h_com_stat[db_name][r_type].update(db_stat[db_name][r_type])
+                hc_annot_row = dict(com_id=h_com, community_size=len(hotspot_ids), N_flanked=n_flanked,
+                                    N_islands=n_islands, hotspots=",".join(hotspot_ids),
+                                    pdf_filename=f"{'_'.join(hotspot_ids)}.pdf")
+                for r_type in r_types:
+                    hc_annot_row[f"N_{r_type}_groups"] = len(hotspot_com_groups[r_type])
+                for db_name in self.prms.args["databases_classes"]:
+                    for r_type in r_types:
+                        hc_annot_row[f"N_{db_name}_{r_type}_groups"] = len(set(h_com_stat[db_name][r_type].values()))
+                hotspot_community_annot_rows.append(hc_annot_row)
+            hotspot_community_annot = pd.DataFrame(hotspot_community_annot_rows)
+            for db_name in self.prms.args["databases_classes"]:
+                hotspot_community_annot[f"{db_name}_cargo_normalised"] = \
+                    hotspot_community_annot.apply(
+                        lambda row: round(row[f"N_{db_name}_cargo_groups"] / row[f"N_cargo_groups"], 4), axis=1)
+            hotspot_community_annot.to_csv(os.path.join(self.prms.args["output_dir"],
+                                                        "found_hotspot_community_annotation.tsv"),
+                                           sep="\t", index=False)
             if self.prms.args["verbose"]:
                 print(f"  ⦿ Query protein homologues were found in {len(found_hotspot_communities)} hotspot "
                       f"communit{'y' if len(found_hotspot_communities) == 1 else 'ies'} "
@@ -1962,6 +2047,7 @@ class Database:
                       f"\n    {n_flanked}/{len(found_islands)} island{'s' if len(found_islands) > 1 else ''} where found"
                       f" as cargo are both side flanked (have conserved genes on both sides)",
                       file=sys.stdout)
+
             homologous_protein_fasta = os.path.join(self.prms.args["output_dir"], "homologous_proteins.fa")
             full_fasta_file = Bio.SeqIO.index(self.proteomes.proteins_fasta_file, "fasta")
             with open(homologous_protein_fasta, "w") as out_handle:
@@ -1986,7 +2072,7 @@ class Database:
                     print(f"⦿ Homologous proteins were saved to {homologous_protein_fasta} and the MSA was "
                           f"visualised with MSA4u")
             print(f"○ Visualisation of the hotspot(s) with your query protein homologues using lovis4u...",
-                      file=sys.stdout)
+                  file=sys.stdout)
             # lovis4u visualisation
             vis_output_folders = [os.path.join(self.prms.args["output_dir"], "lovis4u_full"),
                                   os.path.join(self.prms.args["output_dir"], "lovis4u_with_query")]
@@ -2031,7 +2117,8 @@ class Database:
             proteomes_helper_obj.load_sequences_from_extended_gff(input_f=[query_gff])
             query_proteome = proteomes_helper_obj.proteomes.iat[0]
             # Get and parse mmseqs search results
-            mmseqs_results = self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file)
+            mmseqs_results = self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file,
+                                                                        self.prms.args["fast_mmseqs_search_mode"])
             if self.prms.args["verbose"]:
                 print(f"○ Searching for similar proteomes in the database network", file=sys.stdout)
             mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"], ascending=[True, False, False, False],
@@ -2044,6 +2131,14 @@ class Database:
                 else:
                     cds.group = f"{cds.cds_id}"
                     proteins_wo_hits.append(cds.group)
+            if "protein_group_stat" in self.db_paths.keys():
+                protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t").set_index(
+                    "representative_protein")
+                groups_to_select = list(protein_group_stat_table.index.intersection(mmseqs_results["group"].tolist()))
+                if groups_to_select:
+                    protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
+                    protein_group_stat_table.to_csv(os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
+                                                    sep="\t", index=True, index_label="representative_protein")
             # Running pyhmmer annotation
             if self.prms.args["verbose"]:
                 print(f"○ Preparing data for protein annotation with pyhmmer hmmscan...", file=sys.stdout)
@@ -2057,8 +2152,9 @@ class Database:
                     cdss_with_hits = query_proteome.cdss.loc[proteome_cdss_with_hits].to_list()
                     for cds in cdss_with_hits:
                         alignment_table_row = alignment_table.loc[cds.cds_id]
-                        cds.hmmscan_results = dict(db=alignment_table_row["target_db"],
-                                                   target=alignment_table_row["t_description"],
+                        cds.hmmscan_results = dict(db=alignment_table_row["db_class"],
+                                                   db_name=alignment_table_row["target_db"],
+                                                   target=alignment_table_row["target"],
                                                    evalue=alignment_table_row["hit_evalue"])
             # Connect to the database proteome network
             proteome_names = pd.Series({idx: sid for idx, sid in enumerate(self.proteomes.annotation.index)})
