@@ -744,7 +744,7 @@ This command replaces the tools paths (MMseqs2) in the pre-made config files fro
 If you run this command for fun and want to change it back you can use <code>ilund4u --mac</code>.</p>
 <p><strong>Downloading HMM models:</strong> ilund4u uses pyhmmer for additional functional annotation of proteins with hmmscan versus a set of databases. You can download these database from our server (<a href="https://data-sharing.atkinson-lab.com/iLund4u/">data-sharing.atkinson-lab.com/iLund4u</a>) by running the following command:<br />
 <code>ilund4u --get-hmms</code><br />
-List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); Virulence: VFDB (v. 10.05.2024).</p>
+List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); PADLOC (v. 22.10.2024); Virulence: VFDB (v. 10.05.2024).</p>
 <p><ins>For this demonstration we will use pharokka-generated gff files with sequences of 70 P2-like phages.<br />
 Gff files are stored at: <em>ilund4u_data/guide/gff_files</em>.</ins>    <br />
 The main difference of pharokka/prokka generated gff files from a regular gff3 (for ex. which you can download from the NCBI) is that in addition to annotation rows they contain the corresponding nucleotide sequence in fasta format. </p>
@@ -943,6 +943,7 @@ Here we can also start with only the mandatory arguments set: <code>-fa &lt;fast
 <li><strong><em>homologous_proteins.fa</em></strong> - fasta file containing query protein and identified homologues.</li>
 <li><strong><em>homologous_proteins_aln.fa</em></strong> - alignment fasta file containing query protein and identified homologues built with MAFFT.</li>
 <li><strong><em>msa4u_homologous_proteines.pdf</em></strong> - MSA4u visualisation of the protein alignment.</li>
+<li><strong><em>protein_group_stat.tsv</em></strong> - annotation table of protein group(s) that are homologoues to the query. </li>
 <li><strong><em>found_island_annotation.tsv</em></strong> - annotation table of islands containing query protein homologues.</li>
 <li><strong><em>found_hotspot_annotation.tsv</em></strong> - annotation table of hotspots containing query protein homologues. </li>
 <li><strong><em>lovis4u_full</em></strong> - folder containing LoVis4u visualisation of hotspots where query protein homologues are found.</li>
@@ -1029,6 +1030,7 @@ In this mode mandatory arguments are <code>-gff &lt;gff_path&gt;</code> - path t
 <li><strong><em>hmmscan</em></strong> - folder containing additional functional annotation of <em>all</em> query sequence proteins versus a set of databases with pyhmmer. </li>
 <li><strong><em>query_proteome_network.tsv</em></strong> - sequence id and weights of all edges to the database network of proteomes.</li>
 <li><strong><em>similar_proteome_communities.tsv</em></strong> - table containing annotation of proteome communities with similar proteomes to your query.    - <strong><em>query_protein_clusters.tsv</em></strong> - annotation of query sequence protein classes - variable/intermediate/conserved depending on their presence in proteome community.</li>
+<li><strong><em>protein_group_stat.tsv</em></strong> - annotation table of protein group(s) that are homologoues to the query proteins. </li>
 <li><strong><em>island_to_hotspot_mapping.tsv</em></strong> - mapping of variable islands (regions with at least one non-conserved proteins in your query sequence) that were annotation as hotspots in the database.</li>
 <li><strong><em>annotation_of_mapped_hotspots.tsv</em></strong> - annotation of mapped hotspots containing their description and statistics.</li>
 <li><strong><em>lovis4u_proteome_community_hotspots.pdf</em></strong>* - LoVis4u visualisation of all members of proteome community with your query sequence where hotspots are highlighted.</li>
