@@ -231,6 +231,8 @@ class DrawingManager:
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
 
+            l_parameters.args["use_filename_as_contig_id"] = self.prms.args["use_filename_as_contig_id"]
+
             if compact_mode:
                 l_parameters.args["feature_group_types_to_show_label"] = []
                 l_parameters.args["feature_group_types_to_show_label_on_first_occurrence"] = ["conserved", "variable"]
@@ -380,6 +382,7 @@ class DrawingManager:
             l_parameters = lovis4u.Manager.Parameters()
             l_parameters.load_config(self.prms.args["lovis4u_proteome_config_filename"])
             l_parameters.args["cluster_all_proteins"] = False
+            l_parameters.args["use_filename_as_contig_id"] = self.prms.args["use_filename_as_contig_id"]
             if n_of_added_proteomes > 1:
                 l_parameters.args["draw_individual_x_axis"] = False
             else:

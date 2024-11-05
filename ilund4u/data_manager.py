@@ -77,6 +77,10 @@ class DatabaseManager:
         if os.path.exists(os.path.join(db_path, "protein_group_accumulated_statistics.tsv")):
             db_paths["protein_group_stat"] = os.path.join(db_path, "protein_group_accumulated_statistics.tsv")
 
+        with open(os.path.join(db_path, "parameters.json"), "r") as json_file:
+            annotation_parameters = json.load(json_file)
+        self.prms.args["use_filename_as_contig_id"] = annotation_parameters["use_filename_as_contig_id"]
+
         database = ilund4u.data_processing.Database(proteomes, hotspots, db_paths, self.prms)
         if self.prms.args["verbose"]:
             print(f"⦿ The {db_path} database was successfully loaded", file=sys.stdout)

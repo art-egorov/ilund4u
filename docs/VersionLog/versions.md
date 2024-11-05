@@ -1,8 +1,16 @@
 # Version log
 
-* Preprint release ✨
+* **Ver 0.0.8.1** - 5 November
+	- Bug with LoVis4u visualisation when `-ufid` parameter is used was fixed. 
 
-* **Ver 0.0.7.1** - 15 October 2024
+* **Ver 0.0.8** - 4 November
+	- PADLOC hmm models were added.
+	- Fast mode search for protein and proteome annotation mode is introduced.
+	- Updated statistics output for all modes.
+
+* [Preprint](https://doi.org/10.1101/2024.10.15.618418) released - 16 October,  ✨
+
+* Ver 0.0.7.1 - 15 October 2024
 	- `-use-filename-as-id` and `--parsing-deubg` parameters were added
 
 * Ver 0.0.7 - 15 October 2024
