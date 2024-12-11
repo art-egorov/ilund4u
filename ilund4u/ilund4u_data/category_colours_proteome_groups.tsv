@@ -12,10 +12,13 @@ unknown function	#9B9CA0
 defence (DefenseFinder)	#5E008A
 defence (PADLOC)	#44007D
 defence	#5E008A
+Defence	#5E008A
 virulence	#800000
 virulence (VFDB)	#800000
+Virulence	#800000
 anti-defence	#0A5A6A
 anti-defence (dbAPIS)	#0A5A6A
+Anti-defence	#0A5A6A
 AMR	#B83900
 AMR (AMRFinderPlus)	#B83900
 tRNA	#000000

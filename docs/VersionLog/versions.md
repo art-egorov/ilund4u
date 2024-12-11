@@ -1,9 +1,13 @@
 # Version log
 
-* **Ver 0.0.8.1** - 5 November
+* **Ver 0.0.9** - 11 December
+	- Now for dropped sequences information about duplication source is reported.
+	- Config file parameter for mmseqs *--max-seqs* option is added.
+
+* Ver 0.0.8.1 - 5 November
 	- Bug with LoVis4u visualisation when `-ufid` parameter is used was fixed. 
 
-* **Ver 0.0.8** - 4 November
+* Ver 0.0.8 - 4 November
 	- PADLOC hmm models were added.
 	- Fast mode search for protein and proteome annotation mode is introduced.
 	- Updated statistics output for all modes.
@@ -20,9 +24,6 @@
 * Ver 0.0.6 - 30 September 2024 
 	- Hotspots that are located on the end of non-circular chromosomes are now treated separately. 
 	- `-rnf, --report-not-flanked` parameter is added.
-
-* Ver 0.0.5.2 - 8 August 2024 
-	- Adjusment to the 0.0.5.1 v. update
 
 * Ver 0.0.5.1 - 5 August 2024 
 	- Long table file name bug is fixed (adjusment to the 0.0.5 v. update).

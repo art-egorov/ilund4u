@@ -17,7 +17,7 @@ extra_files = package_files("ilund4u/ilund4u_data")
 extra_files.append("../docs/pypi.md")
 
 setuptools.setup(name="ilund4u",
-                 version="0.0.8.1",
+                 version="0.0.9",
                  python_requires='>=3.8',
                  description="description",
                  url="https://art-egorov.github.io/ilund4u/",
@@ -26,7 +26,7 @@ setuptools.setup(name="ilund4u",
                  license="WTFPL",
                  packages=["ilund4u"],
                  package_data={"ilund4u": extra_files},
-                 install_requires=["biopython", "requests", "configs", "argparse", "pandas", "bcbio-gff", "matplotlib",
+                 install_requires=["biopython", "requests", "configs", "pandas", "bcbio-gff", "matplotlib",
                                    "seaborn", "scipy", "msa4u", "lovis4u", "progress", "leidenalg", "igraph", "pyhmmer"],
                  long_description=long_description,
                  long_description_content_type="text/markdown",

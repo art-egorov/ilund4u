@@ -740,15 +740,18 @@ class Proteomes:
             subprocess.run([self.prms.args["mmseqs_binary"], "createdb", mmseqs_input,
                             os.path.join(mmseqs_output_folder_db, "sequencesDB")], stdout=mmseqs_stdout,
                            stderr=mmseqs_stderr)
-            subprocess.run([self.prms.args["mmseqs_binary"], "cluster",
-                            os.path.join(mmseqs_output_folder_db, "sequencesDB"),
-                            os.path.join(mmseqs_output_folder_db, "clusterDB"),
-                            os.path.join(mmseqs_output_folder_db, "tmp"),
-                            "--cluster-mode", str(self.prms.args["mmseqs_cluster_mode"]),
-                            "--cov-mode", str(self.prms.args["mmseqs_cov_mode"]),
-                            "--min-seq-id", str(self.prms.args["mmseqs_min_seq_id"]),
-                            "-c", str(self.prms.args["mmseqs_c"]),
-                            "-s", str(self.prms.args["mmseqs_s"])], stdout=mmseqs_stdout,
+            cl_args = [self.prms.args["mmseqs_binary"], "cluster",
+                       os.path.join(mmseqs_output_folder_db, "sequencesDB"),
+                       os.path.join(mmseqs_output_folder_db, "clusterDB"),
+                       os.path.join(mmseqs_output_folder_db, "tmp"),
+                       "--cluster-mode", str(self.prms.args["mmseqs_cluster_mode"]),
+                       "--cov-mode", str(self.prms.args["mmseqs_cov_mode"]),
+                       "--min-seq-id", str(self.prms.args["mmseqs_min_seq_id"]),
+                       "-c", str(self.prms.args["mmseqs_c"]),
+                       "-s", str(self.prms.args["mmseqs_s"])]
+            if self.prms.args["mmseqs_max_seqs"]:
+                cl_args += ["--max-seqs", str(self.prms.args["mmseqs_max_seqs"])]
+            subprocess.run(cl_args, stdout=mmseqs_stdout,
                            stderr=mmseqs_stderr)  # threads!
             subprocess.run([self.prms.args["mmseqs_binary"], "createtsv",
                             os.path.join(mmseqs_output_folder_db, "sequencesDB"),
@@ -783,7 +786,7 @@ class Proteomes:
             if self.prms.args["verbose"]:
                 print(f"○ Processing mmseqs results ...", file=sys.stdout)
             sequences_to_drop, drop_reason = [], []
-            current_p_length, cpl_added_proteomes = None, None
+            current_p_length, cpl_added_proteomes, cpl_ids = None, None, None
             cluster_to_sequences = collections.defaultdict(list)
             if self.prms.args["verbose"]:
                 bar = progress.bar.FillingCirclesBar(" ", max=len(self.proteomes.index), suffix='%(index)d/%(max)d')
@@ -793,7 +796,7 @@ class Proteomes:
                 seq_p_size = self.annotation.iat[p_index, self.__col_to_ind["proteome_size"]]
                 if seq_p_size != current_p_length:
                     current_p_length = seq_p_size
-                    cpl_added_proteomes = []
+                    cpl_added_proteomes, cpl_ids = [], []
                 seq_protein_clusters = []
                 for cds in proteome.cdss.to_list():
                     cds.group = mmseqs_results[cds.cds_id]
@@ -801,8 +804,10 @@ class Proteomes:
                 seq_protein_clusters_set = set(seq_protein_clusters)
                 unique_p_size = len(seq_protein_clusters_set)
                 if seq_protein_clusters_set in cpl_added_proteomes:
+                    dup_index = cpl_added_proteomes.index(seq_protein_clusters_set)
+                    dup_proteome_id = cpl_ids[dup_index]
                     sequences_to_drop.append(proteome.proteome_id)
-                    drop_reason.append(f"Duplicate")
+                    drop_reason.append(f"Duplicate: {dup_proteome_id}")
                     continue
                 if unique_p_size / seq_p_size < self.prms.args["proteome_uniqueness_cutoff"]:
                     sequences_to_drop.append(proteome.proteome_id)
@@ -811,6 +816,7 @@ class Proteomes:
                 self.annotation.iat[p_index, self.__col_to_ind["proteome_size_unique"]] = unique_p_size
                 self.annotation.iat[p_index, self.__col_to_ind["protein_clusters"]] = list(seq_protein_clusters_set)
                 cpl_added_proteomes.append(seq_protein_clusters_set)
+                cpl_ids.append(proteome.proteome_id)
                 for p_cluster in seq_protein_clusters_set:
                     cluster_to_sequences[p_cluster].append(proteome.proteome_id)
             dropped_sequences = pd.DataFrame(dict(sequence=sequences_to_drop, reason=drop_reason))
@@ -1692,10 +1698,11 @@ class Hotspots:
                 print(f"○ Protein group statistics calculation...", file=sys.stdout)
                 bar = progress.bar.FillingCirclesBar(" ", max=len(self.hotspots.index), suffix='%(index)d/%(max)d')
             protein_group_statistics_dict = collections.defaultdict(
-                lambda: {"Hotspot_communities": set(), "Hotspots": set(), "Hotpot_islands": set(),
+                lambda: {"Hotspot_communities": set(), "Hotspots": set(), "Hotpot_islands": set(), "RepLength": 0,
                          "Non_hotspot_islands": set(), "Proteome_communities": set(), "Flanked_hotspot_islands": set(),
                          "Flanked_non_hotspot_islands": set(), "Counts": 0, "db": "None", "db_hit": "None", "Name": "",
-                         "RepLength": 0})
+                         "island_neighbours": set(),
+                         **{f"{db_name}_island_neighbours": set() for db_name in self.prms.args["databases_classes"]}})
             # Hotspot stat
             for h_com, hotspots_ids in self.communities.items():
                 hotspots = self.hotspots.loc[hotspots_ids].to_list()
@@ -1706,6 +1713,9 @@ class Hotspots:
                         proteome = proteomes.proteomes.at[island.proteome]
                         island_proteins = island.get_island_proteins(proteome.cdss)
                         island_protein_groups = island.get_island_groups(proteome.cdss)
+                        island_db_hits_sets = dict()
+                        for db_name in self.prms.args["databases_classes"]:
+                            island_db_hits_sets[db_name] = set(island.databases_hits_stat[db_name]["cargo"].values())
                         for isp, ispg in zip(island_proteins, island_protein_groups):
                             if protein_group_statistics_dict[ispg]["Counts"] == 0:
                                 cds_obj = proteome.cdss.at[isp]
@@ -1717,6 +1727,21 @@ class Hotspots:
                                     if "db_name" in cds_obj.hmmscan_results.keys():
                                         protein_group_statistics_dict[ispg]["db_name"] = cds_obj.hmmscan_results[
                                             "db_name"]
+                            for db_name in self.prms.args["databases_classes"]:
+                                groups_to_update_with = island_db_hits_sets[db_name]
+                                if db_name.lower() == "defence":
+                                    system_set = set()
+                                    for db_hit in island_db_hits_sets[db_name]:
+                                        upd_db_hit = db_hit
+                                        if "__" in db_hit:
+                                            upd_db_hit = db_hit.split("__")[0]
+                                        system_set.add(upd_db_hit)
+                                    groups_to_update_with = system_set
+                                protein_group_statistics_dict[ispg][f"{db_name}_island_neighbours"].update(
+                                    groups_to_update_with)
+                            island_protein_group_set = set(island_protein_groups)
+                            island_protein_group_set.discard(ispg)
+                            protein_group_statistics_dict[ispg]["island_neighbours"].update(island_protein_group_set)
                             protein_group_statistics_dict[ispg]["Counts"] += 1
                             protein_group_statistics_dict[ispg]["Hotspot_communities"].add(h_com)
                             protein_group_statistics_dict[ispg]["Proteome_communities"].add(hotspot.proteome_community)
@@ -1755,8 +1780,14 @@ class Hotspots:
 
             statistic_rows = []
             for pg, pg_dict in protein_group_statistics_dict.items():
-                row_dict = dict(representative_protein=pg, db=pg_dict["db"], pb_hit=pg_dict["db_hit"],
+                row_dict = dict(representative_protein=pg, db=pg_dict["db"], db_hit=pg_dict["db_hit"],
                                 name=pg_dict["Name"], counts=pg_dict["Counts"], length=pg_dict["RepLength"])
+                for db_name in self.prms.args["databases_classes"]:
+                    p_hit = pg_dict["db_hit"]
+                    if db_name.lower() == "defence":
+                        if "__" in p_hit:
+                            p_hit = p_hit.split("__")[0]
+                    pg_dict[f"{db_name}_island_neighbours"].discard(p_hit)
                 for k, v in pg_dict.items():
                     if isinstance(v, set):
                         row_dict[f"N_{k}"] = len(v)
@@ -1766,7 +1797,7 @@ class Hotspots:
                         for hotspot in pg_dict["Hotspots"]:
                             dbsn_norm_value = self.annotation.at[hotspot, f"{db_name}_cargo_normalised"]
                             if pg_dict["db"] == db_name:
-                                dbsn_norm_value -= 1 / self.annotation.at[hotspot, f"N_cargo_groups"]
+                                dbsn_norm_value -= round(1 / self.annotation.at[hotspot, f"N_cargo_groups"], 4)
                             dbsn_norm_values.append(dbsn_norm_value)
                         row_dict[f"{db_name}_avg_cargo_fraction"] = round(np.mean(dbsn_norm_values), 4)
                         row_dict[f"{db_name}_max_cargo_fraction"] = round(max(dbsn_norm_values), 4)
@@ -1857,7 +1888,7 @@ class Database:
                             "-s", str(self.prms.args["mmseqs_search_s"])], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
             subprocess.run([self.prms.args["mmseqs_binary"], "convertalis",
                             os.path.join(mmseqs_output_folder_db, "query_seq_db"),
-                            self.db_paths["proteins_db"],
+                            target_db,
                             os.path.join(mmseqs_output_folder_db, "search_res_db"),
                             os.path.join(mmseqs_output_folder, "mmseqs_search_results.tsv"), "--format-output",
                             "query,target,qlen,tlen,alnlen,fident,qstart,qend,tstart,tend,evalue",
@@ -1871,11 +1902,14 @@ class Database:
                 (mmseqs_search_results["tcov"] >= self.prms.args["mmseqs_search_tcov"]) &
                 (mmseqs_search_results["fident"] >= self.prms.args["mmseqs_search_fident"])]
             queries_with_res = len(set(mmseqs_search_results["query"].to_list()))
-            target_to_group = dict()
-            for proteome in self.proteomes.proteomes.to_list():
-                for cds in proteome.cdss.to_list():
-                    target_to_group[cds.cds_id] = cds.group
-            mmseqs_search_results["group"] = mmseqs_search_results["target"].apply(lambda t: target_to_group[t])
+            if not fast:
+                target_to_group = dict()
+                for proteome in self.proteomes.proteomes.to_list():
+                    for cds in proteome.cdss.to_list():
+                        target_to_group[cds.cds_id] = cds.group
+                mmseqs_search_results["group"] = mmseqs_search_results["target"].apply(lambda t: target_to_group[t])
+            if fast:
+                mmseqs_search_results["group"] = mmseqs_search_results["target"]
             mmseqs_search_results.to_csv(os.path.join(self.prms.args["output_dir"], "mmseqs_homology_search_full.tsv"),
                                          sep="\t", index=False)
             if self.prms.args["verbose"]:
@@ -2137,8 +2171,9 @@ class Database:
                 groups_to_select = list(protein_group_stat_table.index.intersection(mmseqs_results["group"].tolist()))
                 if groups_to_select:
                     protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
-                    protein_group_stat_table.to_csv(os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
-                                                    sep="\t", index=True, index_label="representative_protein")
+                    protein_group_stat_table.to_csv(
+                        os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
+                        sep="\t", index=True, index_label="representative_protein")
             # Running pyhmmer annotation
             if self.prms.args["verbose"]:
                 print(f"○ Preparing data for protein annotation with pyhmmer hmmscan...", file=sys.stdout)

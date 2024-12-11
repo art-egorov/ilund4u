@@ -9,11 +9,11 @@
 **Supported input**: gff3 for annotation files (prokka/pharokka generated); fasta for protein sequences        
 **Programming language:** Python3   
 **OS:** MacOS, Linux  
-**Python dependencies:** biopython, bcbio-gff, scipy, configs, argparse, pandas, matplotlib, seaborn, progess, leidanalg, igraph. pyhmmer, msa4u, lovis4u    
+**Python dependencies:** biopython, bcbio-gff, scipy, configs, pandas, matplotlib, seaborn, progess, leidanalg, igraph. pyhmmer, msa4u, lovis4u    
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.8.1 (November 2024)
+**Version:** 0.0.9 (December 2024)
 
 
 **Detailed documentation with user guide is available at [iLund4u Homepage](https://art-egorov.github.io/ilund4u/)**

@@ -79,7 +79,8 @@ class DatabaseManager:
 
         with open(os.path.join(db_path, "parameters.json"), "r") as json_file:
             annotation_parameters = json.load(json_file)
-        self.prms.args["use_filename_as_contig_id"] = annotation_parameters["use_filename_as_contig_id"]
+        if "use_filename_as_contig_id" in annotation_parameters.keys():
+            self.prms.args["use_filename_as_contig_id"] = annotation_parameters["use_filename_as_contig_id"]
 
         database = ilund4u.data_processing.Database(proteomes, hotspots, db_paths, self.prms)
         if self.prms.args["verbose"]:
