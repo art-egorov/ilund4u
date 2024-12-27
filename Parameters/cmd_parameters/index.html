@@ -784,10 +784,21 @@
  Format: tab-separated; column names: id, circular. Values 1 or 0.
  For genomes which id is not listed, the default value will be used.
  [default: non circular; use <code>-cg/--circular-genomes</code> to change]</dd>
+<dt><code>--pclt, --protein-clusters-table &lt;path&gt;</code></dt>
+<dd>Path to a table with predefined protein clusters (to replace
+mmseqs clustering). Format: mmseqs-like cluster table
+(two columns, first - cluster_id; second - protein_id; without header)</dd>
 <dt><code>-psc, --proteome-sim-cutoff &lt;float&gt;</code></dt>
 <dd>Minimal fraction of shared homologous proteins between two
 proteomes to be connected in proteome network by edge.
 [default: 0.7]</dd>
+<dt><code>--pcot, --proteome-communities-table &lt;path&gt;</code></dt>
+<dd>Path to a table with predefined proteome communities (to replace network-based
+Leiden community detection algorithm). Format: mmseqs-like cluster table
+(two columns, first - community_id; second - proteome_id; without header)</dd>
+<dt><code>-spc, --single-proteome-community</code></dt>
+<dd>Set the same single community for all proteomes. Could be considered
+ as pangenome mode when input consists of the same or highly similar species.</dd>
 <dt><code>-mpcs, --min-proteome-community-size &lt;int&gt;</code></dt>
 <dd>Minimal size of proteome community which then will be taken in
    hotspot search analysis [default: 10].</dd>

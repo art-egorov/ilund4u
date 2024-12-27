@@ -543,8 +543,12 @@
 <h1 id="faq">FAQ</h1>
 <p><strong><em>Q:</em> Something weird is happening, e.g. program is crashing with my data. What should I do?</strong><br />
 <em>A:</em> Please add <code>--debug</code> to the command line (or <code>--parsing-debug</code> if some files were not read correctly) and post the details in <a href="https://github.com/art-egorov/ilund4u/issues">Issues</a>.</p>
-<p><strong><em>Q:</em> How to get representative protein ids of flanking genes for a hotspot</strong><br />
+<p><strong><em>Q:</em> How to get representative protein ids of flanking genes for a hotspot?</strong><br />
 <em>A:</em> Each hotspot includes an attribute called <em>conserved signature</em>, which contains the protein IDs of representative sequences for protein families that are highly conserved as flanking genes (found as flanking genes in over 75% of hotspot islands). Starting with iLund4u version 0.0.8, this information is available in the <em>conserved_signature</em> column of the <em>hotspot_annotation.tsv</em> file.</p>
+<p><strong><em>Q:</em> How to use pre-defined protein clusters instead of mmseqs clustering step?</strong><br />
+<em>A:</em> Starting with 0.0.10 version iLund4u has <code>--pclt, --protein-clusters-table &lt;path&gt;</code> parameter that takes as input path to a table with predefined protein clusters. Format: mmseqs-like cluster table (two columns, first - cluster_id; second - protein_id; without header).</p>
+<p><strong><em>Q:</em> How to use pre-defined proteome (sequence/contigs) communities instead of network-based Leiden community detection algorithm?</strong><br />
+<em>A:</em> Starting with 0.0.10 version iLund4u has <code>--pcot, --proteome-communities-table &lt;path&gt;</code> parameter that takes as input path to a table with predefined proteome communities. Format: mmseqs-like cluster table (two columns, first - community_id; second - proteome_id; without header). In addition, it's possible to force iLund4u to consider all contigs as members of one community (pangenome-like mode). For that, simply apply <code>-spc, --single-proteome-community</code> parameter.</p>
 
               
             </article>
