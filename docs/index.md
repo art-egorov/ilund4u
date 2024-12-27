@@ -3,7 +3,7 @@
 
 ## Description
 
-**iLund4u** is a bioinformatics tool for search and annotation of hotspots in a large set of proteomes. 
+**iLund4u** is a bioinformatics tool for search and annotation of accessory genes and hotspots in a large set of proteomes. 
 
 **Supported input**: gff3 for annotation files (prokka/pharokka generated); fasta for protein sequences        
 **Programming language:** Python3   
@@ -12,7 +12,7 @@
 **Python version:** >= 3.8  
 **OS-level dependencies:** MMseqs2 (included in the package)  
 **License:** WTFPL  
-**Version:** 0.0.9 (December 2024)
+**Version:** 0.0.10 (December 2024)
 
 
 ## Workflow

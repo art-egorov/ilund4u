@@ -628,6 +628,7 @@ class Proteomes:
                 bar = progress.bar.FillingCirclesBar(" ", max=num_of_gff_files, suffix='%(index)d/%(max)d')
             proteome_list, annotation_rows = [], []
             gff_records_batch = []
+            total_num_of_CDSs = 0
             for gff_file_index, gff_file_path in enumerate(gff_files):
                 try:
                     if num_of_gff_files > 1 and self.prms.args["verbose"]:
@@ -660,6 +661,7 @@ class Proteomes:
                         record_cdss = []
                         all_defined = True
                         for gff_feature in gff_record.features:
+                            total_num_of_CDSs += 1
                             cds_id = gff_feature.id.replace(";", ",")
                             if gff_record.id not in cds_id:
                                 cds_id = f"{gff_record.id}-{cds_id}"  # Attention
@@ -711,6 +713,7 @@ class Proteomes:
             self.__col_to_ind = {col: idx for idx, col in enumerate(self.annotation.columns)}
             self.annotation = self.annotation.sort_values(by="proteome_size")
             self.proteomes = self.proteomes.loc[self.annotation.index]
+            self.prms.args["total_num_of_CDSs"] = total_num_of_CDSs
             if self.prms.args["verbose"]:
                 print(f"  ⦿ {len(proteome_list)} {'locus was' if len(proteome_list) == 1 else 'loci were'} loaded from"
                       f" the gff files folder", file=sys.stdout)
@@ -750,9 +753,16 @@ class Proteomes:
                        "-c", str(self.prms.args["mmseqs_c"]),
                        "-s", str(self.prms.args["mmseqs_s"])]
             if self.prms.args["mmseqs_max_seqs"]:
-                cl_args += ["--max-seqs", str(self.prms.args["mmseqs_max_seqs"])]
+                mmseqs_max_seqs_default = 1000
+                if isinstance(self.prms.args["mmseqs_max_seqs"], int):
+                    mmseqs_max_seqs = self.prms.args["mmseqs_max_seqs"]
+                if isinstance(self.prms.args["mmseqs_max_seqs"], str):
+                    if "%" in self.prms.args["mmseqs_max_seqs"] and "total_num_of_CDSs" in self.prms.args.keys():
+                        mmseqs_max_seqs = round(int(self.prms.args["mmseqs_max_seqs"][:-1]) * self.prms.args["total_num_of_CDSs"])
+                mmseqs_max_seqs_f = max(mmseqs_max_seqs_default, mmseqs_max_seqs)
+                cl_args += ["--max-seqs", str(mmseqs_max_seqs_f)]
             subprocess.run(cl_args, stdout=mmseqs_stdout,
-                           stderr=mmseqs_stderr)  # threads!
+                           stderr=mmseqs_stderr)
             subprocess.run([self.prms.args["mmseqs_binary"], "createtsv",
                             os.path.join(mmseqs_output_folder_db, "sequencesDB"),
                             os.path.join(mmseqs_output_folder_db, "sequencesDB"),
@@ -835,6 +845,28 @@ class Proteomes:
             return cluster_to_sequences
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to process mmseqs output.") from error
+
+    def load_and_process_predefined_protein_clusters(self, table_path: str):
+        """Load and process table with pre-defined protein clusters
+
+        Arguments:
+            table_path (str): path to the mmseqs-like cluster table (two columns, first - cluster_id; second - protein_id)
+
+        Returns:
+            dict: dictionary with protein cluster id as key and corresponding list of protein ids as item.
+
+        """
+        try:
+            predefined_cluster_results = pd.read_table(table_path, sep="\t", header=None,
+                                                       names=["cluster", "protein_id"])
+            predefined_cluster_results = predefined_cluster_results.set_index("protein_id")["cluster"].to_dict()
+            num_of_unique_clusters = len(set(predefined_cluster_results.values()))
+            num_of_proteins = len(predefined_cluster_results.keys())
+            if self.prms.args["verbose"]:
+                print(f"  ⦿ {num_of_unique_clusters} clusters for {num_of_proteins} proteins were pre-defined")
+            return self.process_mmseqs_results(predefined_cluster_results)
+        except Exception as error:
+            raise ilund4u.manager.ilund4uError("Unable to process table with pre-defined protein clusters.") from error
 
     def build_proteome_network(self, cluster_to_sequences: dict) -> igraph.Graph:
         """Build proteome network where each proteome represented by node and weighted edges between nodes -
@@ -977,6 +1009,70 @@ class Proteomes:
             return None
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to find proteome communities.") from error
+
+    def load_predefined_proteome_communities(self, table_path: str = None):
+        """Load and process table with pre-defined proteome communities
+
+               Arguments:
+                   table_path (str): path to the mmseqs-like cluster table (two columns, first - community_id;
+                   second - proteome). If table_path is not specified, then all proteomes will be considered as memebers
+                   of a single cluster (pangenome mode).
+               Returns:
+                   None
+
+               """
+        try:
+            if table_path:
+                if self.prms.args["verbose"]:
+                    print("○ Loading pre-defined proteome communities...")
+                predefined_cluster_results = pd.read_table(table_path, sep="\t", header=None,
+                                                           names=["cluster", "proteome"])
+                cluster_to_proteomes = collections.defaultdict(list)
+                cluster_index_to_cluster_id = dict()
+                for index, row in predefined_cluster_results.iterrows():
+                    cluster_to_proteomes[index].append(row["proteome"])
+                    cluster_index_to_cluster_id[index] = row["cluster"]
+                cluster_index_to_cluster_id_t = pd.DataFrame(list(cluster_index_to_cluster_id.items()),
+                                                             columns=["Index", "Cluster_ID"])
+                cluster_index_to_cluster_id_t.to_csv(os.path.join(self.prms.args["output_dir"],
+                                                                  "community_index_to_community_id.tsv"),
+                                                     sep="\t", index=False)
+            else:
+                if self.prms.args["verbose"]:
+                    print("○ Setting single community for all proteomes...")
+                    cluster_to_proteomes = {0: self.proteomes.index.tolist()}
+            communities_annot_rows = []
+            sequences_to_drop = []
+            for community_id, community in cluster_to_proteomes.items():
+                community_size = len(community)
+                proteomes = community
+                if community_size >= self.prms.args["min_proteome_community_size"]:
+                    self.communities[community_id] = proteomes
+                else:
+                    sequences_to_drop += proteomes
+                communities_annot_rows.append([community_id, community_size, ";".join(proteomes)])
+            communities_annot = pd.DataFrame(communities_annot_rows, columns=["id", "size", "proteomes"])
+            communities_annot.to_csv(os.path.join(os.path.join(self.prms.args["output_dir"],
+                                                               "proteome_communities.tsv")), sep="\t", index=False)
+            communities_annot = communities_annot[communities_annot["size"] >=
+                                                  self.prms.args["min_proteome_community_size"]]
+            self.communities_annot = communities_annot.set_index("id")
+            self.annotation = self.annotation.drop(sequences_to_drop)
+            self.proteomes = self.proteomes.drop(sequences_to_drop)
+            self.annotation["index"] = list(range(len(self.proteomes.index)))
+            self.seq_to_ind = {sid: idx for idx, sid in enumerate(self.annotation.index)}
+            if self.prms.args["verbose"]:
+                print(f"  ⦿ {len(communities_annot.index)} proteomes communities with size >= "
+                      f"{self.prms.args['min_proteome_community_size']} were taken for further analysis",
+                      file=sys.stdout)
+                print(f"  ⦿ {len(sequences_to_drop)} proteomes from smaller communities were excluded from the "
+                      f"analysis", file=sys.stdout)
+            if len(communities_annot.index) == 0:
+                print("○ Termination since no proteome community was taken for further analysis")
+                sys.exit()
+            return None
+        except Exception as error:
+            raise ilund4u.manager.ilund4uError("Unable to process pre-defined proteome communities.") from error
 
     def define_protein_classes(self) -> None:
         """Define protein classes (conserved, intermediate, variable) based on presence in a proteome community.
@@ -1984,7 +2080,7 @@ class Database:
             found_hotspots = collections.defaultdict(list)
             island_annotations = []
             location_stat = dict(flanking=0, cargo=0)
-            n_flanked = 0
+            n_flanked_total = 0
             for hotspot in self.hotspots.hotspots.to_list():
                 if not self.prms.args["report_not_flanked"] and not hotspot.flanked:
                     continue
@@ -2010,7 +2106,7 @@ class Database:
                         for op in overlapping:
                             if op in isl_proteins:
                                 location_stat["cargo"] += 1
-                                n_flanked += 1
+                                n_flanked_total += 1
                             else:
                                 location_stat["flanking"] += 1
                         island_annotation = hotspot.island_annotation.loc[island.island_id].copy()
@@ -2078,8 +2174,8 @@ class Database:
                       f"({len(found_hotspots.keys())} hotspot{'s' if len(found_hotspots.keys()) > 1 else ''}) on "
                       f"{len(found_islands)} island{'s' if len(found_islands) > 1 else ''}\n"
                       f"    Found as cargo: {location_stat['cargo']}, as flanking gene: {location_stat['flanking']}"
-                      f"\n    {n_flanked}/{len(found_islands)} island{'s' if len(found_islands) > 1 else ''} where found"
-                      f" as cargo are both side flanked (have conserved genes on both sides)",
+                      f"\n    {n_flanked_total}/{len(found_islands)} island{'s' if len(found_islands) > 1 else ''} where"
+                      f" found as cargo are both side flanked (have conserved genes on both sides)",
                       file=sys.stdout)
 
             homologous_protein_fasta = os.path.join(self.prms.args["output_dir"], "homologous_proteins.fa")

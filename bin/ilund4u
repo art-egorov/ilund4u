@@ -12,10 +12,19 @@ try:
         proteomes = ilund4u.data_processing.Proteomes(parameters=parameters)
         proteomes.load_sequences_from_extended_gff(input_f=parameters.args["gff"],
                                                    genome_annotation=parameters.args["genome_annotation"])
-        mmseqs_clusters = proteomes.mmseqs_cluster()
-        cluster_to_sequence = proteomes.process_mmseqs_results(mmseqs_clusters)
-        proteome_network = proteomes.build_proteome_network(cluster_to_sequence)
-        proteomes.find_proteome_communities(proteome_network)
+
+        if parameters.args["protein_clusters_table"]:
+            cluster_to_sequences = parameters.load_and_process_predefined_protein_clusters(table_path=parameters.args[
+                "protein_clusters_table"])
+        else:
+            mmseqs_clusters = proteomes.mmseqs_cluster()
+            cluster_to_sequences = proteomes.process_mmseqs_results(mmseqs_clusters)
+
+        if parameters.args["proteome_communities_table"] or parameters.args["single_proteome_community"]:
+            proteomes.load_predefined_proteome_communities(parameters.args["proteome_communities_table"])
+        else:
+            proteome_network = proteomes.build_proteome_network(cluster_to_sequences)
+            proteomes.find_proteome_communities(proteome_network)
         proteomes.define_protein_classes()
         proteomes.annotate_variable_islands()
         island_networks = proteomes.build_islands_network()

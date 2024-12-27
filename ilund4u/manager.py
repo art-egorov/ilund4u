@@ -64,7 +64,7 @@ class Parameters:
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
         parser.add_argument("-mac", "--mac", dest="mac", action="store_true", default=None)
         parser.add_argument("-h", "--help", dest="help", action="store_true")
-        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.8.1")
+        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.0.10")
 
         subparsers = parser.add_subparsers(dest="mode")
 
@@ -74,8 +74,13 @@ class Parameters:
                                default=None)
         parser_hm.add_argument("-mps", "--min-proteome-size", dest="min_proteome_size", type=int, default=None)
         parser_hm.add_argument("-gct", "--genome-circularity-table", dest="genome_annotation", type=str, default=None)
+        parser_hm.add_argument("-pclt", "--protein-clusters-table", dest="protein_clusters_table", type=str, default="")
         parser_hm.add_argument("-psc", "--proteome-sim-cutoff", dest="proteome_similarity_cutoff", type=float,
                                default=None)
+        parser_hm.add_argument("-pcot", "--proteome-communities-table", dest="proteome_communities_table", type=str,
+                               default="")
+        parser_hm.add_argument("-spc", "--single-proteome-community", dest="single_proteome_community",
+                               action="store_true", default=False)
         parser_hm.add_argument("-mpcs", "--min-proteome-community-size", dest="min_proteome_community_size", type=int,
                                default=None)
         parser_hm.add_argument("-vpc", "--variable-protein-cutoff", dest="variable_protein_cluster_cutoff", type=float,

@@ -79,10 +79,24 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
      For genomes which id is not listed, the default value will be used.
      [default: non circular; use `-cg/--circular-genomes` to change]
 
+`--pclt, --protein-clusters-table <path>`
+:    Path to a table with predefined protein clusters (to replace
+    mmseqs clustering). Format: mmseqs-like cluster table
+    (two columns, first - cluster_id; second - protein_id; without header)
+
 `-psc, --proteome-sim-cutoff <float>`
 :    Minimal fraction of shared homologous proteins between two
     proteomes to be connected in proteome network by edge.
     [default: 0.7]
+
+`--pcot, --proteome-communities-table <path>`
+:    Path to a table with predefined proteome communities (to replace network-based
+    Leiden community detection algorithm). Format: mmseqs-like cluster table
+    (two columns, first - community_id; second - proteome_id; without header)
+
+`-spc, --single-proteome-community`
+:    Set the same single community for all proteomes. Could be considered
+     as pangenome mode when input consists of the same or highly similar species.
 
 `-mpcs, --min-proteome-community-size <int>`
 :   Minimal size of proteome community which then will be taken in

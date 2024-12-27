@@ -1,6 +1,11 @@
 # Version log
 
-* **Ver 0.0.9** - 11 December
+* **Ver 0.0.10** - 27 December
+	- Parameters to use predefined protein and proteome clusters were introduced.
+	- Log messages for protein mode were adjusted.
+	- MMSeqs2 `--max-seqs` clustering parameter is now auto-adjusted for large input. 
+
+* Ver 0.0.9 - 11 December
 	- Now for dropped sequences information about duplication source is reported.
 	- Config file parameter for mmseqs *--max-seqs* option is added.
 
