@@ -391,7 +391,7 @@ class DrawingManager:
             l_parameters.args["locus_label_style"] = "id"
             if mode == "hotspot" and n_of_added_proteomes != 1:
                 l_parameters.args["gff_CDS_category_source"] = "-"
-            l_parameters.args["draw_middle_line"] = False
+            l_parameters.args["draw_middle_line"] = True
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
             if os.path.exists(l_parameters.args["output_dir"]):

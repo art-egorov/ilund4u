@@ -7,6 +7,7 @@ import progress.bar
 import collections
 import subprocess
 import typing
+import pickle
 import shutil
 import json
 import time
@@ -635,67 +636,70 @@ class Proteomes:
                         bar.next()
                     gff_records = list(BCBio.GFF.parse(gff_file_path, limit_info=dict(gff_type=["CDS"])))
                     if len(gff_records) != 1:
-                        print(f"\n○ Warning: gff file {gff_file_path} contains information for more than 1 "
-                              f"sequence. File will be skipped.")
-                        continue
-                    current_gff_records = []
-                    gff_record = gff_records[0]
-                    try:
-                        record_locus_sequence = gff_record.seq
-                    except Bio.Seq.UndefinedSequenceError as error:
-                        raise ilund4u.manager.ilund4uError(f"gff file doesn't contain corresponding "
-                                                           f"sequences.") from error
-                    if self.prms.args["use_filename_as_contig_id"]:
-                        gff_record.id = os.path.splitext(os.path.basename(gff_file_path))[0]
-                    features_ids = [i.id for i in gff_record.features]
-                    if len(features_ids) != len(set(features_ids)):
-                        raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature "
-                                                           f"ids while only unique are allowed.")
-                    if len(features_ids) > self.prms.args["min_proteome_size"]:
-                        if gff_record.id in genome_circularity_dict.keys():
-                            circular = int(genome_circularity_dict[gff_record.id])
-                        else:
-                            circular = int(self.prms.args["circular_genomes"])
-                        record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
-                                                   circular=circular)
-                        record_cdss = []
-                        all_defined = True
-                        for gff_feature in gff_record.features:
-                            total_num_of_CDSs += 1
-                            cds_id = gff_feature.id.replace(";", ",")
-                            if gff_record.id not in cds_id:
-                                cds_id = f"{gff_record.id}-{cds_id}"  # Attention
-                            transl_table = self.prms.args["default_transl_table"]
-                            if "transl_table" in gff_feature.qualifiers.keys():
-                                transl_table = int(gff_feature.qualifiers["transl_table"][0])
-                            name = ""
-                            if self.prms.args["gff_CDS_name_source"] in gff_feature.qualifiers:
-                                name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
-
-                            sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
-
-                            if not sequence.defined:
-                                all_defined = False
-                                continue
-
-                            current_gff_records.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
-                            cds = CDS(cds_id=cds_id, proteome_id=gff_record.id,
-                                      start=int(gff_feature.location.start) + 1, end=int(gff_feature.location.end),
-                                      strand=gff_feature.location.strand, name=name)
-                            record_cdss.append(cds)
-                        if all_defined:
-                            gff_records_batch += current_gff_records
-                            record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
-                            proteome_list.append(record_proteome)
-                            annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
-                                                        proteome_size=len(features_ids),
-                                                        proteome_size_unique="", protein_clusters=""))
-                        else:
-                            raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains not defined feature")
-                    if gff_file_index % 1000 == 0 or gff_file_index == num_of_gff_files - 1:
-                        with open(self.proteins_fasta_file, "a") as handle:
-                            Bio.SeqIO.write(gff_records_batch, handle, "fasta")
-                        gff_records_batch = []
+                        if self.prms.args["use_filename_as_contig_id"]:
+                            self.prms.args["use_filename_as_contig_id"] = False
+                            raise ilund4u.manager.ilund4uError(f"Using filename as contig id is not allowed for GFF"
+                                                               f" files with miltiple loci")
+                        #continue
+                    #gff_record = gff_records[0]
+                    for gff_record in gff_records:
+                        current_gff_records = []
+                        try:
+                            record_locus_sequence = gff_record.seq
+                        except Bio.Seq.UndefinedSequenceError as error:
+                            raise ilund4u.manager.ilund4uError(f"gff file doesn't contain corresponding "
+                                                               f"sequences.") from error
+                        if self.prms.args["use_filename_as_contig_id"]:
+                            gff_record.id = os.path.splitext(os.path.basename(gff_file_path))[0]
+                        features_ids = [i.id for i in gff_record.features]
+                        if len(features_ids) != len(set(features_ids)):
+                            raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains duplicated feature "
+                                                               f"ids while only unique are allowed.")
+                        if len(features_ids) >= self.prms.args["min_proteome_size"]:
+                            if gff_record.id in genome_circularity_dict.keys():
+                                circular = int(genome_circularity_dict[gff_record.id])
+                            else:
+                                circular = int(self.prms.args["circular_genomes"])
+                            record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
+                                                       circular=circular)
+                            record_cdss = []
+                            all_defined = True
+                            for gff_feature in gff_record.features:
+                                if gff_feature.type != "CDS":
+                                    continue
+                                total_num_of_CDSs += 1
+                                cds_id = gff_feature.id.replace(";", ",")
+                                if gff_record.id not in cds_id:
+                                    cds_id = f"{gff_record.id}-{cds_id}"  # Attention
+                                cds_id = cds_id.replace(" ", "_")
+                                transl_table = self.prms.args["default_transl_table"]
+                                if "transl_table" in gff_feature.qualifiers.keys():
+                                    transl_table = int(gff_feature.qualifiers["transl_table"][0])
+                                name = ""
+                                if self.prms.args["gff_CDS_name_source"] in gff_feature.qualifiers:
+                                    name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
+                                sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
+                                if not sequence.defined:
+                                    all_defined = False
+                                    continue
+                                current_gff_records.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
+                                cds = CDS(cds_id=cds_id, proteome_id=gff_record.id,
+                                          start=int(gff_feature.location.start) + 1, end=int(gff_feature.location.end),
+                                          strand=gff_feature.location.strand, name=name)
+                                record_cdss.append(cds)
+                            if all_defined:
+                                gff_records_batch += current_gff_records
+                                record_proteome.cdss = pd.Series(record_cdss, index=[cds.cds_id for cds in record_cdss])
+                                proteome_list.append(record_proteome)
+                                annotation_rows.append(dict(id=gff_record.id, length=len(gff_record.seq),
+                                                            proteome_size=len(features_ids),
+                                                            proteome_size_unique="", protein_clusters=""))
+                            else:
+                                raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains not defined feature")
+                        if gff_file_index % 1000 == 0 or gff_file_index == num_of_gff_files - 1:
+                            with open(self.proteins_fasta_file, "a") as handle:
+                                Bio.SeqIO.write(gff_records_batch, handle, "fasta")
+                            gff_records_batch = []
                 except:
                     print(f"○ Warning: gff file {gff_file_path} was not read properly and skipped")
                     if self.prms.args["parsing_debug"]:

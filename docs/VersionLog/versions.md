@@ -1,5 +1,8 @@
 # Version log
 
+* **Ver 0.0.11** - 26 January
+	- Database reading was updated to cover pkl file parsing.
+
 * **Ver 0.0.10** - 27 December
 	- Parameters to use predefined protein and proteome clusters were introduced.
 	- Log messages for protein mode were adjusted.
