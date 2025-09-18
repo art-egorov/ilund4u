@@ -1,6 +1,9 @@
 # Version log
 
-* **Ver 0.0.11** - 26 January
+* **Ver 0.1.0** - 17 September
+	- Udpate of the default parameters and databases (the main - mmseqs clustering mmseqs_min_seq_id parameter updated from 0.3 to 0.5).
+
+* Ver 0.0.11 - 26 January
 	- Database reading was updated to cover pkl file parsing.
 
 * **Ver 0.0.10** - 27 December

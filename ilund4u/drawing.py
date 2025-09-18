@@ -125,7 +125,7 @@ class DrawingManager:
                         already_added_groups.append(locus_groups)
                     else:
                         if h_island.island_id not in keep_while_deduplication:
-                            continue
+                                continue
                     gff_files.append(proteome.gff_file)
                     start_coordinate = proteome_cdss[locus_indexes[0]].start
                     end_coordinate = proteome_cdss[locus_indexes[-1]].end
@@ -350,10 +350,7 @@ class DrawingManager:
                 proteome = self.proteomes.proteomes.at[proteome_id]
                 gff_files.append(proteome.gff_file)
                 for cds_ind, cds in enumerate(proteome.cdss.to_list()):
-                    if cds.g_class == "conserved":
-                        group_type = "conserved"
-                    else:
-                        group_type = "variable"
+                    group_type =  cds.g_class
                     if mode == "hotspot":
                         if cds.cds_id in island_proteins_d.keys():
                             fcolour = colours_dict[island_proteins_d[cds.cds_id]]
@@ -362,10 +359,19 @@ class DrawingManager:
                                 fcolour = "#BDC6CA"
                             else:
                                 fcolour = "#8C9295"
+                    if mode == "classes":
+                        if group_type == "variable":
+                            fcolour = "#FF3C45"
+                        elif group_type == "conserved":
+                            fcolour = "#BDC5C9"
+                        elif group_type == "intermediate":
+                            fcolour = "#FFD400"
                     feature_annotation_row = dict(feature_id=cds.cds_id, group=cds.group, group_type=group_type)
                     if mode == "hotspot":
                         feature_annotation_row["show_label"] = 0
                         feature_annotation_row["stroke_colour"] = "#000000"
+                        feature_annotation_row["fill_colour"] = fcolour
+                    if mode == "classes":
                         feature_annotation_row["fill_colour"] = fcolour
                     if cds.hmmscan_results and self.prms.args["show_hmmscan_hits_on_full_proteomes"]:
                         feature_annotation_row["name"] = cds.hmmscan_results["target"]

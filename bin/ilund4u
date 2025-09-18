@@ -14,7 +14,7 @@ try:
                                                    genome_annotation=parameters.args["genome_annotation"])
 
         if parameters.args["protein_clusters_table"]:
-            cluster_to_sequences = parameters.load_and_process_predefined_protein_clusters(table_path=parameters.args[
+            cluster_to_sequences = proteomes.load_and_process_predefined_protein_clusters(table_path=parameters.args[
                 "protein_clusters_table"])
         else:
             mmseqs_clusters = proteomes.mmseqs_cluster()

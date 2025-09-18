@@ -74,6 +74,7 @@ class DatabaseManager:
         proteomes = ilund4u.data_processing.Proteomes.db_init(db_path, self.prms)
         hotspots = ilund4u.data_processing.Hotspots.db_init(db_path, proteomes, self.prms)
         db_paths = dict(db_path=db_path, rep_fasta=os.path.join(db_path, "representative_seqs.fa"),
+                        all_proteins_fasta=os.path.join(db_path, "all_proteins.fa"),
                         proteins_db=os.path.join(db_path, "mmseqs_db", "all_proteins"))
         if os.path.exists(os.path.join(db_path, "protein_group_accumulated_statistics.tsv")):
             db_paths["protein_group_stat"] = os.path.join(db_path, "protein_group_accumulated_statistics.tsv")
@@ -98,6 +99,7 @@ class DatabaseManager:
         proteomes.prms = self.prms
         hotspots.prms = self.prms
         db_paths = dict(db_path=db_path, rep_fasta=os.path.join(db_path, "representative_seqs.fa"),
+                        all_proteins_fasta = os.path.join(db_path, "all_proteins.fa"),
                         proteins_db=os.path.join(db_path, "mmseqs_db", "all_proteins"))
         if os.path.exists(os.path.join(db_path, "protein_group_accumulated_statistics.tsv")):
             db_paths["protein_group_stat"] = os.path.join(db_path, "protein_group_accumulated_statistics.tsv")

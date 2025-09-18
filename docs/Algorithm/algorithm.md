@@ -15,7 +15,7 @@ Here we describe in details each step of the iLund4u workflow, which schematical
 The first step is reading input data in gff format with the [BCBio-gff](https://github.com/chapmanb/bcbb/tree/master/gff) library. While reading the files, we store all encoded protein sequences in a fasta file, which will be used as input for MMseqs clustering. In iLund4u objects we do not store sequences. Instead, iLund4u objects hold links to the corresponding files (a gff file for proteomes and the fasta file with amino acid sequences), which helps to avoid large memory usage.  
 This step includes the initial filtering round, based on proteome size. By default, we do not take for proteomes analysis if they have fewer than 15 proteins ($N_{CDSs} < 15$).The minimal proteome size can be changed with `-mps, --min-proteome-size <int>` parameter or the config parameter *min_proteome_size*. 
 
-After gff files are read, we use the [MMseqs2](https://github.com/soedinglab/mmseqs2) clustering pipeline with all encoded proteins as input. All the clustering parameters can be adjusted using the configuration file (see [Parameters](https://art-egorov.github.io/ilund4u/Parameters/cmd_parameters/) section). By default, we use the following parameters: `--cluster mode 0 --cov-mode 0 --min-seq-id 0.25 -c 0.8 -s 7` (see [mmseqs documentation](https://mmseqs.com/latest/userguide.pdf) for a detailed description). Additionally, starting with version 0.0.10, iLund4u adjust `--max-seqs` mmseqs parameter which can affect clustering results for very large inputs. By default, it's set as 1% of all number of sequences. It can be adjusted in a config file with `mmseqs_max_seqs` parameter. 
+After gff files are read, we use the [MMseqs2](https://github.com/soedinglab/mmseqs2) clustering pipeline with all encoded proteins as input. All the clustering parameters can be adjusted using the configuration file (see [Parameters](https://art-egorov.github.io/ilund4u/Parameters/cmd_parameters/) section). By default, we use the following parameters: `--cluster mode 0 --cov-mode 0 --min-seq-id 0.5 -c 0.75 -s 7` (see [mmseqs documentation](https://mmseqs.com/latest/userguide.pdf) for a detailed description). Additionally, starting with version 0.0.10, iLund4u adjust `--max-seqs` mmseqs parameter which can affect clustering results for very large inputs. By default, it's set as 3% of all number of sequences. It can be adjusted in a config file with `mmseqs_max_seqs` parameter. 
 
 We then treat each cluster of proteins as *a group of homologues*. For each group we set the identifier (id) attribute as the id of the representative protein for the cluster.
 
@@ -144,7 +144,7 @@ For additional annotation of proteins encoded either as cargo of annotated hotsp
 The list of used databases and their versions or date of retrieval: 
 
 - Antimicrobial resistance genes (AMR): [AMRFinderPlus](https://www.ncbi.nlm.nih.gov/pathogens/antimicrobial-resistance/AMRFinder/): 02.05.2024.2
-- Anti-Defence: [dbAPIS_Acr](https://bcb.unl.edu/dbAPIS/): 19.09.2023
+- Anti-Defence: [dbAPIS_Acr](https://bcb.unl.edu/dbAPIS/): 17.08.2025
 - Defence systems: [DefenceFinder](https://defensefinder.mdmlab.fr): 1.2.4, [CasFinder](https://github.com/macsy-models/CasFinder): 3.1.0; [PADLOC](https://padloc.otago.ac.nz/padloc/): (v. 22.10.2024)
 - Virulence factors: [VFDB](http://www.mgc.ac.cn/VFs/) : 10.05.2024
 

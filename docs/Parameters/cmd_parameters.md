@@ -87,7 +87,7 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 `-psc, --proteome-sim-cutoff <float>`
 :    Minimal fraction of shared homologous proteins between two
     proteomes to be connected in proteome network by edge.
-    [default: 0.7]
+    [default: 0.65]
 
 `--pcot, --proteome-communities-table <path>`
 :    Path to a table with predefined proteome communities (to replace network-based
@@ -187,7 +187,7 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-msf, --mmseqs-fident <float>`
 :    MMseqs search fident (fraction of identical matches) cutoff
-    [default: 0.2]
+    [default: 0.3]
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
@@ -254,7 +254,7 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-msf, --mmseqs-fident <float>`
 :    MMseqs search fident (fraction of identical matches) cutoff
-    [default: 0.2]
+    [default: 0.3]
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]

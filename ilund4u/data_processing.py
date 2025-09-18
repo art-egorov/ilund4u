@@ -640,8 +640,8 @@ class Proteomes:
                             self.prms.args["use_filename_as_contig_id"] = False
                             raise ilund4u.manager.ilund4uError(f"Using filename as contig id is not allowed for GFF"
                                                                f" files with miltiple loci")
-                        #continue
-                    #gff_record = gff_records[0]
+                        # continue
+                    # gff_record = gff_records[0]
                     for gff_record in gff_records:
                         current_gff_records = []
                         try:
@@ -660,7 +660,8 @@ class Proteomes:
                                 circular = int(genome_circularity_dict[gff_record.id])
                             else:
                                 circular = int(self.prms.args["circular_genomes"])
-                            record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path, cdss=pd.Series(),
+                            record_proteome = Proteome(proteome_id=gff_record.id, gff_file=gff_file_path,
+                                                       cdss=pd.Series(),
                                                        circular=circular)
                             record_cdss = []
                             all_defined = True
@@ -678,11 +679,13 @@ class Proteomes:
                                 name = ""
                                 if self.prms.args["gff_CDS_name_source"] in gff_feature.qualifiers:
                                     name = gff_feature.qualifiers[self.prms.args["gff_CDS_name_source"]][0]
-                                sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[:-1]
+                                sequence = gff_feature.translate(record_locus_sequence, table=transl_table, cds=False)[
+                                           :-1]
                                 if not sequence.defined:
                                     all_defined = False
                                     continue
-                                current_gff_records.append(Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
+                                current_gff_records.append(
+                                    Bio.SeqRecord.SeqRecord(seq=sequence, id=cds_id, description=""))
                                 cds = CDS(cds_id=cds_id, proteome_id=gff_record.id,
                                           start=int(gff_feature.location.start) + 1, end=int(gff_feature.location.end),
                                           strand=gff_feature.location.strand, name=name)
@@ -695,7 +698,8 @@ class Proteomes:
                                                             proteome_size=len(features_ids),
                                                             proteome_size_unique="", protein_clusters=""))
                             else:
-                                raise ilund4u.manager.ilund4uError(f"Gff file {gff_file_path} contains not defined feature")
+                                raise ilund4u.manager.ilund4uError(
+                                    f"Gff file {gff_file_path} contains not defined feature")
                         if gff_file_index % 1000 == 0 or gff_file_index == num_of_gff_files - 1:
                             with open(self.proteins_fasta_file, "a") as handle:
                                 Bio.SeqIO.write(gff_records_batch, handle, "fasta")
@@ -762,7 +766,8 @@ class Proteomes:
                     mmseqs_max_seqs = self.prms.args["mmseqs_max_seqs"]
                 if isinstance(self.prms.args["mmseqs_max_seqs"], str):
                     if "%" in self.prms.args["mmseqs_max_seqs"] and "total_num_of_CDSs" in self.prms.args.keys():
-                        mmseqs_max_seqs = round(int(self.prms.args["mmseqs_max_seqs"][:-1]) * self.prms.args["total_num_of_CDSs"])
+                        mmseqs_max_seqs = round(
+                            int(self.prms.args["mmseqs_max_seqs"][:-1]) * self.prms.args["total_num_of_CDSs"])
                 mmseqs_max_seqs_f = max(mmseqs_max_seqs_default, mmseqs_max_seqs)
                 cl_args += ["--max-seqs", str(mmseqs_max_seqs_f)]
             subprocess.run(cl_args, stdout=mmseqs_stdout,
@@ -1253,7 +1258,7 @@ class Proteomes:
                 partition_leiden = leidenalg.find_partition(com_island_network, leidenalg.CPMVertexPartition,
                                                             resolution_parameter=self.prms.args[
                                                                 "leiden_resolution_parameter_i"],
-                                                            weights="weight", n_iterations=-1)
+                                                            weights="weight", n_iterations=100)
                 com_island_network.vs["communities_Leiden"] = partition_leiden.membership
                 islands_list = [island for proteome in com_proteomes for island in proteome.islands.to_list()]
                 for icom_ind, i_com in enumerate(partition_leiden):
@@ -1943,7 +1948,8 @@ class Database:
         self.db_paths = db_paths
         self.prms = parameters
 
-    def mmseqs_search_versus_protein_database(self, query_fasta: str, fast=False) -> pd.DataFrame:
+    def mmseqs_search_versus_protein_database(self, query_fasta: str, fast: bool = False,
+                                              cds_sublist: list = []) -> pd.DataFrame:
         """Run mmseqs search versus protein database.
 
         Arguments:
@@ -1956,9 +1962,13 @@ class Database:
         """
         try:
             if self.prms.args["verbose"]:
-                print(f"○ Running mmseqs for protein search versus the {'representative' if fast else 'full'}"
-                      f" database of proteins...",
-                      file=sys.stdout)
+                if not cds_sublist:
+                    print(f"○ Running mmseqs for protein search versus the {'representative' if fast else 'full'}"
+                          f" database of proteins...",
+                          file=sys.stdout)
+                else:
+                    print(f"○ Second iteration running of mmseqs to find the closest protein groups...",
+                          file=sys.stdout)
             if not os.path.exists(self.prms.args["output_dir"]):
                 os.mkdir(self.prms.args["output_dir"])
             mmseqs_output_folder = os.path.join(self.prms.args["output_dir"], "mmseqs")
@@ -1970,9 +1980,10 @@ class Database:
             mmseqs_stdout = open(os.path.join(mmseqs_output_folder, "mmseqs_stdout.txt"), "w")
             mmseqs_stderr = open(os.path.join(mmseqs_output_folder, "mmseqs_stderr.txt"), "w")
             query_length = len(list(Bio.SeqIO.parse(query_fasta, "fasta")))
-            subprocess.run([self.prms.args["mmseqs_binary"], "createdb", query_fasta,
-                            os.path.join(mmseqs_output_folder_db, "query_seq_db")], stdout=mmseqs_stdout,
-                           stderr=mmseqs_stderr)
+            if not os.path.exists(os.path.join(mmseqs_output_folder_db, "query_seq_db")):
+                subprocess.run([self.prms.args["mmseqs_binary"], "createdb", query_fasta,
+                                os.path.join(mmseqs_output_folder_db, "query_seq_db")], stdout=mmseqs_stdout,
+                               stderr=mmseqs_stderr)
             target_db = self.db_paths["proteins_db"]
             if fast:
                 if not os.path.exists(os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")):
@@ -1980,39 +1991,61 @@ class Database:
                                     os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")],
                                    stdout=mmseqs_stdout, stderr=mmseqs_stderr)
                 target_db = os.path.join(self.db_paths["db_path"], "mmseqs_db", "rep_proteins")
+            if cds_sublist:
+                initial_fasta_file = Bio.SeqIO.index(self.db_paths["all_proteins_fasta"], "fasta")
+                with open(os.path.join(mmseqs_output_folder, "pcluster_member_sequences.fa"), "wb") as out_handle:
+                    for acc in cds_sublist:
+                        out_handle.write(initial_fasta_file.get_raw(acc))
+                subprocess.run([self.prms.args["mmseqs_binary"], "createdb",
+                                os.path.join(mmseqs_output_folder, "pcluster_member_sequences.fa"),
+                                os.path.join(mmseqs_output_folder_db, "pcluster_members")],
+                               stdout=mmseqs_stdout, stderr=mmseqs_stderr)
+                target_db = os.path.join(mmseqs_output_folder_db, "pcluster_members")
+
             subprocess.run([self.prms.args["mmseqs_binary"], "search",
                             os.path.join(mmseqs_output_folder_db, "query_seq_db"), target_db,
-                            os.path.join(mmseqs_output_folder_db, "search_res_db"),
-                            os.path.join(mmseqs_output_folder, "tmp"), "-e",
+                            os.path.join(mmseqs_output_folder_db,
+                                         "search_res_db" if not cds_sublist else "query_seq_db_rerun"),
+                            os.path.join(mmseqs_output_folder, "tmp" if not cds_sublist else "tmp1"), "-e",
                             str(self.prms.args["mmseqs_search_evalue"]),
                             "-s", str(self.prms.args["mmseqs_search_s"])], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
             subprocess.run([self.prms.args["mmseqs_binary"], "convertalis",
                             os.path.join(mmseqs_output_folder_db, "query_seq_db"),
                             target_db,
-                            os.path.join(mmseqs_output_folder_db, "search_res_db"),
-                            os.path.join(mmseqs_output_folder, "mmseqs_search_results.tsv"), "--format-output",
-                            "query,target,qlen,tlen,alnlen,fident,qstart,qend,tstart,tend,evalue",
+                            os.path.join(mmseqs_output_folder_db,
+                                         "search_res_db" if not cds_sublist else "query_seq_db_rerun"),
+                            os.path.join(mmseqs_output_folder,
+                                         "mmseqs_search_results.tsv" if not cds_sublist else "mmseqs_search_results_2nd.tsv"),
+                            "--format-output",
+                            "query,target,raw,bits,qlen,tlen,alnlen,fident,qstart,qend,tstart,tend,evalue",
                             "--format-mode", "4"], stdout=mmseqs_stdout, stderr=mmseqs_stderr)
-            mmseqs_search_results = pd.read_table(os.path.join(mmseqs_output_folder, "mmseqs_search_results.tsv"),
-                                                  sep="\t")
-            mmseqs_search_results["qcov"] = mmseqs_search_results.apply(lambda row: row["alnlen"] / row["qlen"], axis=1)
-            mmseqs_search_results["tcov"] = mmseqs_search_results.apply(lambda row: row["alnlen"] / row["tlen"], axis=1)
-            mmseqs_search_results = mmseqs_search_results[
-                (mmseqs_search_results["qcov"] >= self.prms.args["mmseqs_search_qcov"]) &
-                (mmseqs_search_results["tcov"] >= self.prms.args["mmseqs_search_tcov"]) &
-                (mmseqs_search_results["fident"] >= self.prms.args["mmseqs_search_fident"])]
-            queries_with_res = len(set(mmseqs_search_results["query"].to_list()))
-            if not fast:
-                target_to_group = dict()
-                for proteome in self.proteomes.proteomes.to_list():
-                    for cds in proteome.cdss.to_list():
-                        target_to_group[cds.cds_id] = cds.group
-                mmseqs_search_results["group"] = mmseqs_search_results["target"].apply(lambda t: target_to_group[t])
-            if fast:
-                mmseqs_search_results["group"] = mmseqs_search_results["target"]
-            mmseqs_search_results.to_csv(os.path.join(self.prms.args["output_dir"], "mmseqs_homology_search_full.tsv"),
-                                         sep="\t", index=False)
-            if self.prms.args["verbose"]:
+            mmseqs_search_results = pd.read_table(
+                os.path.join(mmseqs_output_folder, "mmseqs_search_results.tsv" if not cds_sublist else
+                "mmseqs_search_results_2nd.tsv"), sep="\t")
+            if len(mmseqs_search_results.index) > 0:
+                mmseqs_search_results["qcov"] = mmseqs_search_results.apply(lambda row: row["alnlen"] / row["qlen"],
+                                                                            axis=1)
+                mmseqs_search_results["tcov"] = mmseqs_search_results.apply(lambda row: row["alnlen"] / row["tlen"],
+                                                                            axis=1)
+                mmseqs_search_results = mmseqs_search_results[
+                    (mmseqs_search_results["qcov"] >= self.prms.args["mmseqs_search_qcov"]) &
+                    (mmseqs_search_results["tcov"] >= self.prms.args["mmseqs_search_tcov"]) &
+                    (mmseqs_search_results["fident"] >= self.prms.args["mmseqs_search_fident"])]
+                queries_with_res = len(set(mmseqs_search_results["query"].to_list()))
+                if not fast:
+                    target_to_group = dict()
+                    for proteome in self.proteomes.proteomes.to_list():
+                        for cds in proteome.cdss.to_list():
+                            target_to_group[cds.cds_id] = cds.group
+                    mmseqs_search_results["group"] = mmseqs_search_results["target"].apply(lambda t: target_to_group[t])
+                if fast:
+                    mmseqs_search_results["group"] = mmseqs_search_results["target"]
+                mmseqs_search_results.to_csv(
+                    os.path.join(self.prms.args["output_dir"], "mmseqs_homology_search_full.tsv"),
+                    sep="\t", index=False)
+            else:
+                queries_with_res = 0
+            if self.prms.args["verbose"] and not cds_sublist:
                 if queries_with_res > 0:
                     print(f"  ⦿ A homologous group was found for {queries_with_res}/{query_length} query protein"
                           f"{'s' if query_length > 1 else ''}", file=sys.stdout)
@@ -2045,7 +2078,7 @@ class Database:
                 # Run mmseqs for homology search
                 if self.prms.args["protein_search_target_mode"] == "proteins" and self.prms.args[
                     "fast_mmseqs_search_mode"]:
-                    print("○ Fast mode is not available with 'proteins' search modea and was deactivated.",
+                    print("○ Fast mode is not available with 'proteins' search mode and was deactivated.",
                           file=sys.stdout)
                     self.prms.args["fast_mmseqs_search_mode"] = False
                 mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta,
@@ -2057,8 +2090,8 @@ class Database:
                     homologous_protein_ids = mmseqs_results["target"].to_list()
                     homologous_groups = mmseqs_results["group"].to_list()
                 elif self.prms.args["protein_search_target_mode"] == "group":
-                    mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"],
-                                               ascending=[True, False, False, False], inplace=True)
+                    mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
+                                               ascending=[False, True, False, False, False], inplace=True)
                     mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
                     homologous_protein_ids = []
                     homologous_group = mmseqs_results.at[query_record.id, "group"]
@@ -2228,6 +2261,7 @@ class Database:
                                           output_folder=os.path.join(self.prms.args["output_dir"],
                                                                      "lovis4u_with_query"),
                                           island_ids=found_islands,
+                                          keep_while_deduplication = found_islands,
                                           additional_annotation=additional_annotation)
             if self.prms.args["verbose"]:
                 print(f"⦿ Done!")
@@ -2253,11 +2287,26 @@ class Database:
             # Get and parse mmseqs search results
             mmseqs_results = self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file,
                                                                         self.prms.args["fast_mmseqs_search_mode"])
+            mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
+                                       ascending=[False, True, False, False, False], inplace=True)
+            if self.prms.args["fast_mmseqs_search_mode"]:
+                all_mmseqs_hit_groups = set(mmseqs_results["group"].to_list())
+                hit_groups_cds_ids = []
+                for proteome in self.proteomes.proteomes.to_list():
+                    for cds in proteome.cdss.to_list():
+                        if cds.group in all_mmseqs_hit_groups:
+                            hit_groups_cds_ids.append(cds.cds_id)
+                mmseqs_second_iteration = \
+                    self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file, fast=False,
+                                                               cds_sublist=hit_groups_cds_ids)
+                mmseqs_second_iteration.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
+                                                    ascending=[False, True, False, False, False], inplace=True)
+                mmseqs_results = mmseqs_second_iteration
+            mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+
             if self.prms.args["verbose"]:
                 print(f"○ Searching for similar proteomes in the database network", file=sys.stdout)
-            mmseqs_results.sort_values(by=["evalue", "qcov", "tcov", "fident"], ascending=[True, False, False, False],
-                                       inplace=True)
-            mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+
             proteins_wo_hits = []
             for cds in query_proteome.cdss.to_list():
                 if cds.cds_id in mmseqs_results.index:
@@ -2307,6 +2356,9 @@ class Database:
             query_clusters = set(query_proteome.cdss.apply(lambda cds: cds.group).to_list())
             query_size = len(query_clusters)
             counts = collections.defaultdict(int)
+            if self.prms.args["fast_mmseqs_search_mode"]:
+                pass
+                # query_clusters = all_mmseqs_hit_groups # !
             for cl in query_clusters:
                 if cl not in proteins_wo_hits:
                     js = cluster_to_proteome_index[cl]
@@ -2498,6 +2550,11 @@ class Database:
                                                     mode="regular",
                                                     proteome_ids=[query_proteome.proteome_id],
                                                     filename="lovis4u_query_proteome_variable.pdf")
+            drawing_manager.plot_proteome_community(community=query_proteome_community,
+                                                    output_folder=self.prms.args["output_dir"],
+                                                    mode="classes",
+                                                    proteome_ids=[query_proteome.proteome_id],
+                                                    filename="lovis4u_query_proteome_classes.pdf")
             drawing_manager.plot_proteome_community(community=query_proteome_community,
                                                     output_folder=self.prms.args["output_dir"],
                                                     mode="hotspot",
