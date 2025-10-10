@@ -48,7 +48,13 @@ try:
 
         database_manager = ilund4u.data_manager.DatabaseManager(parameters)
         database = database_manager.load_database(db_path=parameters.args["database"])
-        database.protein_search_mode(query_fasta=parameters.args["fa"], query_label=parameters.args["query_label"])
+        ps_output = database.protein_search_for_homologues(query_fasta=parameters.args["fa"])
+        homologous_groups, names = ps_output["groups"], ps_output["names"]
+        for hgi, hg in enumerate(homologous_groups):
+            database.protein_search_mode_using_single_homologue(homologous_group=hg, query_fasta=parameters.args["fa"],
+                                                                name=names[hgi],
+                                                                query_label=parameters.args["query_label"])
+        database.postprocess_protein_search_folder()
 
     elif parameters.args["mode"] == "proteome":
         database_manager = ilund4u.data_manager.DatabaseManager(parameters)

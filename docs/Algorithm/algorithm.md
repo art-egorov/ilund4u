@@ -169,7 +169,7 @@ Optionally during the hotspot annotation step you can build the corresponding to
 iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.  
 The database of phages was built by running hotspot annotation mode on all available [PhageScope database](https://phagescope.deepomics.org) sequences (~870K sequences, version of September 2024). For the plasmids database we took [IMG/PR database of plasmids](https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html) (~700K sequences, version of June 2024).  
 
-**Database sizes:** Phages: 6.48GB; Plasmids: 1.07GB 
+**Database sizes (compressed):** Phages: 6.8GB; Plasmids: 1.3GB 
 
 <div style="clear: both;"></div>
 
@@ -182,10 +182,10 @@ See the [Example-driven guide page](https://art-egorov.github.io/ilund4u/Example
 This mode uses *the guilt by association* (or rather in our case we can call it *guilt by location*) approach. In short, if an unannotated protein is found in a locus containing several for example phage defence systems or in a hotspot in which the annotated cargo proteins are frequently defence systems, then other genes in the locus or in the hotspot are more likely to be involved in this function. That is, the protein location as well as its mobility through hotspots is an important property that can help in functional annotation of proteins with unknown function.
 
 ### Homology search 
-In order to find hotspots containing homologues of your query protein of interest, we need to define homologues as the first step. iLund4u has two modes for this. Both start with an [MMseqs2](https://mmseqs.com) search of the query protein versus all proteins of the iLund4u database. By default the following mmseqs search parameters are used: `-e 1e-5 -s 7` and subsequent query and target coverage cutoffs set as 0.6. Then there are two alternatives:
+In order to find hotspots containing homologues of your query protein of interest, we need to define homologues as the first step. iLund4u has two modes for this. Both start with an [MMseqs2](https://mmseqs.com) search of the query protein versus all proteins of the iLund4u database. By default the following mmseqs search parameters are used: `-e 1e-5 -s 7` and subsequent query and target coverage cutoffs set as 0.65. Then there are two alternatives:
 
-1.	In the *”group”* search mode the query protein is assigned to the same homologous group as that of the best search hit protein.
-2.	In the *”proteins”* search mode all target proteins that pass the search cutoffs are considered to be homologues of your query without focusing on corresponding protein groups.
+1.	In the *”all”* search mode subsequence results will be shown for all protein families that homologouis to the the query protein.
+2.	In the *”best”* search mode results only for the closest protein family in the database will be shown.
 
 ### Hotspots retrieval
 
@@ -199,7 +199,7 @@ This mode is used to annotate hotspots even if the query is a single proteome, b
 
 ### Homology search 
 
-The first step is to define the protein group for each CDS of the query proteome. For this task the ”group” search mode of protein annotation mode is used.
+The first step is to define the protein group for each CDS of the query proteome.
 
 ### Defining proteome communities
 

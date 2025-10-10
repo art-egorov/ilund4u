@@ -2056,8 +2056,64 @@ class Database:
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to run mmseqs search versus protein database.") from error
 
-    def protein_search_mode(self, query_fasta: str, query_label: typing.Union[None, str] = None,
-                            predefined_protein_group: typing.Union[None, str] = None) -> None:
+    def protein_search_for_homologues(self, query_fasta: str) -> list:
+        """Run the first step of protein search mode which finds homologues of your query proteins in the database.
+
+        Arguments:
+            query_fasta (str): Fasta with query protein sequence.
+
+        Returns:
+            list: list of homologous groups to the query sequence
+        """
+        try:
+            # Load fasta
+            query_records = list(Bio.SeqIO.parse(query_fasta, "fasta"))
+            if len(query_records) > 1:
+                raise ilund4u.manager.ilund4uError("Only single query protein is allowed for protein mode")
+            # Run mmseqs for homology search
+            mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta, True)
+            if len(mmseqs_results.index) == 0:
+                print("○ Termination since no homology to iLund4u db proteins was found", file=sys.stdout)
+                return []
+
+            mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
+                                       ascending=[False, True, False, False, False], inplace=True)
+            homologous_groups = mmseqs_results["group"].to_list()
+
+            if self.prms.args["protein_search_target_mode"] == "best":
+                mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+                homologous_groups = mmseqs_results["group"].to_list()
+
+            protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t",
+                                                     low_memory=False).set_index("representative_protein")
+            groups_to_select = list(protein_group_stat_table.index.intersection(homologous_groups))
+            if groups_to_select:
+                protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
+                protein_group_stat_table = protein_group_stat_table[protein_group_stat_table["N_Hotpot_islands"] > 0]
+                groups_to_select_from_hotspots = protein_group_stat_table.index.to_list()
+                homologous_groups_filtered = [i for i in homologous_groups if i in groups_to_select_from_hotspots]
+                homologous_groups = homologous_groups_filtered
+                protein_group_stat_table.to_csv(
+                    os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
+                    sep="\t", index=True, index_label="representative_protein")
+            names = []
+            for hpi, hp in enumerate(homologous_groups):
+                fident = mmseqs_results.loc[mmseqs_results["group"] == hp, "fident"].iloc[0]
+                names.append(f"r-{hpi}_fident-{fident}_{hp}")
+            # Searching for hotspots
+            if self.prms.args["verbose"]:
+                print(f"○ In total {len(set(homologous_groups))} homologous protein group"
+                      f"{'s were' if len(set(homologous_groups)) > 1 else ' was'} selected", file=sys.stdout)
+                if self.prms.args["protein_search_target_mode"] != "all":
+                    print(f"\tNote: you can use ' --homology-search-mode all' parameter to display results for all "
+                          f"homologous groups, not only for the best one", file=sys.stdout)
+            return dict(groups = homologous_groups, names = names)
+        except Exception as error:
+            raise ilund4u.manager.ilund4uError("Unable to perform protein search for homologues versus "
+                                               "the database.") from error
+
+    def protein_search_mode_using_single_homologue(self, homologous_group: str, query_fasta: str, name: None,
+                                                   query_label: typing.Union[None, str] = None) -> None:
         """Run protein search mode which finds homologues of your query proteins in the database and returns
             comprehensive output including visualisation and hotspot annotation.
 
@@ -2069,52 +2125,16 @@ class Database:
             None
         """
         try:
-            # Load fasta
-            if not predefined_protein_group:
-                query_records = list(Bio.SeqIO.parse(query_fasta, "fasta"))
-                if len(query_records) > 1:
-                    raise ilund4u.manager.ilund4uError("Only single query protein is allowed for protein mode")
-                query_record = query_records[0]
-                # Run mmseqs for homology search
-                if self.prms.args["protein_search_target_mode"] == "proteins" and self.prms.args[
-                    "fast_mmseqs_search_mode"]:
-                    print("○ Fast mode is not available with 'proteins' search mode and was deactivated.",
-                          file=sys.stdout)
-                    self.prms.args["fast_mmseqs_search_mode"] = False
-                mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta,
-                                                                            self.prms.args["fast_mmseqs_search_mode"])
-                if len(mmseqs_results.index) == 0:
-                    print("○ Termination since no homology to hotspot db proteins was found", file=sys.stdout)
-                    return None
-                if self.prms.args["protein_search_target_mode"] == "proteins":
-                    homologous_protein_ids = mmseqs_results["target"].to_list()
-                    homologous_groups = mmseqs_results["group"].to_list()
-                elif self.prms.args["protein_search_target_mode"] == "group":
-                    mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
-                                               ascending=[False, True, False, False, False], inplace=True)
-                    mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
-                    homologous_protein_ids = []
-                    homologous_group = mmseqs_results.at[query_record.id, "group"]
-                    homologous_groups = [homologous_group]
-            else:
-                homologous_group = predefined_protein_group
-                homologous_groups = [homologous_group]
-                homologous_protein_ids = []
-                self.prms.args["protein_search_target_mode"] = "group"
-            if "protein_group_stat" in self.db_paths.keys():
-                protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t").set_index(
-                    "representative_protein")
-                groups_to_select = list(protein_group_stat_table.index.intersection(homologous_groups))
-                if groups_to_select:
-                    protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
-                    protein_group_stat_table.to_csv(
-                        os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
-                        sep="\t", index=True, index_label="representative_protein")
-
-            # Searching for hotspots
+            if not name:
+                name = homologous_group
+            query_record = list(Bio.SeqIO.parse(query_fasta, "fasta"))[0]
+            group_output_folder = os.path.join(self.prms.args["output_dir"], name.replace("|", "_"))
+            os.makedirs(group_output_folder, exist_ok=True)
             if self.prms.args["verbose"]:
-                print(f"○ Searching for hotspots with your query protein homologues...", file=sys.stdout)
+                print(f"○ Searching for hotspots with your query protein homologous group {homologous_group}...",
+                      file=sys.stdout)
             found_hotspots = collections.defaultdict(list)
+            homologous_protein_ids = []
             island_annotations = []
             location_stat = dict(flanking=0, cargo=0)
             n_flanked_total = 0
@@ -2123,21 +2143,15 @@ class Database:
                     continue
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
-                    if self.prms.args["protein_search_target_mode"] == "proteins":
+                    locus_groups = island.get_locus_groups(proteome.cdss)
+                    if homologous_group in locus_groups:
+                        homologous_protein_ids_island = []
                         locus_proteins = island.get_locus_proteins(proteome.cdss)
-                        overlapping = list(set(homologous_protein_ids) & set(locus_proteins))
-                    elif self.prms.args["protein_search_target_mode"] == "group":
-                        locus_groups = island.get_locus_groups(proteome.cdss)
-                        overlapping = homologous_group in locus_groups
-                    if overlapping:
-                        if self.prms.args["protein_search_target_mode"] == "group":
-                            homologous_protein_ids_island = []
-                            locus_proteins = island.get_locus_proteins(proteome.cdss)
-                            for lp, lpg in zip(locus_proteins, locus_groups):
-                                if lpg == homologous_group:
-                                    homologous_protein_ids_island.append(lp)
-                                    homologous_protein_ids.append(lp)
-                            overlapping = homologous_protein_ids_island
+                        for lp, lpg in zip(locus_proteins, locus_groups):
+                            if lpg == homologous_group:
+                                homologous_protein_ids_island.append(lp)
+                                homologous_protein_ids.append(lp)
+                        overlapping = homologous_protein_ids_island
                         isl_groups = island.get_island_groups(proteome.cdss)
                         isl_proteins = island.get_island_proteins(proteome.cdss)
                         for op in overlapping:
@@ -2158,14 +2172,15 @@ class Database:
             if sum(location_stat.values()) == 0:
                 print("○ Termination since no homologous protein was found in hotspots (neither as flanking or cargo)",
                       file=sys.stdout)
+                os.rmdir(group_output_folder)
                 return None
             found_islands = [island.island_id for islands in found_hotspots.values() for island in islands]
             island_annotations = pd.DataFrame(island_annotations)
-            island_annotations.to_csv(os.path.join(os.path.join(self.prms.args["output_dir"],
+            island_annotations.to_csv(os.path.join(os.path.join(group_output_folder,
                                                                 "found_island_annotation.tsv")),
                                       sep="\t", index_label="island_id")
             found_hotspots_annotation = self.hotspots.annotation.loc[found_hotspots.keys()]
-            found_hotspots_annotation.to_csv(os.path.join(self.prms.args["output_dir"], "found_hotspot_annotation.tsv"),
+            found_hotspots_annotation.to_csv(os.path.join(group_output_folder, "found_hotspot_annotation.tsv"),
                                              sep="\t", index_label="hotspot_id")
             found_hotspot_communities = list(set(found_hotspots_annotation["hotspot_community"].to_list()))
             # Get hotspot community stat
@@ -2202,7 +2217,7 @@ class Database:
                 hotspot_community_annot[f"{db_name}_cargo_normalised"] = \
                     hotspot_community_annot.apply(
                         lambda row: round(row[f"N_{db_name}_cargo_groups"] / row[f"N_cargo_groups"], 4), axis=1)
-            hotspot_community_annot.to_csv(os.path.join(self.prms.args["output_dir"],
+            hotspot_community_annot.to_csv(os.path.join(group_output_folder,
                                                         "found_hotspot_community_annotation.tsv"),
                                            sep="\t", index=False)
             if self.prms.args["verbose"]:
@@ -2215,21 +2230,24 @@ class Database:
                       f" found as cargo are both side flanked (have conserved genes on both sides)",
                       file=sys.stdout)
 
-            homologous_protein_fasta = os.path.join(self.prms.args["output_dir"], "homologous_proteins.fa")
-            full_fasta_file = Bio.SeqIO.index(self.proteomes.proteins_fasta_file, "fasta")
+            homologues_folder = os.path.join(group_output_folder, "homologous_proteins")
+            if os.path.exists(homologues_folder):
+                shutil.rmtree(homologues_folder)
+            os.mkdir(homologues_folder)
+            homologous_protein_fasta = os.path.join(homologues_folder, "homologous_proteins.fa")
+            full_fasta_file = Bio.SeqIO.index(self.db_paths["all_proteins_fasta"], "fasta")
             with open(homologous_protein_fasta, "w") as out_handle:
-                if not predefined_protein_group:
-                    Bio.SeqIO.write(query_record, out_handle, "fasta")
-                for acc in homologous_protein_ids:
+                Bio.SeqIO.write(query_record, out_handle, "fasta")
+                for acc in set(homologous_protein_ids):
                     out_handle.write(full_fasta_file.get_raw(acc).decode())
             # MSA visualisation
-            if len(homologous_protein_ids) > 1 or not predefined_protein_group:
+            if len(homologous_protein_ids) > 1:
                 msa4u_p = msa4u.manager.Parameters()
                 msa4u_p.arguments["label"] = "id"
                 msa4u_p.arguments["verbose"] = False
-                msa4u_p.arguments["output_filename"] = os.path.join(self.prms.args["output_dir"],
+                msa4u_p.arguments["output_filename"] = os.path.join(homologues_folder,
                                                                     "msa4u_homologous_proteines.pdf")
-                msa4u_p.arguments["output_filename_aln"] = os.path.join(self.prms.args["output_dir"],
+                msa4u_p.arguments["output_filename_aln"] = os.path.join(homologues_folder,
                                                                         "homologous_proteins_aln.fa")
                 fasta = msa4u.manager.Fasta(fasta=homologous_protein_fasta, parameters=msa4u_p)
                 mafft_output = fasta.run_mafft()
@@ -2241,8 +2259,8 @@ class Database:
             print(f"○ Visualisation of the hotspot(s) with your query protein homologues using lovis4u...",
                   file=sys.stdout)
             # lovis4u visualisation
-            vis_output_folders = [os.path.join(self.prms.args["output_dir"], "lovis4u_full"),
-                                  os.path.join(self.prms.args["output_dir"], "lovis4u_with_query")]
+            vis_output_folders = [os.path.join(group_output_folder, "lovis4u_hotspot_plots_full"),
+                                  os.path.join(group_output_folder, "lovis4u_hotspot_plots_with_query")]
             for vis_output_folder in vis_output_folders:
                 if os.path.exists(vis_output_folder):
                     shutil.rmtree(vis_output_folder)
@@ -2255,16 +2273,55 @@ class Database:
             drawing_manager = ilund4u.drawing.DrawingManager(self.proteomes, self.hotspots, self.prms)
             for community in found_hotspot_communities:
                 drawing_manager.plot_hotspots(self.hotspots.communities[community],
-                                              output_folder=os.path.join(self.prms.args["output_dir"], "lovis4u_full"),
+                                              output_folder=os.path.join(group_output_folder,
+                                                                         "lovis4u_hotspot_plots_full"),
                                               additional_annotation=additional_annotation)
             drawing_manager.plot_hotspots(list(found_hotspots.keys()),
-                                          output_folder=os.path.join(self.prms.args["output_dir"],
-                                                                     "lovis4u_with_query"),
+                                          output_folder=os.path.join(group_output_folder,
+                                                                     "lovis4u_hotspot_plots_with_query"),
                                           island_ids=found_islands,
-                                          keep_while_deduplication = found_islands,
+                                          keep_while_deduplication=found_islands,
                                           additional_annotation=additional_annotation)
+            return None
+        except Exception as error:
+            raise ilund4u.manager.ilund4uError("Unable to perform protein search versus the database.") from error
+
+    def postprocess_protein_search_folder(self) -> None:
+        """Postprocess output folder
+
+        Returns:
+
+        """
+        try:
+            folders_with_results = [i for i in os.listdir(self.prms.args["output_dir"]) if i.startswith("r-")]
+            if len(folders_with_results) == 1:
+                folder_with_results = folders_with_results[0]
+                file_names = [i for i in os.listdir(os.path.join(self.prms.args["output_dir"], folder_with_results)) if
+                              not i.startswith(".")]
+                for file_name in file_names:
+                    shutil.move(os.path.join(self.prms.args["output_dir"], folder_with_results, file_name),
+                                self.prms.args["output_dir"])
+                os.rmdir(os.path.join(self.prms.args["output_dir"], folder_with_results))
+            elif len(folders_with_results) > 1:
+                lovis4u_full_new_dir = os.path.join(self.prms.args["output_dir"], "lovis4u_hotspot_plots_full")
+                lovis4u_query_new_dir = os.path.join(self.prms.args["output_dir"], "lovis4u_hotspot_plots_with_query")
+                os.makedirs(lovis4u_full_new_dir, exist_ok=True)
+                os.makedirs(lovis4u_query_new_dir, exist_ok=True)
+                for fwr in folders_with_results:
+                    fwr_path = os.path.join(self.prms.args["output_dir"], fwr)
+                    folder_with_full_hotspot_plots = os.path.join(fwr_path, "lovis4u_hotspot_plots_full")
+                    folder_with_query_hotspot_plots = os.path.join(fwr_path, "lovis4u_hotspot_plots_with_query")
+                    for pdf in [i for i in os.listdir(folder_with_full_hotspot_plots) if i.endswith(".pdf")]:
+                        pdf_new_name = f"{fwr}_{pdf}"
+                        shutil.copy(os.path.join(folder_with_full_hotspot_plots, pdf),
+                                    os.path.join(lovis4u_full_new_dir, pdf_new_name))
+                    for pdf in [i for i in os.listdir(folder_with_query_hotspot_plots) if i.endswith(".pdf")]:
+                        pdf_new_name = f"{fwr}_{pdf}"
+                        shutil.copy(os.path.join(folder_with_query_hotspot_plots, pdf),
+                                    os.path.join(lovis4u_query_new_dir, pdf_new_name))
             if self.prms.args["verbose"]:
                 print(f"⦿ Done!")
+
             return None
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to perform protein search versus the database.") from error
@@ -2285,23 +2342,10 @@ class Database:
             proteomes_helper_obj.load_sequences_from_extended_gff(input_f=[query_gff])
             query_proteome = proteomes_helper_obj.proteomes.iat[0]
             # Get and parse mmseqs search results
-            mmseqs_results = self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file,
-                                                                        self.prms.args["fast_mmseqs_search_mode"])
+            mmseqs_results = self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file, True)
             mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
                                        ascending=[False, True, False, False, False], inplace=True)
-            if self.prms.args["fast_mmseqs_search_mode"]:
-                all_mmseqs_hit_groups = set(mmseqs_results["group"].to_list())
-                hit_groups_cds_ids = []
-                for proteome in self.proteomes.proteomes.to_list():
-                    for cds in proteome.cdss.to_list():
-                        if cds.group in all_mmseqs_hit_groups:
-                            hit_groups_cds_ids.append(cds.cds_id)
-                mmseqs_second_iteration = \
-                    self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file, fast=False,
-                                                               cds_sublist=hit_groups_cds_ids)
-                mmseqs_second_iteration.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
-                                                    ascending=[False, True, False, False, False], inplace=True)
-                mmseqs_results = mmseqs_second_iteration
+
             mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
 
             if self.prms.args["verbose"]:
@@ -2356,9 +2400,6 @@ class Database:
             query_clusters = set(query_proteome.cdss.apply(lambda cds: cds.group).to_list())
             query_size = len(query_clusters)
             counts = collections.defaultdict(int)
-            if self.prms.args["fast_mmseqs_search_mode"]:
-                pass
-                # query_clusters = all_mmseqs_hit_groups # !
             for cl in query_clusters:
                 if cl not in proteins_wo_hits:
                     js = cluster_to_proteome_index[cl]

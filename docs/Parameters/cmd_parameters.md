@@ -171,13 +171,13 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 ### Optional arguments | data processing
 
-`-hsm, --homology-search-mode <group|proteins>`
-:    Mode to define homologous proteins from the database.
-    If "group" is selected, a query protein is assigned to the
-    same homologous group as that of the best search hit
-    protein. In "proteins" mode, all target proteins that
-    pass the cutoffs are considered to be homologues.
-    [default: group]
+`-hsm, --homology-search-mode <best|all>`
+:    Mode to define homologous families from the database.
+    If "best" is selected, results are shown only for the
+    protein family which representative sequence is the closest
+    to the query. If "all" is selected, results for all families 
+    that pass the cutoffs are shown.
+    [default: all]
 
 `-msqc, --mmseqs-query-cov <float>`
 :    MMseqs search query coverage cutoff [default: 0.65]
@@ -187,14 +187,11 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-msf, --mmseqs-fident <float>`
 :    MMseqs search fident (fraction of identical matches) cutoff
-    [default: 0.3]
+    [default: 0.25]
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
 
-`-fm, --fast-mmseqs`
-:    MMseqs search only against a database of representative sequences.
-     [default: False]
 
 `-rnf, --report-not-flanked`
 :    Report in results hotspots that have flanked conserved genes only on one
@@ -254,14 +251,11 @@ To show mode-specific help messages use: `ilund4u --help [mode]`
 
 `-msf, --mmseqs-fident <float>`
 :    MMseqs search fident (fraction of identical matches) cutoff
-    [default: 0.3]
+    [default: 0.25]
 
 `-mse, --mmseqs-evalue`
  :   MMseqs search evalue cutoff [default: 1e-5]
 
-`-fm, --fast-mmseqs`
-:    MMseqs search only against a database of representative sequences.
-     [default: False]
 
 `-rnf, --report-not-flanked`
 :    Report in results hotspots that have flanked conserved genes only on one

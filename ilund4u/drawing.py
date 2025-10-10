@@ -199,7 +199,7 @@ class DrawingManager:
                             feature_annotation_rows.append(feature_annotation_row)
                         mmseqs_results_rows.append(dict(cluster=cds.group, protein_id=cds.cds_id))
 
-            cds_tables_folder = os.path.join(self.prms.args["output_dir"], "lovis4u_hotspots_annotation")
+            cds_tables_folder = os.path.join(output_folder, "lovis4u_hotspots_annotation")
             if not os.path.exists(cds_tables_folder):
                 os.mkdir(cds_tables_folder)
             cds_table = pd.DataFrame(cds_table_rows)
@@ -229,7 +229,7 @@ class DrawingManager:
 
             l_parameters.args["draw_middle_line"] = True
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
-            l_parameters.args["output_dir"] = os.path.join(self.prms.args["output_dir"], "lovis4u_tmp")
+            l_parameters.args["output_dir"] = os.path.join(output_folder, "lovis4u_tmp")
 
             l_parameters.args["use_filename_as_contig_id"] = self.prms.args["use_filename_as_contig_id"]
 

@@ -64,7 +64,7 @@ class Parameters:
         parser.add_argument("-linux", "--linux", dest="linux", action="store_true", default=None)
         parser.add_argument("-mac", "--mac", dest="mac", action="store_true", default=None)
         parser.add_argument("-h", "--help", dest="help", action="store_true")
-        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.1.0")
+        parser.add_argument("-v", "--version", action="version", version="%(prog)s 0.1.1")
 
         subparsers = parser.add_subparsers(dest="mode")
 
@@ -107,17 +107,17 @@ class Parameters:
         parser_ps.add_argument("-db", "--database", dest="database", type=str, default=None)
         parser_ps.add_argument("-ql", "--query-label", dest="query_label", type=str, default=None)
         parser_ps.add_argument("-hsm", "--homology-search-mode", dest="protein_search_target_mode", type=str,
-                               choices=["group", "proteins"], default="group")
+                               choices=["best", "all"], default="all")
         parser_ps.add_argument("-msqc", "--mmseqs-query-cov", dest="mmseqs_search_qcov", type=float, default=None)
         parser_ps.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_ps.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_ps.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
-        parser_ps.add_argument("-fm", "--fast-mmseqs", dest="fast_mmseqs_search_mode", action="store_true",
-                               default=None)
         parser_ps.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
                                default=None)
         parser_ps.add_argument("-c", dest="config_file", type=str, default="standard")
         parser_ps.add_argument("-o", dest="output_dir", type=str, default=None)
+        parser_ps.add_argument("-pph", "--predefined-protein-groups", dest="predefined_protein_groups", type=str,
+                               default="")
         parser_ps.add_argument("-q", "--quiet", dest="verbose", default=True, action="store_false")
         parser_ps.add_argument("--debug", "-debug", dest="debug", action="store_true")
 
@@ -130,8 +130,6 @@ class Parameters:
         parser_pa.add_argument("-mstc", "--mmseqs-target-cov", dest="mmseqs_search_tcov", type=float, default=None)
         parser_pa.add_argument("-msf", "--mmseqs-fident", dest="mmseqs_search_fident", type=float, default=None)
         parser_pa.add_argument("-mse", "--mmseqs-evalue", dest="mmseqs_search_evalue", type=float, default=None)
-        parser_pa.add_argument("-fm", "--fast-mmseqs", dest="fast_mmseqs_search_mode", action="store_true",
-                               default=None)
         parser_pa.add_argument("-rnf", "--report-not-flanked", dest="report_not_flanked", action="store_true",
                                default=None)
         parser_pa.add_argument("-c", dest="config_file", type=str, default="standard")
