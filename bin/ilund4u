@@ -51,6 +51,9 @@ try:
         ps_output = database.protein_search_for_homologues(query_fasta=parameters.args["fa"])
         homologous_groups, names = ps_output["groups"], ps_output["names"]
         for hgi, hg in enumerate(homologous_groups):
+            if parameters.args["verbose"]:
+                print(f"--- Analysis of {hgi + 1}/{len(homologous_groups)} family homologous to the query ---",
+                      file=sys.stdout)
             database.protein_search_mode_using_single_homologue(homologous_group=hg, query_fasta=parameters.args["fa"],
                                                                 name=names[hgi],
                                                                 query_label=parameters.args["query_label"])

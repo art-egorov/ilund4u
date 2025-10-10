@@ -1,6 +1,6 @@
 # Version log
 
-* **Ver 0.1.1** - 10 October
+* **Ver 0.1.1 and 0.1.2** - 10 October
 	- Update of the protein search mode. Now it can return results for multiple protein families that are homologous to the query sequence.
 
 * **Ver 0.1.0** - 17 September

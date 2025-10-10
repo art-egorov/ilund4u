@@ -2074,7 +2074,7 @@ class Database:
             mmseqs_results = self.mmseqs_search_versus_protein_database(query_fasta, True)
             if len(mmseqs_results.index) == 0:
                 print("○ Termination since no homology to iLund4u db proteins was found", file=sys.stdout)
-                return []
+                return dict(groups=[], names=[])
 
             mmseqs_results.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
                                        ascending=[False, True, False, False, False], inplace=True)
@@ -2093,6 +2093,8 @@ class Database:
                 groups_to_select_from_hotspots = protein_group_stat_table.index.to_list()
                 homologous_groups_filtered = [i for i in homologous_groups if i in groups_to_select_from_hotspots]
                 homologous_groups = homologous_groups_filtered
+                protein_group_stat_table = protein_group_stat_table.loc[homologous_groups]
+                protein_group_stat_table["r_index"] = [f"r-{i}" for i in range(len(homologous_groups))]
                 protein_group_stat_table.to_csv(
                     os.path.join(self.prms.args["output_dir"], "protein_group_stat.tsv"),
                     sep="\t", index=True, index_label="representative_protein")
@@ -2107,7 +2109,7 @@ class Database:
                 if self.prms.args["protein_search_target_mode"] != "all":
                     print(f"\tNote: you can use ' --homology-search-mode all' parameter to display results for all "
                           f"homologous groups, not only for the best one", file=sys.stdout)
-            return dict(groups = homologous_groups, names = names)
+            return dict(groups=homologous_groups, names=names)
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to perform protein search for homologues versus "
                                                "the database.") from error
@@ -2136,40 +2138,34 @@ class Database:
             found_hotspots = collections.defaultdict(list)
             homologous_protein_ids = []
             island_annotations = []
-            location_stat = dict(flanking=0, cargo=0)
-            n_flanked_total = 0
+            n_island_total = 0
+            n_island_flanked = 0
             for hotspot in self.hotspots.hotspots.to_list():
                 if not self.prms.args["report_not_flanked"] and not hotspot.flanked:
                     continue
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
-                    locus_groups = island.get_locus_groups(proteome.cdss)
-                    if homologous_group in locus_groups:
-                        homologous_protein_ids_island = []
-                        locus_proteins = island.get_locus_proteins(proteome.cdss)
-                        for lp, lpg in zip(locus_proteins, locus_groups):
-                            if lpg == homologous_group:
-                                homologous_protein_ids_island.append(lp)
-                                homologous_protein_ids.append(lp)
-                        overlapping = homologous_protein_ids_island
-                        isl_groups = island.get_island_groups(proteome.cdss)
-                        isl_proteins = island.get_island_proteins(proteome.cdss)
-                        for op in overlapping:
-                            if op in isl_proteins:
-                                location_stat["cargo"] += 1
-                                n_flanked_total += 1
-                            else:
-                                location_stat["flanking"] += 1
+                    isl_groups = island.get_island_groups(proteome.cdss)
+                    isl_proteins = island.get_island_proteins(proteome.cdss)
+                    homologous_protein_ids_island = []
+                    if homologous_group in isl_groups:
+                        for ip, ipg in zip(isl_proteins, isl_groups):
+                            if ipg == homologous_group:
+                                homologous_protein_ids.append(ip)
+                                homologous_protein_ids_island.append(ip)
+                        n_island_total += 1
+                        if island.flanked:
+                            n_island_flanked += 1
                         island_annotation = hotspot.island_annotation.loc[island.island_id].copy()
                         island_annotation.drop(labels=["island_index", "strength", "degree"], inplace=True)
                         island_annotation.at["indexes"] = ",".join(map(str, island.indexes))
                         island_annotation.at["size"] = island.size
-                        island_annotation.at["island_proteins"] = ",".join(island.get_island_proteins(proteome.cdss))
+                        island_annotation.at["island_proteins"] = ",".join(isl_proteins)
                         island_annotation.at["island_protein_groups"] = ",".join(isl_groups)
-                        island_annotation.at["query_homologues"] = ",".join(overlapping)
+                        island_annotation.at["query_homologues"] = ",".join(homologous_protein_ids_island)
                         island_annotations.append(island_annotation)
                         found_hotspots[hotspot.hotspot_id].append(island)
-            if sum(location_stat.values()) == 0:
+            if n_island_total == 0:
                 print("○ Termination since no homologous protein was found in hotspots (neither as flanking or cargo)",
                       file=sys.stdout)
                 os.rmdir(group_output_folder)
@@ -2224,9 +2220,8 @@ class Database:
                 print(f"  ⦿ Query protein homologues were found in {len(found_hotspot_communities)} hotspot "
                       f"communit{'y' if len(found_hotspot_communities) == 1 else 'ies'} "
                       f"({len(found_hotspots.keys())} hotspot{'s' if len(found_hotspots.keys()) > 1 else ''}) on "
-                      f"{len(found_islands)} island{'s' if len(found_islands) > 1 else ''}\n"
-                      f"    Found as cargo: {location_stat['cargo']}, as flanking gene: {location_stat['flanking']}"
-                      f"\n    {n_flanked_total}/{len(found_islands)} island{'s' if len(found_islands) > 1 else ''} where"
+                      f"{n_island_total} island{'s' if n_island_total > 1 else ''}\n"
+                      f"    {n_island_flanked}/{n_island_total} island{'s' if n_island_flanked > 1 else ''} where"
                       f" found as cargo are both side flanked (have conserved genes on both sides)",
                       file=sys.stdout)
 
@@ -2348,6 +2343,21 @@ class Database:
 
             mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
 
+            all_mmseqs_hit_groups = set(mmseqs_results["group"].to_list())
+            hit_groups_cds_ids = []
+            for proteome in self.proteomes.proteomes.to_list():
+                for cds in proteome.cdss.to_list():
+                    if cds.group in all_mmseqs_hit_groups:
+                        hit_groups_cds_ids.append(cds.cds_id)
+            mmseqs_second_iteration = \
+                self.mmseqs_search_versus_protein_database(proteomes_helper_obj.proteins_fasta_file, fast=False,
+                                                           cds_sublist=hit_groups_cds_ids)
+            mmseqs_second_iteration.sort_values(by=["raw", "evalue", "qcov", "tcov", "fident"],
+                                                ascending=[False, True, False, False, False], inplace=True)
+            mmseqs_results = mmseqs_second_iteration
+            mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
+
+
             if self.prms.args["verbose"]:
                 print(f"○ Searching for similar proteomes in the database network", file=sys.stdout)
 
@@ -2359,8 +2369,8 @@ class Database:
                     cds.group = f"{cds.cds_id}"
                     proteins_wo_hits.append(cds.group)
             if "protein_group_stat" in self.db_paths.keys():
-                protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t").set_index(
-                    "representative_protein")
+                protein_group_stat_table = pd.read_table(self.db_paths["protein_group_stat"], sep="\t",
+                                                         low_memory=False).set_index("representative_protein")
                 groups_to_select = list(protein_group_stat_table.index.intersection(mmseqs_results["group"].tolist()))
                 if groups_to_select:
                     protein_group_stat_table = protein_group_stat_table.loc[groups_to_select]
