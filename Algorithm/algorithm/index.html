@@ -862,7 +862,7 @@ where <span class="arithmatex">\(|G_i|\)</span>, <span class="arithmatex">\(|G_j
 </figure>
 <p>iLund4u has two precomputed databases of hotspots built on phage and plasmid sequences.<br />
 The database of phages was built by running hotspot annotation mode on all available <a href="https://phagescope.deepomics.org">PhageScope database</a> sequences (~870K sequences, version of September 2024). For the plasmids database we took <a href="https://genome.jgi.doe.gov/portal/IMG_PR/IMG_PR.home.html">IMG/PR database of plasmids</a> (~700K sequences, version of June 2024).  </p>
-<p><strong>Database sizes:</strong> Phages: 6.48GB; Plasmids: 1.07GB </p>
+<p><strong>Database sizes (compressed):</strong> Phages: 6.8GB; Plasmids: 1.3GB </p>
 <div style="clear: both;"></div>
 
 <p>See the <a href="https://art-egorov.github.io/ilund4u/ExampleDrivenGuide/cmd_guide/">Example-driven guide page</a> for details about database building and downloading.</p>
@@ -870,10 +870,10 @@ The database of phages was built by running hotspot annotation mode on all avail
 <h2 id="protein-annotation-mode">Protein annotation mode</h2>
 <p>This mode uses <em>the guilt by association</em> (or rather in our case we can call it <em>guilt by location</em>) approach. In short, if an unannotated protein is found in a locus containing several for example phage defence systems or in a hotspot in which the annotated cargo proteins are frequently defence systems, then other genes in the locus or in the hotspot are more likely to be involved in this function. That is, the protein location as well as its mobility through hotspots is an important property that can help in functional annotation of proteins with unknown function.</p>
 <h3 id="homology-search">Homology search</h3>
-<p>In order to find hotspots containing homologues of your query protein of interest, we need to define homologues as the first step. iLund4u has two modes for this. Both start with an <a href="https://mmseqs.com">MMseqs2</a> search of the query protein versus all proteins of the iLund4u database. By default the following mmseqs search parameters are used: <code>-e 1e-5 -s 7</code> and subsequent query and target coverage cutoffs set as 0.6. Then there are two alternatives:</p>
+<p>In order to find hotspots containing homologues of your query protein of interest, we need to define homologues as the first step. iLund4u has two modes for this. Both start with an <a href="https://mmseqs.com">MMseqs2</a> search of the query protein versus all proteins of the iLund4u database. By default the following mmseqs search parameters are used: <code>-e 1e-5 -s 7</code> and subsequent query and target coverage cutoffs set as 0.65. Then there are two alternatives:</p>
 <ol>
-<li>In the <em>”group”</em> search mode the query protein is assigned to the same homologous group as that of the best search hit protein.</li>
-<li>In the <em>”proteins”</em> search mode all target proteins that pass the search cutoffs are considered to be homologues of your query without focusing on corresponding protein groups.</li>
+<li>In the <em>”all”</em> search mode subsequence results will be shown for all protein families that homologouis to the the query protein.</li>
+<li>In the <em>”best”</em> search mode results only for the closest protein family in the database will be shown.</li>
 </ol>
 <h3 id="hotspots-retrieval">Hotspots retrieval</h3>
 <p>If homologues are found in the database, iLund4u searches for hotspots that contain these proteins either as cargo or flanking genes. The search results contain a LoVis4u visualisation and the set of annotation tables. See the <a href="https://art-egorov.github.io/ilund4u/ExampleDrivenGuide/cmd_guide/">Example-driven guide page</a> for details.</p>
@@ -881,7 +881,7 @@ The database of phages was built by running hotspot annotation mode on all avail
 <h2 id="proteome-annotation-mode">Proteome annotation mode</h2>
 <p>This mode is used to annotate hotspots even if the query is a single proteome, but it has a community of similar proteomes in the iLund4u database. If you have sequenced, let say a phage, then you can search it versus the iLund4u database of all phages and in case there is a proteome community of related phages the already known hotspots can be mapped to your query proteome. Additionally, it gives the ability to define “conserved” proteins in your query proteome, whose homologues are found in the majority of similar proteomes and “variable”. See the detailed definition in the corresponding sections above. </p>
 <h3 id="homology-search_1">Homology search</h3>
-<p>The first step is to define the protein group for each CDS of the query proteome. For this task the ”group” search mode of protein annotation mode is used.</p>
+<p>The first step is to define the protein group for each CDS of the query proteome.</p>
 <h3 id="defining-proteome-communities">Defining proteome communities</h3>
 <p>When protein groups are defined, we can calculate proteome similarity weights <span class="arithmatex">\(w_{qi}\)</span> from the query proteome <span class="arithmatex">\(q\)</span> to all other database proteomes. All thresholds for weights are set the same as for the initial network building described above. </p>
 <h3 id="annotation-of-variable-islands-and-hotspot-mapping">Annotation of variable islands and hotspot mapping</h3>

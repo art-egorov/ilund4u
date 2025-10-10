@@ -744,7 +744,7 @@ This command replaces the tools paths (MMseqs2) in the pre-made config files fro
 If you run this command for fun and want to change it back you can use <code>ilund4u --mac</code>.</p>
 <p><strong>Downloading HMM models:</strong> ilund4u uses pyhmmer for additional functional annotation of proteins with hmmscan versus a set of databases. You can download these database from our server (<a href="https://data-sharing.atkinson-lab.com/iLund4u/">data-sharing.atkinson-lab.com/iLund4u</a>) by running the following command:<br />
 <code>ilund4u --get-hmms</code><br />
-List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 19.09.2023); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); PADLOC (v. 22.10.2024); Virulence: VFDB (v. 10.05.2024).</p>
+List of databases: AMR: AMRFinderPlus (v. 02.05.2024.2); Anti-defence: dbAPIS_Acr (v. 17.08.2025); Defence: DefenceFinder (v. 1.2.4), CasFinder (v. 3.1.0); PADLOC (v. 22.10.2024); Virulence: VFDB (v. 10.05.2024).</p>
 <p><ins>For this demonstration we will use pharokka-generated gff files with sequences of 70 P2-like phages.<br />
 Gff files are stored at: <em>ilund4u_data/guide/gff_files</em>.</ins>    <br />
 The main difference of pharokka/prokka generated gff files from a regular gff3 (for ex. which you can download from the NCBI) is that in addition to annotation rows they contain the corresponding nucleotide sequence in fasta format. </p>
@@ -937,24 +937,12 @@ Here we can also start with only the mandatory arguments set: <code>-fa &lt;fast
 </details>
 <details class="card_hearts">
 <summary><strong>Output folder structure</strong></summary>
-<ul>
-<li><strong><em>mmseqs_homology_search_full.tsv</em></strong> - table with identified homologues.</li>
-<li><strong><em>mmseqs</em></strong> - folder containing mmseqs results and logs.  </li>
-<li><strong><em>homologous_proteins.fa</em></strong> - fasta file containing query protein and identified homologues.</li>
-<li><strong><em>homologous_proteins_aln.fa</em></strong> - alignment fasta file containing query protein and identified homologues built with MAFFT.</li>
-<li><strong><em>msa4u_homologous_proteines.pdf</em></strong> - MSA4u visualisation of the protein alignment.</li>
-<li><strong><em>protein_group_stat.tsv</em></strong> - annotation table of protein group(s) that are homologoues to the query. </li>
-<li><strong><em>found_island_annotation.tsv</em></strong> - annotation table of islands containing query protein homologues.</li>
-<li><strong><em>found_hotspot_annotation.tsv</em></strong> - annotation table of hotspots containing query protein homologues. </li>
-<li><strong><em>lovis4u_full</em></strong> - folder containing LoVis4u visualisation of hotspots where query protein homologues are found.</li>
-<li><strong><em>lovis4u_with_query</em></strong> - folder containing LoVis4u visualisation of hotspots with only loci where query protein homologues are found.</li>
-<li><strong><em>lovis4u_hotspots_annotation</em></strong> - folder with LoVis4u annotation tables for hotspot visualisation.  </li>
-</ul>
+<p>To be updated...</p>
 </details>
 <p><strong>Note:</strong> iLund4u searches for homology not only versus cargo proteins but against flanking genes as well.</p>
 <h3 id="specifying-homology-search-mode-and-setting-up-labels">Specifying homology search mode and setting up labels</h3>
 <p>Protein annotation mode has three important optional arguments that we want to describe here.  </p>
-<p>The first one: <code>-hsm, --homology-search-mode &lt;group|proteins&gt;</code>  which specifies the mode of search for homologous proteins in the database. If "group" is selected, a query protein is assigned to the same homologous group as that of the best search hit protein. In "proteins" mode, all target proteins that pass the cutoffs are considered to be homologues. By default, "group" mode is set. We recommend to use "proteins" mode if you want to find more diverse set of homologues.  </p>
+<p>The first one: <code>-hsm, --homology-search-mode &lt;best|all&gt;</code>  which specifies the mode to define homologous families from the database. If "best" is selected, results are shown only for the protein family which representative sequence is the closest to the query. If "all" is selected, results for all families that pass the cutoffs are shown.</p>
 <p>The second is: <code>-rnf, --report-not-flanked</code> controls whether islands and hotspots located at the ends of sequences (flanked from only one side) will be considered in search. The importance of it described in the hotspot annotation section which has exactly the same argument. </p>
 <p>The last one we want to highlight is <code>-ql, --query-label &lt;str&gt;</code> which simply changes the label of your query protein homologues on LoVis4u visualisation. For example:
 <div class="language-sh highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>ilund4u<span class="w"> </span>protein<span class="w"> </span>-fa<span class="w">  </span>ilund4u_data/guide/RloC.fa<span class="w"> </span>-db<span class="w"> </span>ilund4u_data/guide/P2-like_phages_guide_DB<span class="w"> </span><span class="se">\</span>
@@ -1092,7 +1080,7 @@ The database of phages was built based on running hotspot annotation mode on all
 <p>To download iLund4u database from our server [<a href="https://data-sharing.atkinson-lab.com/iLund4u/">data-sharing.atkinson-lab.com/iLund4u</a>] you can use the following command: <code>--database &lt;phages|plasmids&gt;</code>. For example, to get plasmids database you need to run:<br />
 <div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>ilund4u --database plasmids
 </span></code></pre></div></p>
-<p><strong>Database sizes:</strong> Phages: 6.2GB; Plasmids: 1.12GB </p>
+<p><strong>Database sizes (compressed):</strong> Phages: 6.8GB; Plasmids: 1.3GB </p>
 <hr />
 
               

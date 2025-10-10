@@ -856,25 +856,22 @@ If not specified then no database will be saved.</dd>
 </dl>
 <h3 id="optional-arguments-data-processing_1">Optional arguments | data processing</h3>
 <dl>
-<dt><code>-hsm, --homology-search-mode &lt;group|proteins&gt;</code></dt>
-<dd>Mode to define homologous proteins from the database.
-If "group" is selected, a query protein is assigned to the
-same homologous group as that of the best search hit
-protein. In "proteins" mode, all target proteins that
-pass the cutoffs are considered to be homologues.
-[default: group]</dd>
+<dt><code>-hsm, --homology-search-mode &lt;best|all&gt;</code></dt>
+<dd>Mode to define homologous families from the database.
+If "best" is selected, results are shown only for the
+protein family which representative sequence is the closest
+to the query. If "all" is selected, results for all families 
+that pass the cutoffs are shown.
+[default: all]</dd>
 <dt><code>-msqc, --mmseqs-query-cov &lt;float&gt;</code></dt>
 <dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
 <dt><code>-mstc, --mmseqs-target-cov &lt;float&gt;</code></dt>
 <dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
 <dt><code>-msf, --mmseqs-fident &lt;float&gt;</code></dt>
 <dd>MMseqs search fident (fraction of identical matches) cutoff
-[default: 0.3]</dd>
+[default: 0.25]</dd>
 <dt><code>-mse, --mmseqs-evalue</code></dt>
 <dd>MMseqs search evalue cutoff [default: 1e-5]</dd>
-<dt><code>-fm, --fast-mmseqs</code></dt>
-<dd>MMseqs search only against a database of representative sequences.
- [default: False]</dd>
 <dt><code>-rnf, --report-not-flanked</code></dt>
 <dd>Report in results hotspots that have flanked conserved genes only on one
 side (located on the end of non-circular sequences) [default: False]</dd>
@@ -924,12 +921,9 @@ and last proteins won't be considered to be neighbours.
 <dd>MMseqs search query coverage cutoff [default: 0.65]</dd>
 <dt><code>-msf, --mmseqs-fident &lt;float&gt;</code></dt>
 <dd>MMseqs search fident (fraction of identical matches) cutoff
-[default: 0.3]</dd>
+[default: 0.25]</dd>
 <dt><code>-mse, --mmseqs-evalue</code></dt>
 <dd>MMseqs search evalue cutoff [default: 1e-5]</dd>
-<dt><code>-fm, --fast-mmseqs</code></dt>
-<dd>MMseqs search only against a database of representative sequences.
- [default: False]</dd>
 <dt><code>-rnf, --report-not-flanked</code></dt>
 <dd>Report in results hotspots that have flanked conserved genes only on one
 side (located on the end of non-circular sequences) [default: False]</dd>
