@@ -17,7 +17,7 @@ extra_files = package_files("ilund4u/ilund4u_data")
 extra_files.append("../docs/pypi.md")
 
 setuptools.setup(name="ilund4u",
-                 version="0.1.2",
+                 version="0.1.2.1",
                  python_requires='>=3.8',
                  description="description",
                  url="https://art-egorov.github.io/ilund4u/",

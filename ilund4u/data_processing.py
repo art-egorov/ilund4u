@@ -2109,12 +2109,27 @@ class Database:
                 if self.prms.args["protein_search_target_mode"] != "all":
                     print(f"\tNote: you can use ' --homology-search-mode all' parameter to display results for all "
                           f"homologous groups, not only for the best one", file=sys.stdout)
-            return dict(groups=homologous_groups, names=names)
+
+            found_hotspots = []
+            set_homologous_groups = set(homologous_groups)
+            for hotspot in self.hotspots.hotspots.to_list():
+                if not self.prms.args["report_not_flanked"] and not hotspot.flanked:
+                    continue
+                for island in hotspot.islands:
+                    proteome = self.proteomes.proteomes.at[island.proteome]
+                    isl_groups = set(island.get_island_groups(proteome.cdss))
+                if isl_groups & set_homologous_groups:
+                    found_hotspots.append(hotspot.hotspot_id)
+
+
+
+            return dict(groups=homologous_groups, names=names, found_hotspots = found_hotspots)
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to perform protein search for homologues versus "
                                                "the database.") from error
 
     def protein_search_mode_using_single_homologue(self, homologous_group: str, query_fasta: str, name: None,
+                                                   found_hotspots_list: str = None,
                                                    query_label: typing.Union[None, str] = None) -> None:
         """Run protein search mode which finds homologues of your query proteins in the database and returns
             comprehensive output including visualisation and hotspot annotation.
@@ -2143,6 +2158,9 @@ class Database:
             for hotspot in self.hotspots.hotspots.to_list():
                 if not self.prms.args["report_not_flanked"] and not hotspot.flanked:
                     continue
+                if found_hotspots_list:
+                    if hotspot.hotspot_id not in found_hotspots_list:
+                        continue
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
                     isl_groups = island.get_island_groups(proteome.cdss)
@@ -2166,8 +2184,7 @@ class Database:
                         island_annotations.append(island_annotation)
                         found_hotspots[hotspot.hotspot_id].append(island)
             if n_island_total == 0:
-                print("○ Termination since no homologous protein was found in hotspots (neither as flanking or cargo)",
-                      file=sys.stdout)
+                print("○ Termination since not found in hotspots as cargo", file=sys.stdout)
                 os.rmdir(group_output_folder)
                 return None
             found_islands = [island.island_id for islands in found_hotspots.values() for island in islands]
@@ -2356,7 +2373,6 @@ class Database:
                                                 ascending=[False, True, False, False, False], inplace=True)
             mmseqs_results = mmseqs_second_iteration
             mmseqs_results = mmseqs_results.drop_duplicates(subset="query", keep="first").set_index("query")
-
 
             if self.prms.args["verbose"]:
                 print(f"○ Searching for similar proteomes in the database network", file=sys.stdout)

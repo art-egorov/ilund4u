@@ -48,14 +48,25 @@ try:
 
         database_manager = ilund4u.data_manager.DatabaseManager(parameters)
         database = database_manager.load_database(db_path=parameters.args["database"])
-        ps_output = database.protein_search_for_homologues(query_fasta=parameters.args["fa"])
-        homologous_groups, names = ps_output["groups"], ps_output["names"]
+        if parameters.args["predefined_protein_groups"]:
+            with open(parameters.args["predefined_protein_groups"]) as file:
+                homologous_groups = [line.strip() for line in file if line.strip()]
+            found_hotspots_list = None
+        else:
+            ps_output = database.protein_search_for_homologues(query_fasta=parameters.args["fa"])
+            homologous_groups, names = ps_output["groups"], ps_output["names"]
+            found_hotspots_list = ps_output["found_hotspots"]
         for hgi, hg in enumerate(homologous_groups):
             if parameters.args["verbose"]:
                 print(f"--- Analysis of {hgi + 1}/{len(homologous_groups)} family homologous to the query ---",
                       file=sys.stdout)
+            if parameters.args["predefined_protein_groups"]:
+                name = f"r-{hgi+1}_{hg}"
+            else:
+                name = names[hgi]
             database.protein_search_mode_using_single_homologue(homologous_group=hg, query_fasta=parameters.args["fa"],
-                                                                name=names[hgi],
+                                                                name=name,
+                                                                found_hotspots_list=found_hotspots_list,
                                                                 query_label=parameters.args["query_label"])
         database.postprocess_protein_search_folder()
 
