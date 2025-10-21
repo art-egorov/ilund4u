@@ -2056,7 +2056,7 @@ class Database:
         except Exception as error:
             raise ilund4u.manager.ilund4uError("Unable to run mmseqs search versus protein database.") from error
 
-    def protein_search_for_homologues(self, query_fasta: str) -> list:
+    def protein_search_for_homologues(self, query_fasta: str) -> dict:
         """Run the first step of protein search mode which finds homologues of your query proteins in the database.
 
         Arguments:
@@ -2118,8 +2118,8 @@ class Database:
                 for island in hotspot.islands:
                     proteome = self.proteomes.proteomes.at[island.proteome]
                     isl_groups = set(island.get_island_groups(proteome.cdss))
-                if isl_groups & set_homologous_groups:
-                    found_hotspots.append(hotspot.hotspot_id)
+                    if isl_groups & set_homologous_groups:
+                        found_hotspots.append(hotspot.hotspot_id)
 
 
 
@@ -2129,7 +2129,7 @@ class Database:
                                                "the database.") from error
 
     def protein_search_mode_using_single_homologue(self, homologous_group: str, query_fasta: str, name: None,
-                                                   found_hotspots_list: str = None,
+                                                   found_hotspots_list: list = None,
                                                    query_label: typing.Union[None, str] = None) -> None:
         """Run protein search mode which finds homologues of your query proteins in the database and returns
             comprehensive output including visualisation and hotspot annotation.

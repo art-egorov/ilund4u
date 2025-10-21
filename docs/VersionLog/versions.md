@@ -1,9 +1,12 @@
 # Version log
 
-* **Ver 0.1.1 and 0.1.2** - 10 October
+* **Ver 0.1.3*** - 21 Octover
+	- Hotspot visualisation but fix in protein search mode
+
+* Ver 0.1.1 and 0.1.2 - 10 October
 	- Update of the protein search mode. Now it can return results for multiple protein families that are homologous to the query sequence.
 
-* **Ver 0.1.0** - 17 September
+* Ver 0.1.0 - 17 September
 	- Udpate of the default parameters and databases (the main - mmseqs clustering mmseqs_min_seq_id parameter updated from 0.3 to 0.5).
 
 * Ver 0.0.11 - 26 January
