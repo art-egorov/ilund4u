@@ -1,6 +1,9 @@
 # Version log
 
-* **Ver 0.1.3*** - 21 Octover
+* **Ver 0.1.4*** - 28 Octover
+	- Incorrect parsing of pre-defined proteome community was fixed
+
+* Ver 0.1.3 - 21 Octover
 	- Hotspot visualisation but fix in protein search mode
 
 * Ver 0.1.1 and 0.1.2 - 10 October

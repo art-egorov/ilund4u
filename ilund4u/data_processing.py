@@ -1036,11 +1036,18 @@ class Proteomes:
                     print("○ Loading pre-defined proteome communities...")
                 predefined_cluster_results = pd.read_table(table_path, sep="\t", header=None,
                                                            names=["cluster", "proteome"])
+                unique_clusters = predefined_cluster_results["cluster"].unique().tolist()
+                cluster_id_to_cluster_index = dict()
+                for c_ind, cl in enumerate(unique_clusters):
+                    cluster_id_to_cluster_index[cl] = c_ind
+
                 cluster_to_proteomes = collections.defaultdict(list)
                 cluster_index_to_cluster_id = dict()
-                for index, row in predefined_cluster_results.iterrows():
+                for _, row in predefined_cluster_results.iterrows():
+                    cluster = row["cluster"]
+                    index = cluster_id_to_cluster_index[cluster]
                     cluster_to_proteomes[index].append(row["proteome"])
-                    cluster_index_to_cluster_id[index] = row["cluster"]
+                    cluster_index_to_cluster_id[index] = cluster
                 cluster_index_to_cluster_id_t = pd.DataFrame(list(cluster_index_to_cluster_id.items()),
                                                              columns=["Index", "Cluster_ID"])
                 cluster_index_to_cluster_id_t.to_csv(os.path.join(self.prms.args["output_dir"],
