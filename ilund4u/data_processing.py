@@ -1572,7 +1572,7 @@ class Hotspots:
         """
         try:
             if self.prms.args["verbose"]:
-                print(f"○ Preparing data for additional island protein annotation with pyhmmer hmmsearch...",
+                print(f"○ Preparing data for additional island protein annotation with pyhmmer hmmscan...",
                       file=sys.stdout)
             hotspots_repr_proteins = set()
             for hotspot in self.hotspots.to_list():

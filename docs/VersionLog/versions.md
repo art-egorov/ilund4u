@@ -1,7 +1,7 @@
 # Version log
 
 * **Ver 0.1.4.2*** - 24 January
-	- pyhmmer hmmscan switched to hmmsearch + version control included in setup.py
+	- pyhmmer version control included in setup.py
 
 * Ver 0.1.4* - 28 Octover
 	- Incorrect parsing of pre-defined proteome community was fixed

@@ -130,7 +130,7 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
         query_proteins = seqs_file.read_block()
     num_of_query_proteins = query_size
 
-    hmmscan_output_folder = os.path.join(prms.args["output_dir"], "hmmsearch")
+    hmmscan_output_folder = os.path.join(prms.args["output_dir"], "hmmscan")
     if os.path.exists(hmmscan_output_folder):
         shutil.rmtree(hmmscan_output_folder)
     os.mkdir(hmmscan_output_folder)
@@ -166,9 +166,9 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
             with pyhmmer.plan7.HMMFile(os.path.join(db_path, hmm_file)) as hmm_file:
                 hmms.append(hmm_file.read()) 
         if prms.args["verbose"]:
-            print(f"  ⦿ Running pyhmmer hmmsearch versus {db_full_name}...", file=sys.stdout)
-            bar = progress.bar.FillingCirclesBar("   ", max=len(hmms), suffix="%(index)d/%(max)d")
-        for hits in pyhmmer.hmmsearch(hmms, query_proteins, E=1e-3, cpus=0, Z=len(hmms)):
+            print(f"  ⦿ Running pyhmmer hmmscan versus {db_full_name}...", file=sys.stdout)
+            bar = progress.bar.FillingCirclesBar("   ", max=len(query_proteins), suffix="%(index)d/%(max)d")
+        for hits in pyhmmer.hmmscan(query_proteins, hmms, E=1e-3, cpus=0): 
             if prms.args["verbose"]:
                 bar.next()
             for hit in hits:
