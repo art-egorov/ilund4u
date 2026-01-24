@@ -304,7 +304,7 @@ class DrawingManager:
     def plot_proteome_community(self, community: int, output_folder: str, mode: str = "hotspot",
                                 proteome_ids: typing.Union[None, list] = None,
                                 additional_annotation: typing.Union[None, dict] = None,
-                                filename: typing.Union[None, str] = None):
+                                filename: typing.Union[None, str] = None, keep_temp_data = False):
         """Visualise proteome community using LoVis4u.
 
         Arguments:
@@ -429,7 +429,17 @@ class DrawingManager:
                 filename = f"{community}.pdf"
             canvas_manager.plot(filename)
             os.system(f"mv {l_parameters.args['output_dir']}/{filename} {output_folder}/")
-            shutil.rmtree(l_parameters.args["output_dir"])
+
+            if keep_temp_data:
+                if not os.path.exists(os.path.join(output_folder, "lovis4u_output")):
+                    os.mkdir(os.path.join(output_folder, "lovis4u_output"))
+                os.system(f"mv {l_parameters.args['output_dir']} "
+                          f"{os.path.join(output_folder, 'lovis4u_output', str(community))}")
+                os.makedirs(os.path.join(output_folder, "lovis4u_output", str(community), "gff_files"), exist_ok = True)
+                for gff_file in gff_files:
+                    os.system(f"cp '{gff_file}' {os.path.join(output_folder, 'lovis4u_output', str(community), 'gff_files')}/")
+            else:
+                shutil.rmtree(l_parameters.args["output_dir"])
             return None
         except Exception as error:
             raise ilund4u.manager.ilund4uError(f"Unable to plot proteome community {community}.") from error

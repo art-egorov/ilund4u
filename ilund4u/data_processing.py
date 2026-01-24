@@ -1572,7 +1572,7 @@ class Hotspots:
         """
         try:
             if self.prms.args["verbose"]:
-                print(f"○ Preparing data for additional island protein annotation with pyhmmer hmmscan...",
+                print(f"○ Preparing data for additional island protein annotation with pyhmmer hmmsearch...",
                       file=sys.stdout)
             hotspots_repr_proteins = set()
             for hotspot in self.hotspots.to_list():
@@ -1604,7 +1604,7 @@ class Hotspots:
                                                        evalue=alignment_table_row["hit_evalue"])
             return None
         except Exception as error:
-            raise ilund4u.manager.ilund4uError("Unable to run pyhmmer hmmscan annotation.") from error
+            raise ilund4u.manager.ilund4uError("Unable to run pyhmmer hmmsearch annotation.") from error
 
     def build_hotspot_network(self):
         """Build hotspot network and merge similar hotspots from different proteome communities into hotspot communities.
@@ -2151,7 +2151,8 @@ class Database:
         try:
             if not name:
                 name = homologous_group
-            query_record = list(Bio.SeqIO.parse(query_fasta, "fasta"))[0]
+            if query_fasta:
+                query_record = list(Bio.SeqIO.parse(query_fasta, "fasta"))[0]
             group_output_folder = os.path.join(self.prms.args["output_dir"], name.replace("|", "_"))
             os.makedirs(group_output_folder, exist_ok=True)
             if self.prms.args["verbose"]:
@@ -2256,7 +2257,8 @@ class Database:
             homologous_protein_fasta = os.path.join(homologues_folder, "homologous_proteins.fa")
             full_fasta_file = Bio.SeqIO.index(self.db_paths["all_proteins_fasta"], "fasta")
             with open(homologous_protein_fasta, "w") as out_handle:
-                Bio.SeqIO.write(query_record, out_handle, "fasta")
+                if query_fasta:
+                    Bio.SeqIO.write(query_record, out_handle, "fasta")
                 for acc in set(homologous_protein_ids):
                     out_handle.write(full_fasta_file.get_raw(acc).decode())
             # MSA visualisation
@@ -2338,6 +2340,9 @@ class Database:
                         pdf_new_name = f"{fwr}_{pdf}"
                         shutil.copy(os.path.join(folder_with_query_hotspot_plots, pdf),
                                     os.path.join(lovis4u_query_new_dir, pdf_new_name))
+
+
+
             if self.prms.args["verbose"]:
                 print(f"⦿ Done!")
 

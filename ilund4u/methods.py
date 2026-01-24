@@ -130,7 +130,7 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
         query_proteins = seqs_file.read_block()
     num_of_query_proteins = query_size
 
-    hmmscan_output_folder = os.path.join(prms.args["output_dir"], "hmmscan")
+    hmmscan_output_folder = os.path.join(prms.args["output_dir"], "hmmsearch")
     if os.path.exists(hmmscan_output_folder):
         shutil.rmtree(hmmscan_output_folder)
     os.mkdir(hmmscan_output_folder)
@@ -163,11 +163,12 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
         hmm_files = [fp for fp in os.listdir(db_path) if os.path.splitext(fp)[1].lower() == ".hmm" and fp[0] != "."]
         hmms = []
         for hmm_file in hmm_files:
-            hmms.append(pyhmmer.plan7.HMMFile(os.path.join(db_path, hmm_file)).read())
+            with pyhmmer.plan7.HMMFile(os.path.join(db_path, hmm_file)) as hmm_file:
+                hmms.append(hmm_file.read()) 
         if prms.args["verbose"]:
-            print(f"  ⦿ Running pyhmmer hmmscan versus {db_full_name}...", file=sys.stdout)
-            bar = progress.bar.FillingCirclesBar("   ", max=num_of_query_proteins, suffix="%(index)d/%(max)d")
-        for hits in pyhmmer.hmmscan(query_proteins, hmms, E=prms.args["hmmscan_evalue"], cpus=0):
+            print(f"  ⦿ Running pyhmmer hmmsearch versus {db_full_name}...", file=sys.stdout)
+            bar = progress.bar.FillingCirclesBar("   ", max=len(hmms), suffix="%(index)d/%(max)d")
+        for hits in pyhmmer.hmmsearch(hmms, query_proteins, E=1e-3, cpus=0, Z=len(hmms)):
             if prms.args["verbose"]:
                 bar.next()
             for hit in hits:
@@ -175,10 +176,10 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
                     for domain in hit.domains.reported:
                         if domain.i_evalue < prms.args["hmmscan_evalue"]:
                             alignment = domain.alignment
-                            hit_name = hit.name.decode()
+                            hit_name = hit.name
                             hit_description = hit.description
                             if hit.description:
-                                hit_description = hit_description.decode()
+                                hit_description = hit_description
                                 if hit_description == "NA":
                                     hit_description = ""
                             else:
@@ -189,7 +190,7 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
                                 hname = hit_description
                             else:
                                 hname = hit_name
-                            alignment_row = dict(query=alignment.target_name.decode(),  db_class = db_class,
+                            alignment_row = dict(query=alignment.target_name,  db_class = db_class,
                                                  target_db=db_shortname, target=hname,t_name=hit_name,
                                                  t_description=hit_description,
                                                  hit_evalue=hit.evalue, di_evalue=domain.i_evalue,
@@ -203,9 +204,9 @@ def run_pyhmmer(query_fasta: str, query_size: int, prms: ilund4u.manager.Paramet
                             if alignment_row["q_cov"] >= prms.args["hmmscan_query_coverage_cutoff"] and \
                                     alignment_row["t_cov"] >= prms.args["hmmscan_hmm_coverage_cutoff"]:
                                 if hit.description:
-                                    alignment_row["t_description"] = hit.description.decode()
+                                    alignment_row["t_description"] = hit.description
                                 else:
-                                    alignment_row["t_description"] = hit.name.decode()
+                                    alignment_row["t_description"] = hit.name
                                 db_alignment_table_rows.append(alignment_row)
         if prms.args["verbose"]:
             bar.finish()
