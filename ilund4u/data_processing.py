@@ -945,10 +945,8 @@ class Proteomes:
             graph.vs["index"] = self.annotation["index"].to_list()
             graph.vs["sequence_id"] = self.annotation.index.to_list()
             graph.es["weight"] = weights
-            graph.save(os.path.join(self.prms.args["output_dir"], "proteome_network.gml"))
             if self.prms.args["verbose"]:
-                print(f"  ⦿ Proteomes network with {len(edges)} connections was built\n"
-                      f"  ⦿ Network was saved as {os.path.join(self.prms.args['output_dir'], 'proteome_network.gml')}",
+                print(f"  ⦿ Proteomes network with {len(edges)} connections was built\n",
                       file=sys.stdout)
             return graph
         except Exception as error:
@@ -972,6 +970,10 @@ class Proteomes:
                                                             "leiden_resolution_parameter_p"],
                                                         weights="weight", n_iterations=-1)
             graph.vs["communities_Leiden"] = partition_leiden.membership
+            graph.save(os.path.join(self.prms.args["output_dir"], "proteome_network_with_communities.gml"))
+            if self.prms.args["verbose"]:
+                print(f"  ⦿ Network was saved as {os.path.join(self.prms.args['output_dir'], 'proteome_network_with_communities.gml')}",
+                      file=sys.stdout)
             if self.prms.args["verbose"]:
                 print(f"  ⦿ {len(set(partition_leiden.membership))} proteome communities were found")
             communities_annot_rows = []
@@ -2317,8 +2319,7 @@ class Database:
             folders_with_results = [i for i in os.listdir(self.prms.args["output_dir"]) if i.startswith("r-")]
             if len(folders_with_results) == 1:
                 folder_with_results = folders_with_results[0]
-                file_names = [i for i in os.listdir(os.path.join(self.prms.args["output_dir"], folder_with_results)) if
-                              not i.startswith(".")]
+                file_names = [i for i in os.listdir(os.path.join(self.prms.args["output_dir"], folder_with_results))]
                 for file_name in file_names:
                     shutil.move(os.path.join(self.prms.args["output_dir"], folder_with_results, file_name),
                                 self.prms.args["output_dir"])

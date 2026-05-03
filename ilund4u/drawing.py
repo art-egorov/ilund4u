@@ -220,13 +220,15 @@ class DrawingManager:
                 l_parameters.load_config("A4p1")
             else:
                 l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
+                l_parameters.args["figure_width"] = 200
+                l_parameters.args["feature_label_font_size"] = 6 # lower label font size
             # l_parameters.load_config(self.prms.args["lovis4u_hotspot_config_filename"])
             l_parameters.args["cluster_all_proteins"] = False
             l_parameters.args["locus_label_style"] = "id"
             l_parameters.args["locus_label_position"] = "bottom"
+            l_parameters.args["show_first_noncoding_label"] = True
             l_parameters.args["verbose"] = False
             l_parameters.args["draw_individual_x_axis"] = False
-
             l_parameters.args["draw_middle_line"] = True
             l_parameters.args["category_colours"] = self.prms.args["category_colours"]
             l_parameters.args["output_dir"] = os.path.join(output_folder, "lovis4u_tmp")
@@ -412,9 +414,12 @@ class DrawingManager:
             loci.load_loci_from_extended_gff(gff_files, ilund4u_mode=True)
             if len(gff_files) <= self.prms.args["max_number_of_seqs_to_redefine_order"]:
                 loci.cluster_sequences(mmseqs_results_t, one_cluster=True)
-            loci.reorient_loci(ilund4u_mode=True)
+            #loci.reorient_loci(ilund4u_mode=True)
             if mode == "regular" or n_of_added_proteomes == 1:
                 loci.define_labels_to_be_shown()
+            loci.define_global_frequencies()
+            if self.prms.args["circular_genomes"]:
+                loci.auto_align_loci()
             loci.set_feature_colours_based_on_groups()
             loci.set_category_colours()
             loci.save_feature_annotation_table()

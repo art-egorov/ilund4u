@@ -1,6 +1,9 @@
 # Version log
 
-* **Ver 0.1.4.2*** - 24 January
+* **Ver 0.1.5** - 3 may 2026
+	- HMM models of defence finder are updated
+
+* Ver 0.1.4.2 - 24 January
 	- pyhmmer version control included in setup.py
 
 * Ver 0.1.4* - 28 Octover
@@ -18,7 +21,7 @@
 * Ver 0.0.11 - 26 January
 	- Database reading was updated to cover pkl file parsing.
 
-* **Ver 0.0.10** - 27 December
+* Ver 0.0.10 - 27 December
 	- Parameters to use predefined protein and proteome clusters were introduced.
 	- Log messages for protein mode were adjusted.
 	- MMSeqs2 `--max-seqs` clustering parameter is now auto-adjusted for large input. 
